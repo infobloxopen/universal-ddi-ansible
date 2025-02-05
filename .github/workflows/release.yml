@@ -8,16 +8,8 @@ on:
 jobs:
   release:
     name: Publish to Ansible Galaxy
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Get the version name from the tags
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-
-      - name: Publish Collection to Ansible Galaxy
-        uses: artis3n/ansible_galaxy_collection@v2
-        with:
-          api_key: '${{ secrets.GALAXY_API_KEY }}'
-          galaxy_version: '${{ env.RELEASE_VERSION }}'
+    uses: ansible/ansible-content-actions/.github/workflows/release_galaxy.yaml@main
+    with:
+      environment: release
+    secrets:
+      ansible_galaxy_api_key: '${{ secrets.GALAXY_API_KEY }}'
