@@ -1,7 +1,5 @@
 # Universal DDI Collection for Ansible
 
-## Description
-
 This repo hosts the `infoblox.universal_ddi` Ansible Collection. 
 
 The collection provides modules to automate your Universal DDI (DHCP, DNS and IPAM) and Infoblox Cloud objects hosted in the Infoblox Portal.
@@ -11,6 +9,10 @@ The collection provides modules to automate your Universal DDI (DHCP, DNS and IP
 ### Migration from Legacy Modules
 
 We recommend migrating from the legacy B1DDI Collection since they will be deprecated in the near future. Please expect a few breaking changes while migrating from legacy modules to the new collection modules. A migration guide will be published soon to help you with the migration process.
+
+### Plugin Documentation 
+
+The complete information regarding the collection and the supported modules can be found in the [documentation](https://docs.ansible.com/ansible/latest/collections/infoblox/universal_ddi/index.html).
 
 ## Installation
 
@@ -44,7 +46,7 @@ git clone https://github.com/infobloxopen/universal-ddi-ansible.git ~/ansible_co
 The collection also requires the following Python Libraries to be installed:
 
 - requests >= 2.22.0
-- [universal-ddi-python-client](https://pypi.org/project/universal-ddi-python-client/)
+- [universal-ddi-python-client](https://pypi.org/project/universal-ddi-python-client/) >= 0.1.0
 
 ### Installing required libraries and SDK
 
@@ -59,11 +61,6 @@ If you are working on developing and/or testing Infoblox Universal DDI collectio
 ```bash
 pip install -r test-requirements.txt
 ```
-
-## Modules
-
-The complete list of modules can be found in the [Plugin Index](https://docs.ansible.com/ansible/latest/collections/infoblox/universal_ddi/index.html#plugin-index).
-
 
 ## Configuration
 
@@ -143,6 +140,5 @@ If you have any questions or issues, you can reach out to us using the following
 
 ## Related Information
 
-- The Universal DDI Ansible Collection [Documentation](https://docs.ansible.com/ansible/latest/collections/infoblox/universal_ddi/index.html#)
 - Official Infoblox [Documentation](https://docs.infoblox.com/)
 - Infoblox API [Documentation](https://csp.infoblox.com/apidoc)
