@@ -34,7 +34,7 @@ collections:
 You can also clone the git repository and use the collection directly:
 
 ```bash
-mkdir -p ~/ansible_collections/infoblox
+mkdir -p ~/ansible_collections/infoblox/universal_ddi
 git clone https://github.com/infobloxopen/universal-ddi-ansible.git ~/ansible_collections/infoblox/universal_ddi
 ```
 
@@ -70,7 +70,7 @@ The default URL for the Cloud Services Portal is `https://csp.infoblox.com`. If 
 
 ```yaml
 module_defaults:
-  group/infoblox.bloxone.all:
+  group/infoblox.universal_ddi.all:
     portal_url: "{{portal_url_value}}"
 ```
 
@@ -87,7 +87,7 @@ To use an API key with Infoblox API, you can pass the `portal_key` as a part of 
 
 ```yaml
 module_defaults:
-  group/infoblox.bloxone.all:
+  group/infoblox.universal.all:
     portal_key: "{{portal_key_value}}"
 ```
 
