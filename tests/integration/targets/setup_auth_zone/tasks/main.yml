@@ -4,7 +4,7 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random View name to avoid conflicts
+    # Create a random Auth Zone to avoid conflicts
     - ansible.builtin.set_fact:
         _fqdn_auth_zone: "test-auth-zone-{{ 999999 | random | string }}.com."
 

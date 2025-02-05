@@ -161,7 +161,7 @@ objects:
             elements: dict
             contains:
                 algorithm:
-                    description: ""
+                    description: "Algorithm number for the Trust Anchor."
                     type: int
                     returned: Always
                 protocol_zone:
@@ -195,7 +195,7 @@ objects:
             elements: dict
             contains:
                 algorithm:
-                    description: ""
+                    description: "Algorithm number for the Trust Anchor."
                     type: int
                     returned: Always
                 protocol_zone:
@@ -562,7 +562,7 @@ objects:
                                     elements: dict
                                     contains:
                                         algorithm:
-                                            description: ""
+                                            description: "Algorithm number for the Trust Anchor."
                                             type: int
                                             returned: Always
                                         protocol_zone:
