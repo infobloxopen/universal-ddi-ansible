@@ -105,9 +105,9 @@ The following example demonstrates how to use the `infoblox.universal_ddi` colle
 - hosts: localhost
   gather_facts: no
   module_defaults:
-    group/infoblox.bloxone.all:
-      csp_url: "{{csp_url}}"
-      api_key: "{{api_key}}"
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{portal_url_value}}"
+      portal_key: "{{portal_key_value}}"
   tasks:
     - name: Create a DNS View
       infoblox.universal_ddi.dns_view:
