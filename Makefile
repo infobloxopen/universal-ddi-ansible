@@ -36,3 +36,8 @@ lint:
 	@make flynt-lint
 	@make isort-lint
 	@make black-lint
+
+.PHONY: changelog
+changelog:
+	@echo "Generating changelog"
+	antsibull-changelog release -v
