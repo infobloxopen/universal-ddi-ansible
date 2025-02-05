@@ -638,15 +638,15 @@ EXAMPLES = r"""
   - name: Create an Auth Zone
     infoblox.universal_ddi.dns_auth_zone:
       fqdn: "auth-zone"
-      primary_type: external
+      primary_type: cloud
       view: "{{ view.id }}"
       state: present
 
   - name: Create an Auth Zone with Additional Fields
     infoblox.universal_ddi.dns_auth_zone:
       fqdn: "auth-zone"
-      primary_type: external
-      comment: "Test Comment"
+      primary_type: cloud
+      comment: "Example Auth Zone"
       view: "{{ view.id }}"
       query_acl:
         - access: "allow"
@@ -656,12 +656,12 @@ EXAMPLES = r"""
       notify: true
       state: "present"
       tags:
-        location: "my-location"
+        location: "site-1"
 
   - name: Delete the Auth Zone
     infoblox.universal_ddi.dns_auth_zone:
       fqdn: "auth-zone"
-      primary_type: external
+      primary_type: cloud
       view: "{{ view.id }}"
       state: absent
 """  # noqa: E501
