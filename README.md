@@ -41,7 +41,7 @@ git clone https://github.com/infobloxopen/universal-ddi-ansible.git ~/ansible_co
 ## Requirements
 
 - Required Ansible version: 2.15 or later
-- Required Python version: 3.x
+- Required Python version: 3.9 or later
 
 The collection also requires the following Python Libraries to be installed:
 
