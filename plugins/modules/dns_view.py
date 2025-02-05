@@ -83,7 +83,7 @@ options:
         elements: dict
         suboptions:
             algorithm:
-                description: ""
+                description: "Algorithm number for the Trust Anchor."
                 type: int
             public_key:
                 description:
@@ -1306,7 +1306,7 @@ item:
             elements: dict
             contains:
                 algorithm:
-                    description: ""
+                    description: "Algorithm number for the Trust Anchor."
                     type: int
                     returned: Always
                 protocol_zone:
@@ -1340,7 +1340,7 @@ item:
             elements: dict
             contains:
                 algorithm:
-                    description: ""
+                    description: "Algorithm number for the Trust Anchor."
                     type: int
                     returned: Always
                 protocol_zone:
@@ -1707,7 +1707,7 @@ item:
                                     elements: dict
                                     contains:
                                         algorithm:
-                                            description: ""
+                                            description: "Algorithm number for the Trust Anchor."
                                             type: int
                                             returned: Always
                                         protocol_zone:
