@@ -645,7 +645,7 @@ EXAMPLES = r"""
   - name: Create an Auth Zone with Additional Fields
     infoblox.universal_ddi.dns_auth_zone:
       fqdn: "auth-zone"
-      primary_type: cloud
+      primary_type: external
       comment: "Test Comment"
       view: "{{ view.id }}"
       query_acl:
