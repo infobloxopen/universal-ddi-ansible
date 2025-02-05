@@ -629,15 +629,25 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+  - name: Create a View (required as parent)
+    infoblox.universal_ddi.dns_view:
+      name: "dns-view"
+      state: present
+    register: view
+
   - name: Create an Auth Zone
     infoblox.universal_ddi.dns_auth_zone:
-      name: "example_zone"
-      state: "present"
+      fqdn: "auth-zone"
+      primary_type: external
+      view: "{{ view.id }}"
+      state: present
 
   - name: Create an Auth Zone with Additional Fields
     infoblox.universal_ddi.dns_auth_zone:
-      name: "example_zone"
-      comment: "Example Auth Zone"
+      fqdn: "auth-zone"
+      primary_type: cloud
+      comment: "Test Comment"
+      view: "{{ view.id }}"
       query_acl:
         - access: "allow"
           element: "ip"
@@ -648,10 +658,12 @@ EXAMPLES = r"""
       tags:
         location: "my-location"
 
-  - name: Delete the Zone
+  - name: Delete the Auth Zone
     infoblox.universal_ddi.dns_auth_zone:
-      name: "example_zone"
-      state: "absent"
+      fqdn: "auth-zone"
+      primary_type: external
+      view: "{{ view.id }}"
+      state: absent
 """  # noqa: E501
 
 RETURN = r"""
