@@ -1,0 +1,136 @@
+ancestor: null
+releases:
+  1.0.0:
+    modules:
+    - description: Manage IPAM Address.
+      name: ipam_address
+      namespace: ''
+    - description: Get IPAM Address information.
+      name: ipam_address_info
+      namespace: ''
+    - description: Manage IPAM Address Block.
+      name: ipam_address_block
+      namespace: ''
+    - description: Get IPAM Address Block information.
+      name: ipam_address_block_info
+      namespace: ''
+    - description: Manage IPAM Host.
+      name: ipam_host
+      namespace: ''
+    - description: Get IPAM Host information.
+      name: ipam_host_info
+      namespace: ''
+    - description: Manage IPAM IPSpace.
+      name: ipam_ip_space
+      namespace: ''
+    - description: Get IPAM IPSpace information.
+      name: ipam_ip_space_info
+      namespace: ''
+    - description: Manage IPAM Range.
+      name: ipam_range
+      namespace: ''
+    - description: Get IPAM Range information.
+      name: ipam_range_info
+      namespace: ''
+    - description: Manage IPAM Subnet.
+      name: ipam_subnet
+      namespace: ''
+    - description: Get IPAM Subnet information.
+      name: ipam_subnet_info
+      namespace: ''
+    - description: Get next available IP information.
+      name: ipam_next_available_ip_info
+      namespace: ''
+    - description: Get next available Subnet information.
+      name: ipam_next_available_subnet_info
+      namespace: ''
+    - description: Get next available Address Block information.
+      name: ipam_next_available_address_block_info
+      namespace: ''
+    - description: Manage DNS ACL.
+      name: dns_acl
+      namespace: ''
+    - description: Get DNS ACL information.
+      name: dns_acl_info
+      namespace: ''
+    - description: Manage DNS Auth Nsg.
+      name: dns_auth_nsg
+      namespace: ''
+    - description: Get DNS Auth Nsg information.
+      name: dns_auth_nsg_info
+      namespace: ''
+    - description: Manage DNS Auth zone.
+      name: dns_auth_zone
+      namespace: ''
+    - description: Get DNS Auth zone information.
+      name: dns_auth_zone_info
+      namespace: ''
+    - description: Manage DNS delegation.
+      name: dns_delegation
+      namespace: ''
+    - description: Get DNS delegation information.
+      name: dns_delegation_info
+      namespace: ''
+    - description: Manage DNS Forward Nsg.
+      name: dns_forward_nsg
+      namespace: ''
+    - description: Get DNS Forward Nsg information.
+      name: dns_forward_nsg_info
+      namespace: ''
+    - description: Manage DNS Forward zone.
+      name: dns_forward_zone
+      namespace: ''
+    - description: Get DNS Forward zone information.
+      name: dns_forward_zone_info
+      namespace: ''
+    - description: Manage DNS Host.
+      name: dns_host
+      namespace: ''
+    - description: Get DNS Host information.
+      name: dns_host_info
+      namespace: ''
+    - description: Manage DNS Record.
+      name: dns_record
+      namespace: ''
+    - description: Get DNS Record information.
+      name: dns_record_info
+      namespace: ''
+    - description: Manage DNS Server.
+      name: dns_server
+      namespace: ''
+    - description: Get DNS Server information.
+      name: dns_server_info
+      namespace: ''
+    - description: Manage DNS View.
+      name: dns_view
+      namespace: ''
+    - description: Get DNS View information.
+      name: dns_view_info
+      namespace: ''
+    - description: Manage Infra Host.
+      name: infra_host
+      namespace: ''
+    - description: Get Infra Host information.
+      name: infra_host_info
+      namespace: ''
+    - description: Manage Infra join token.
+      name: infra_join_token
+      namespace: ''
+    - description: Get Infra join token information.
+      name: infra_join_token_info
+      namespace: ''
+    - description: Manage Infra Service.
+      name: infra_service
+      namespace: ''
+    - description: Get Infra Service information.
+      name: infra_service_info
+      namespace: ''
+    - description: Manage TSIG Key.
+      name: tsig_key
+      namespace: ''
+    - description: Get TSIG Key information.
+      name: tsig_key_info
+      namespace: ''
+    - description: Get Kerberos Key information.
+      name: kerberos_key_info
+      namespace: ''
