@@ -12,7 +12,7 @@ We recommend migrating from the legacy B1DDI Collection since they will be depre
 
 ### Plugin Documentation 
 
-The complete information regarding the collection and the supported modules can be found in the [documentation](https://docs.ansible.com/ansible/latest/collections/infoblox/universal_ddi/index.html).
+The complete information regarding the collection and the supported modules can be found in the [documentation](https://galaxy.ansible.com/ui/repo/published/infoblox/universal_ddi/docs/).
 
 ## Installation
 
