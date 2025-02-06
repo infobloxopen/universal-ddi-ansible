@@ -1,1 +1,1 @@
-universal-ddi-python-client @ git+https://github.com/infobloxopen/universal-ddi-python-client
+universal-ddi-python-client >= 0.1.0

@@ -1,2 +1,2 @@
-requests >= 2.22.0
-universal-ddi-python-client @ git+https://github.com/infobloxopen/universal-ddi-python-client
+requests >= 2.32.0
+universal-ddi-python-client >= 0.1.0
