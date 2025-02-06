@@ -23,24 +23,5 @@ jobs:
       - name: Run linters
         run: make lint
 
-  sanity:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ansible: ['stable-2.15', 'stable-2.16', 'stable-2.17', 'devel']
-        python: ['3.9', '3.10', '3.11', '3.12']
-        exclude:
-          - ansible: 'stable-2.15'
-            python: '3.12'
-    steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-        with:
-          path: infoblox.universal_ddi
-
-      - uses: ansible-community/ansible-test-gh-action@v1.15.0
-        with:
-          collection-src-directory: infoblox.universal_ddi
-          ansible-core-version: ${{ matrix.ansible }}
-          target-python-version: ${{ matrix.python }}
-          testing-type: sanity
+  pr-sanity-test:
+    uses: ./.github/workflows/sanity.yml
