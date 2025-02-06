@@ -167,3 +167,5 @@ cython_debug/
 
 # Ignore the Anstibull files addded
 dest/
+
+changelogs/.plugin-cache.yaml
