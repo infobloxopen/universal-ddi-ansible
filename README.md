@@ -45,7 +45,7 @@ git clone https://github.com/infobloxopen/universal-ddi-ansible.git ~/ansible_co
 
 The collection also requires the following Python Libraries to be installed:
 
-- requests >= 2.22.0
+- requests >= 2.32.0
 - [universal-ddi-python-client](https://pypi.org/project/universal-ddi-python-client/) >= 0.1.0
 
 ### Installing required libraries and SDK
