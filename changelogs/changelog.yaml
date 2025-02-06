@@ -3,53 +3,7 @@ releases:
   1.0.0:
     changes:
       release_summary: Initial Release for Universal DDI Ansible Collection.
-    release_date: '2025-02-06'
     modules:
-    - description: Manage IPAM Address.
-      name: ipam_address
-      namespace: ''
-    - description: Get IPAM Address information.
-      name: ipam_address_info
-      namespace: ''
-    - description: Manage IPAM Address Block.
-      name: ipam_address_block
-      namespace: ''
-    - description: Get IPAM Address Block information.
-      name: ipam_address_block_info
-      namespace: ''
-    - description: Manage IPAM Host.
-      name: ipam_host
-      namespace: ''
-    - description: Get IPAM Host information.
-      name: ipam_host_info
-      namespace: ''
-    - description: Manage IPAM IPSpace.
-      name: ipam_ip_space
-      namespace: ''
-    - description: Get IPAM IPSpace information.
-      name: ipam_ip_space_info
-      namespace: ''
-    - description: Manage IPAM Range.
-      name: ipam_range
-      namespace: ''
-    - description: Get IPAM Range information.
-      name: ipam_range_info
-      namespace: ''
-    - description: Manage IPAM Subnet.
-      name: ipam_subnet
-      namespace: ''
-    - description: Get IPAM Subnet information.
-      name: ipam_subnet_info
-      namespace: ''
-    - description: Get next available IP information.
-      name: ipam_next_available_ip_info
-      namespace: ''
-    - description: Get next available Subnet information.
-      name: ipam_next_available_subnet_info
-      namespace: ''
-    - description: Get next available Address Block information.
-      name: ipam_next_available_address_block_info
-      namespace: ''
     - description: Manage DNS ACL.
       name: dns_acl
       namespace: ''
@@ -128,12 +82,58 @@ releases:
     - description: Get Infra Service information.
       name: infra_service_info
       namespace: ''
+    - description: Manage IPAM Address.
+      name: ipam_address
+      namespace: ''
+    - description: Manage IPAM Address Block.
+      name: ipam_address_block
+      namespace: ''
+    - description: Get IPAM Address Block information.
+      name: ipam_address_block_info
+      namespace: ''
+    - description: Get IPAM Address information.
+      name: ipam_address_info
+      namespace: ''
+    - description: Manage IPAM Host.
+      name: ipam_host
+      namespace: ''
+    - description: Get IPAM Host information.
+      name: ipam_host_info
+      namespace: ''
+    - description: Manage IPAM IPSpace.
+      name: ipam_ip_space
+      namespace: ''
+    - description: Get IPAM IPSpace information.
+      name: ipam_ip_space_info
+      namespace: ''
+    - description: Get next available Address Block information.
+      name: ipam_next_available_address_block_info
+      namespace: ''
+    - description: Get next available IP information.
+      name: ipam_next_available_ip_info
+      namespace: ''
+    - description: Get next available Subnet information.
+      name: ipam_next_available_subnet_info
+      namespace: ''
+    - description: Manage IPAM Range.
+      name: ipam_range
+      namespace: ''
+    - description: Get IPAM Range information.
+      name: ipam_range_info
+      namespace: ''
+    - description: Manage IPAM Subnet.
+      name: ipam_subnet
+      namespace: ''
+    - description: Get IPAM Subnet information.
+      name: ipam_subnet_info
+      namespace: ''
+    - description: Get Kerberos Keys information.
+      name: kerberos_key_info
+      namespace: ''
     - description: Manage TSIG Keys.
       name: tsig_key
       namespace: ''
     - description: Get TSIG Keys information.
       name: tsig_key_info
       namespace: ''
-    - description: Get Kerberos Keys information.
-      name: kerberos_key_info
-      namespace: ''
+    release_date: '2025-02-06'
