@@ -1,6 +1,9 @@
 ancestor: null
 releases:
   1.0.0:
+    changes:
+      release_summary: Initial Release for Universal DDI Ansible Collection.
+    release_date: '2025-02-06'
     modules:
     - description: Manage IPAM Address.
       name: ipam_address
@@ -125,12 +128,12 @@ releases:
     - description: Get Infra Service information.
       name: infra_service_info
       namespace: ''
-    - description: Manage TSIG Key.
+    - description: Manage TSIG Keys.
       name: tsig_key
       namespace: ''
-    - description: Get TSIG Key information.
+    - description: Get TSIG Keys information.
       name: tsig_key_info
       namespace: ''
-    - description: Get Kerberos Key information.
+    - description: Get Kerberos Keys information.
       name: kerberos_key_info
       namespace: ''
