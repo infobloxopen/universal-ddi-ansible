@@ -56,10 +56,10 @@ releases:
     - description: Get DNS ACL information.
       name: dns_acl_info
       namespace: ''
-    - description: Manage DNS Auth Nsg.
+    - description: Manage DNS Auth NSG.
       name: dns_auth_nsg
       namespace: ''
-    - description: Get DNS Auth Nsg information.
+    - description: Get DNS Auth NSG information.
       name: dns_auth_nsg_info
       namespace: ''
     - description: Manage DNS Auth zone.
@@ -74,10 +74,10 @@ releases:
     - description: Get DNS delegation information.
       name: dns_delegation_info
       namespace: ''
-    - description: Manage DNS Forward Nsg.
+    - description: Manage DNS Forward NSG.
       name: dns_forward_nsg
       namespace: ''
-    - description: Get DNS Forward Nsg information.
+    - description: Get DNS Forward NSG information.
       name: dns_forward_nsg_info
       namespace: ''
     - description: Manage DNS Forward zone.
