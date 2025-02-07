@@ -1,0 +1,141 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a Fixed Address check mode
+    - name: Create a Fixed Address( check mode )
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        name: "test_fixed_address_ansible"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        ip_space: "{{ _ip_space.id }}"
+        state: "present"
+      check_mode: true
+      register: fixed_address
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address is changed
+          - fixed_address is not failed
+          - fixed_address_info.objects | length == 0
+
+    # Create a Fixed Address
+    - name: Create a Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        name: "test_fixed_address_ansible"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        ip_space: "{{ _ip_space.id }}"
+        state: "present"
+      register: fixed_address
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+          - fixed_address_info.objects[0].id == fixed_address.id
+          - fixed_address_info.objects[0].address == fixed_address.object.address
+
+    # Create a Fixed Address (idempotent)
+    - name: Create a Fixed Address (idempotent)
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        name: "test_fixed_address_ansible"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        ip_space: "{{ _ip_space.id }}"
+        state: "present"
+      register: fixed_address
+    - name: Get Fixed Address Info (idempotent)
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+          - fixed_address_info.objects[0].id == fixed_address.id
+
+    - name: Delete a Fixed Address ( check mode )
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        ip_space: "{{ _ip_space.id }}"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        state: "absent"
+      check_mode: true
+      register: fixed_address
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+
+
+    # Delete the Fixed Address
+    - name: Delete a Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        ip_space: "{{ _ip_space.id }}"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        state: "absent"
+      register: fixed_address
+    # Verify the Fixed Address is deleted
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 0
+
+    # Create a next available Fixed Address
+    - name: Create a Next Available Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address:
+        next_available_id: "{{ _subnet.id }}"
+        name: "test_next_available_fixed_address_ansible"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:01"
+        ip_space: "{{ _ip_space.id }}"
+        state: "present"
+      register: fixed_address
+#    # Verify the Next available Fixed Address is generated
+#    - name: Get information about the Fixed Address
+#      infoblox.universal_ddi.dhcp_fixed_address_info:
+#        filters:
+#          address: "{{ fixed_address.id }}"
+#          ip_space: "{{ _ip_space.id }}"
+#      register: fixed_address_info
+#    - assert:
+#        that:
+#          - fixed_address_info.objects | length == 1
+#          - fixed_address_info.objects[0].id == fixed_address.id
+
+  always:
+
+    - name: Delete IP Space
+      ansible.builtin.include_role:
+        name: setup_ip_space
+        tasks_from: cleanup.yml
