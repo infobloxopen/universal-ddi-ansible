@@ -2,7 +2,7 @@ name: Sanity Tests
 
 on:
   workflow_call:
-
+  workflow_dispatch:
 jobs:
   sanity:
     runs-on: ubuntu-latest
