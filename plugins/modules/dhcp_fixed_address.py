@@ -202,14 +202,13 @@ EXAMPLES = r"""
         name: "example-ipspace"
         state: "present"
       register: ip_space
-
     - name: "Create a Subnet (required as parent)"
       infoblox.universal_ddi.ipam_subnet:
         address: "10.0.0.0/16"
         space: "{{ ip_space.id }}"
         state: "present"
       register: subnet
-      
+
     - name: Create a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
@@ -218,7 +217,7 @@ EXAMPLES = r"""
         match_value: "00:00:00:00:00:00"
         ip_space: "{{ _ip_space.id }}"
         state: "present"
-    
+
     - name: Create a Next Available Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "{{ _subnet.id }}/nextavailableip"
@@ -227,7 +226,6 @@ EXAMPLES = r"""
         match_value: "00:00:00:00:00:01"
         ip_space: "{{ _ip_space.id }}"
         state: "present"
-
     - name: Delete a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
@@ -578,8 +576,8 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
+    from ipam import FixedAddress, FixedAddressApi
     from universal_ddi_client import ApiException, NotFoundException
-    from ipam import FixedAddress, FixedAddressApi, SubnetApi
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
@@ -589,7 +587,7 @@ class FixedAddressModule(UniversalDDIAnsibleModule):
         super(FixedAddressModule, self).__init__(*args, **kwargs)
         self.next_available_id = self.params.get("next_available_id")
 
-        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
+        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id", "next_available_id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = FixedAddress.from_dict(self._payload_params)
         self._existing = None
@@ -627,6 +625,7 @@ class FixedAddressModule(UniversalDDIAnsibleModule):
                     return None
                 raise e
         else:
+            # If address is None, return None, indicating next_available_address block should be created
             if self.params["address"] is None:
                 return None
 
@@ -700,7 +699,9 @@ class FixedAddressModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -714,42 +715,64 @@ def main():
         address=dict(type="str", required=False),
         next_available_id=dict(type="str", required=False),
         comment=dict(type="str"),
-        dhcp_options=dict(type="list", elements="dict", options=dict(
-            group=dict(type="str"),
-            option_code=dict(type="str"),
-            option_value=dict(type="str"),
-            type=dict(type="str"),
-        )),
+        dhcp_options=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                group=dict(type="str"),
+                option_code=dict(type="str"),
+                option_value=dict(type="str"),
+                type=dict(type="str"),
+            ),
+        ),
         disable_dhcp=dict(type="bool"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
         header_option_server_name=dict(type="str"),
         hostname=dict(type="str"),
         inheritance_parent=dict(type="str"),
-        inheritance_sources=dict(type="dict", options=dict(
-            dhcp_options=dict(type="dict", options=dict(
-                action=dict(type="str"),
-                value=dict(type="list", elements="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-            )),
-            header_option_filename=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            header_option_server_address=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            header_option_server_name=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-        )),
+        inheritance_sources=dict(
+            type="dict",
+            options=dict(
+                dhcp_options=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(
+                            type="list",
+                            elements="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
+                header_option_filename=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                header_option_server_address=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                header_option_server_name=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+            ),
+        ),
         ip_space=dict(type="str"),
         match_type=dict(type="str"),
         match_value=dict(type="str"),
         name=dict(type="str"),
         parent=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = FixedAddressModule(

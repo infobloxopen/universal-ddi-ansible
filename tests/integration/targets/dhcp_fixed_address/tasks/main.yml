@@ -121,17 +121,15 @@
         ip_space: "{{ _ip_space.id }}"
         state: "present"
       register: fixed_address
-#    # Verify the Next available Fixed Address is generated
-#    - name: Get information about the Fixed Address
-#      infoblox.universal_ddi.dhcp_fixed_address_info:
-#        filters:
-#          address: "{{ fixed_address.id }}"
-#          ip_space: "{{ _ip_space.id }}"
-#      register: fixed_address_info
-#    - assert:
-#        that:
-#          - fixed_address_info.objects | length == 1
-#          - fixed_address_info.objects[0].id == fixed_address.id
+    # Verify the Next available Fixed Address is generated
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        id: "{{ fixed_address.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+          - fixed_address_info.objects[0].id == fixed_address.id
 
   always:
 

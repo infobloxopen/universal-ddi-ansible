@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_fixed_address_info
-short_description: Retrieve a DHCP Fixed Address
+short_description: Manage FixedAddress
 description:
-    - Retrieves information about existing Fixed Address.
+    - Manage FixedAddress
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -62,6 +62,10 @@ EXAMPLES = r"""
         filters:
           address: "10.0.0.1"
           ip_space: "{{ _ip_space.id }}"
+    
+    - name: Get information about the Fixed Address using ID
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        id: "{{ fixed_address.id }}"
 """  # noqa: E501
 
 RETURN = r"""
