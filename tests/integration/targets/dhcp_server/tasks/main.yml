@@ -1,0 +1,575 @@
+---
+# TODO
+# - Dhcp server with options configuration
+
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a random server name to avoid conflicts
+    - ansible.builtin.set_fact:
+        dhcp_server_name: "test-dhcp-server-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a dhcp server (check_mode)
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: present
+      check_mode: true
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 0
+
+    - name: Create a dhcp server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+
+    - name: Create a dhcp server (idempotent)
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is not changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+
+    - name: Delete a dhcp server (check mode)
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: absent
+      check_mode: true
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+
+    - name: Delete a dhcp server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: absent
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 0
+
+    - name: Delete a dhcp server (idempotent)
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: absent
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is not changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 0
+
+    - name: Create a dhcp server with name
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].name == dhcp_server_name
+
+
+    - name: Create a dhcp server with profile_type
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        profile_type: "server"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is not changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].profile_type == "server"
+
+    - name: Create a dhcp server with server_principal
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        server_principal: "test.com"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].server_principal == "test.com"
+
+    - name: Create a dhcp server with comment
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        comment: "test_comment"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].comment ==  "test_comment"
+
+    - name: Create a dhcp server with tags
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].tags.location ==  tag_value
+
+    - name: Create a dhcp server with ddns_client_update
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_client_update: "client"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is not changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_client_update == "client"
+
+    - name: Create a dhcp server with ddns_conflict_resolution_mode
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_conflict_resolution_mode: "check_with_dhcid"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is not failed
+          - dhcp_server is not changed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_conflict_resolution_mode == "check_with_dhcid"
+
+    - name: Create a dhcp server with ddns_domain
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_domain: "test.com."
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_domain == "test.com."
+
+    - name: Create a dhcp server with ddns_zone
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_domain: "{{ _fqdn_auth_zone }}"
+        ddns_zones:
+          - zone: "{{ _auth_zone.id }}"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_zones[0].zone == _auth_zone.id
+
+    - name: Create a dhcp server with ddns_enabled
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_enabled: true
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - name:
+      assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_enabled == true
+
+    - name: Create a dhcp server with ddns_generate_name
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_generate_name: true
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_generate_name == true
+
+    - name: Create a dhcp server with ddns_generated_prefix
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_generated_prefix: "host-prefix"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_generated_prefix ==  "host-prefix"
+
+    - name: Create a dhcp server with ddns_send_updates
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_send_updates: false
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_send_updates ==  false
+
+    - name: Create a dhcp server with ddns_ttl_percent
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_ttl_percent: 50
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_ttl_percent ==  50
+
+    - name: Create a dhcp server with ddns_update_on_renew
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_update_on_renew: true
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_update_on_renew ==  true
+
+    - name: Create a dhcp server with ddns_use_conflict_resolution
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        ddns_use_conflict_resolution: false
+        ddns_conflict_resolution_mode: "check_exists_with_dhcid"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].ddns_use_conflict_resolution ==  false
+          - dhcp_server_info.objects[0].ddns_conflict_resolution_mode ==  "check_exists_with_dhcid"
+
+    - name: Create a dhcp server with dhcp_config
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        dhcp_config:
+          allow_unknown: true
+          allow_unknown_v6: true
+          ignore_client_uid: true
+          lease_time: 50
+          lease_time_v6: 60
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].dhcp_config.allow_unknown == true
+          - dhcp_server_info.objects[0].dhcp_config.allow_unknown_v6 == true
+          - dhcp_server_info.objects[0].dhcp_config.ignore_client_uid == true
+          - dhcp_server_info.objects[0].dhcp_config.lease_time == 50
+          - dhcp_server_info.objects[0].dhcp_config.lease_time_v6 == 60
+
+    - name: Create a dhcp server with gss_tsig_fallback
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        gss_tsig_fallback: true
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].gss_tsig_fallback == true
+
+    - name: Create a dhcp server with header_option_filename
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        header_option_filename: "HEADER_OPTION.txt"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].header_option_filename == "HEADER_OPTION.txt"
+
+    - name: Create a dhcp server with header_option_server_address
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        header_option_server_address: "12.0.0.4"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].header_option_server_address == "12.0.0.4"
+
+    - name: Create a dhcp server with header_option_server_name
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        header_option_server_name: "test-server-1"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].header_option_server_name == "test-server-1"
+
+    - name: Create a dhcp server with hostname_rewrite_char
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        hostname_rewrite_char: "+"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].hostname_rewrite_char == "+"
+
+    - name: Create a dhcp server with hostname_rewrite_enabled
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        hostname_rewrite_enabled: "true"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].hostname_rewrite_enabled == true
+
+    - name: Create a dhcp server with hostname_rewrite_regex
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        hostname_rewrite_regex: "[^a-z]"
+        state: present
+      register: dhcp_server
+    - name: Get information about the dhcp server
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server is changed
+          - dhcp_server is not failed
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].hostname_rewrite_regex == "[^a-z]"
+
+  always:
+    - name: Delete a dhcp server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: absent
+
+    - name: "Delete an Auth Zone"
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: "Delete DNS View"
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml

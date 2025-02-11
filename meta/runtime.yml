@@ -7,6 +7,7 @@ action_groups:
           - dns
           - keys
           - infra
+          - dhcp
   dns:
     - dns_view
     - dns_view_info
@@ -58,3 +59,7 @@ action_groups:
     - infra_host_info
     - infra_service
     - infra_service_info
+
+  dhcp:
+    - dhcp_server
+    - dhcp_server_info
