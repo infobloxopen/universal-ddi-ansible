@@ -87,7 +87,7 @@ Some modules have been renamed for consistency:
 
 Our latest update to the Ansible modules introduces a significant enhancement: the addition of a **Return** section. Building on the existing documentation and examples, this new section details the types of data and values returned by module execution.
 ####
-In the current version of our Ansible modules, every example required explicit declaration of portal_key and host under the task parameters to establish connectivity and authentication details for operations. Here’s how parameters were defined and used in earlier versions:
+In the current version of our Ansible modules, every example required explicit declaration of portal_key and host under the task parameters to establish connectivity and authentication details for operations. Here's how parameters were defined and used in earlier versions:
 
 ```
 vars:   
