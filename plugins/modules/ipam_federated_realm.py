@@ -72,13 +72,13 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Create a Federated Realm
       infoblox.universal_ddi.ipam_federated_realm:
-        name: "{{ fed_realm_name }}"
+        name: "example_federated_realm"
         state: "present"
       register: federated_realm
 
     - name: Create a Federated Realm with Additional Parameters
       infoblox.universal_ddi.ipam_federated_realm:
-        name: "{{ fed_realm_name }}"
+        name: "example_federated_realm"
         comment: "This is a federated realm"
         state: "present"
         tags:
@@ -87,7 +87,7 @@ EXAMPLES = r"""
 
     - name: Delete the Federated Realm
       infoblox.universal_ddi.ipam_federated_realm:
-        name: "{{ fed_realm_name }}"
+        name: "example_federated_realm"
         state: "absent"
 """
 
