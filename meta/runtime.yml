@@ -45,6 +45,8 @@ action_groups:
     - ipam_address
     - ipam_address_info
     - ipam_next_available_ip_info
+    - dhcp_option_space
+    - dhcp_option_space_info
 
   keys:
     - tsig_key

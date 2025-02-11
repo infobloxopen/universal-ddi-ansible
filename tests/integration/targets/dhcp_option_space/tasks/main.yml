@@ -1,0 +1,181 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        option_space_name: "test-option-space-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Space (check mode)
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        state: present
+      check_mode: true
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 0
+
+    - name: Create a DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        state: present
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space is not failed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+          - option_space_info.objects[0].name == option_space.object.name
+
+    - name: Create a DHCP Option Space (idempotent)
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        state: present
+      register: option_space
+    - assert:
+        that:
+          - option_space is not changed
+          - option_space is not failed
+
+    - name: Delete the DHCP Option Space (check mode)
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: absent
+      check_mode: true
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 1
+
+    - name: Delete the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: absent
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 0
+
+    - name: Delete the DHCP Option Space (idempotent)
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: absent
+      register: option_space
+    - assert:
+        that:
+          - option_space.changed == false
+          - option_space.failed == false
+
+    - name: Create a DHCP Option Space with Comment
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        comment: "test comment"
+        state: present
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space.changed == true
+          - option_space.failed == false
+          - option_space_info.failed == false
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].comment == "test comment"
+
+    - name: Create a DHCP Option Space with Tags
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        tags:
+          location: "my-location"
+        state: present
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space is not failed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+          - option_space_info.objects[0].name == option_space.object.name
+          - option_space_info.objects[0].tags.location == "my-location"
+
+    - name: Create a DHCP Option Space with ipv6
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}_v6"
+        protocol: "ip6"
+        comment: "test comment for ipv6"
+        tags:
+          location: "my-location"
+        state: present
+      register: option_space
+    - name: Get Information about the DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          name: "{{ option_space_name }}_v6"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space is changed
+          - option_space is not failed
+          - option_space_info is not failed
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+          - option_space_info.objects[0].name == option_space.object.name
+          - option_space_info.objects[0].tags.location == "my-location"
+
+  always:
+    - name: Cleanup v4 Dhcp Option Space
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Cleanup v6 Dhcp Option Space
+      infoblox.universal_ddi.dhcp_option_space:
+          name: "{{ option_space_name }}_v6"
+          state: absent
+      ignore_errors: true
