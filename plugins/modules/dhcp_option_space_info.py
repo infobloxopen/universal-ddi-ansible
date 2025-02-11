@@ -129,8 +129,8 @@ objects:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from universal_ddi_client import ApiException, NotFoundException
     from ipam import OptionSpaceApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
