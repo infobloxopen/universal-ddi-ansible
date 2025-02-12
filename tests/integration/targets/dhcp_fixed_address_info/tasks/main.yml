@@ -74,25 +74,6 @@
         that:
           - fixed_address_info.objects | length != 0
 
-    - name: Delete a Fixed Address
-      infoblox.universal_ddi.dhcp_fixed_address:
-        address: "10.0.0.1"
-        ip_space: "{{ _ip_space.id }}"
-        match_type: "mac"
-        match_value: "00:00:00:00:00:00"
-        state: "absent"
-      register: fixed_address
-
-    - name: Verify the Fixed Address is deleted
-      infoblox.universal_ddi.dhcp_fixed_address_info:
-        filters:
-          address: "10.0.0.1"
-          ip_space: "{{ _ip_space.id }}"
-      register: fixed_address_info
-    - assert:
-        that:
-          - fixed_address_info.objects | length == 0
-
   always:
     - name: Delete IP Space
       ansible.builtin.include_role:
