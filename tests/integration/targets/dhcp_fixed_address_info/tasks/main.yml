@@ -5,19 +5,37 @@
       portal_key: "{{ portal_key }}"
 
   block:
+    # Create a random name and tag value to avoid conflicts
+    - ansible.builtin.set_fact:
+        name: "test-fixed-address-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
     # Create a Fixed Address
     - name: Create a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
-        name: "test_fixed_address_ansible"
+        name: "{{ name }}"
         match_type: "mac"
         match_value: "00:00:00:00:00:00"
         ip_space: "{{ _ip_space.id }}"
+        tags:
+          location: "{{ tag_value }}"
         state: "present"
       register: fixed_address
 
-    # Get information about the Fixed Address
-    - name: Get information about the Fixed Address using ID
+    - name: Get Fixed Address information
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+          - fixed_address_info.objects[0].id == fixed_address.id
+          - fixed_address_info.objects[0].address == fixed_address.object.address
+
+    - name: Get Fixed Address information by ID
       infoblox.universal_ddi.dhcp_fixed_address_info:
         id: "{{ fixed_address.id }}"
       register: fixed_address_info
@@ -27,11 +45,10 @@
           - fixed_address_info.objects[0].id == fixed_address.id
           - fixed_address_info.objects[0].address == fixed_address.object.address
 
-    - name: Get information about the Fixed Address
+    - name: Get Fixed Address information by name
       infoblox.universal_ddi.dhcp_fixed_address_info:
         filters:
-          address: "10.0.0.1"
-          ip_space: "{{ _ip_space.id }}"
+          name: "{{ name }}"
       register: fixed_address_info
     - assert:
         that:
@@ -39,20 +56,24 @@
           - fixed_address_info.objects[0].id == fixed_address.id
           - fixed_address_info.objects[0].address == fixed_address.object.address
 
-    # Test idempotency of Fixed Address Info
-    - name: Get Fixed Address Info (idempotent)
+    - name: Get Fixed Address information by tag_filters
       infoblox.universal_ddi.dhcp_fixed_address_info:
-        filters:
-          address: "10.0.0.1"
-          ip_space: "{{ _ip_space.id }}"
+        tag_filters:
+          location: "{{ tag_value }}"
       register: fixed_address_info
     - assert:
         that:
-          - fixed_address_info.objects | length == 1
-          - fixed_address_info.objects[0].id == fixed_address.id
-          - fixed_address_info.objects[0].address == fixed_address.object.address
+          - fixed_address_info.objects | length != 0
 
-    # Delete the Fixed Address
+    - name: Get Fixed Address information by match type
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          match_type: "mac"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length != 0
+
     - name: Delete a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
@@ -62,8 +83,7 @@
         state: "absent"
       register: fixed_address
 
-    # Verify the Fixed Address is deleted
-    - name: Get information about the Fixed Address
+    - name: Verify the Fixed Address is deleted
       infoblox.universal_ddi.dhcp_fixed_address_info:
         filters:
           address: "10.0.0.1"

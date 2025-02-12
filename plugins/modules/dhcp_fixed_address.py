@@ -202,6 +202,7 @@ EXAMPLES = r"""
         name: "example-ipspace"
         state: "present"
       register: ip_space
+      
     - name: "Create a Subnet (required as parent)"
       infoblox.universal_ddi.ipam_subnet:
         address: "10.0.0.0/16"
@@ -220,12 +221,13 @@ EXAMPLES = r"""
 
     - name: Create a Next Available Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
-        address: "{{ _subnet.id }}/nextavailableip"
+        next_available_ip: "{{ _subnet.id }}"
         name: "test_fixed_address_ansible"
         match_type: "mac"
         match_value: "00:00:00:00:00:01"
         ip_space: "{{ _ip_space.id }}"
         state: "present"
+        
     - name: Delete a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"

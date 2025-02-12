@@ -66,6 +66,23 @@ EXAMPLES = r"""
     - name: Get information about the Fixed Address using ID
       infoblox.universal_ddi.dhcp_fixed_address_info:
         id: "{{ fixed_address.id }}"
+        
+    - name: Get Fixed Address information by name
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          name: "{{ name }}"
+               
+    - name: Get Fixed Address information by match type
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          match_type: "mac"
+      register: fixed_address_info
+      
+    - name: Get Fixed Address information by tag_filters
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+
 """  # noqa: E501
 
 RETURN = r"""
