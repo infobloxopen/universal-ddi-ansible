@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_federated_realm
-short_description: Manage FederatedRealm
+short_description: Manages the Federated Realm
 description:
-    - Manage FederatedRealm
+    - The Federated Realm object is a unique set of federated blocks per realm.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -205,7 +205,7 @@ class FederatedRealmModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = FederatedRealmApi(self.client).read(self.params["id"], inherit="full")
+                resp = FederatedRealmApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
