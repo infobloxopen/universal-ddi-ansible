@@ -73,8 +73,9 @@ Place these files under `/plugins/modules`.
 
 For local testing, ensure you set up your integration test configuration
 1. Navigate to `tests/integration` folder
-2. Create or update the integration_config.yaml file with necessary environment-specific configurations such as
-   ```shell
+2. Create the integration_config.yaml file with necessary environment-specific configurations such as portal_url and portal_key as shown below.
+
+   ```yaml
    portal_url: https://csp.infoblox.com
    portal_key: "your-portal-secret-key"
    ```
