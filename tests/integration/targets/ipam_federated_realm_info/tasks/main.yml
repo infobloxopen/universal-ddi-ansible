@@ -6,13 +6,13 @@
   block:
     # Create a random Federated Realm name to avoid conflicts
     - ansible.builtin.set_fact:
-        fed_realm_name: "test-federated-realm-{{ 999999 | random | string }}"
+        federated_realm_name: "test-federated-realm-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
       # Basic Test for IPAM Federated Realm
     - name: Create a Federated Realm
       infoblox.universal_ddi.ipam_federated_realm:
-        name: "{{ fed_realm_name }}"
+        name: "{{ federated_realm_name }}"
         tags:
           location: "{{ tag_value }}"
         state: present
@@ -31,7 +31,7 @@
     - name: Get Federated Realm information by filters (Name)
       infoblox.universal_ddi.ipam_federated_realm_info:
         filters:
-          name: "{{ fed_realm_name }}"
+          name: "{{ federated_realm_name }}"
       register: federated_realm_info
     - assert:
         that:
@@ -40,7 +40,7 @@
 
     - name: Get Federated Realm information by raw filter query
       infoblox.universal_ddi.ipam_federated_realm_info:
-          filter_query: "name=='{{ fed_realm_name }}'"
+          filter_query: "name=='{{ federated_realm_name }}'"
     - assert:
         that:
           - federated_realm_info.objects | length == 1
@@ -59,6 +59,6 @@
     # Cleanup if the test fails
     - name: "Delete the Federated Realm"
       infoblox.universal_ddi.ipam_federated_realm:
-        name: "{{ fed_realm_name }}"
+        name: "{{ federated_realm_name }}"
         state: "absent"
       ignore_errors: true
