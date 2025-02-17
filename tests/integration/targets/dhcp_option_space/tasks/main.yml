@@ -97,7 +97,7 @@
       register: option_space
     - assert:
         that:
-          - option_space.changed == false
+          - option_space is not changed
           - option_space.failed == false
 
     - name: Create a DHCP Option Space with Comment
@@ -114,7 +114,7 @@
       register: option_space_info
     - assert:
         that:
-          - option_space.changed == true
+          - option_space is changed
           - option_space.failed == false
           - option_space_info.failed == false
           - option_space_info.objects | length == 1
@@ -171,11 +171,13 @@
     - name: Cleanup v4 Dhcp Option Space
       infoblox.universal_ddi.dhcp_option_space:
         name: "{{ option_space_name }}"
+        protocol: "ip4"
         state: absent
       ignore_errors: true
 
     - name: Cleanup v6 Dhcp Option Space
       infoblox.universal_ddi.dhcp_option_space:
           name: "{{ option_space_name }}_v6"
+          protocol: "ip6"
           state: absent
       ignore_errors: true

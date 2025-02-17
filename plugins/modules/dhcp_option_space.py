@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dhcp_option_space
 short_description: Manage a OptionSpace
 description:
-    - Manage a OptionSpace
+    - Manages a DHCP Option Code by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -57,7 +57,7 @@ EXAMPLES = r"""
         name: "example-option-space"
         protocol: "ip4"
 
-    - name: Create a OptionSpace with additional tags
+    - name: Create a OptionSpace with additional fields
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
@@ -68,6 +68,7 @@ EXAMPLES = r"""
     - name: Delete a OptionSpace
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
+        protocol: "ip4"
         state: absent
 """  # noqa: E501
 
@@ -164,7 +165,7 @@ class OptionSpaceModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = OptionSpaceApi(self.client).read(self.params["id"], inherit="full")
+                resp = OptionSpaceApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
