@@ -1,0 +1,58 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        option_code_name: "basic_opt_code_1"
+        option_code: 234
+        option_item_type: "boolean"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        name: "{{ option_code_name }}"
+        code: "{{ option_code }}"
+        type: "{{ option_item_type }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        state: present
+      register: option_code
+
+    - name: Get Information about the DHCP Option Code by Name
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+
+    - name: Get Information about the DHCP Option Code by ID
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          id: "{{ option_code.id }}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].name == "basic_opt_code_1"
+
+    - name: Get DHCP Option Code information by filter query
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filter_query: "name=='{{ option_code_name }}'"
+    - assert:
+        that:
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+
+  always:
+    - name: "Delete DHCP Option Code"
+      infoblox.universal_ddi.dhcp_option_code:
+        name: "{{ option_code_name }}"
+        code: 234
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: absent
+

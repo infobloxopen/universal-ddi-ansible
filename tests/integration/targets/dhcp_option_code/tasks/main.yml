@@ -1,0 +1,268 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        option_code_name: "basic_opt_code_1"
+        option_code: 234
+        option_item_type: "boolean"
+
+#after spcae PR is mergered we can use this
+#    - name: Create a DHCP Option Space (check mode)
+#      infoblox.universal_ddi.dhcp_option_space:
+#        name: "{{ option_space_name }}"
+#        protocol: "ip4"
+#        state: present
+#      check_mode: true
+#      register: option_space
+#
+#    - name: Get Information about the DHCP Option Space
+#      infoblox.universal_ddi.dhcp_option_space_info:
+#        filters:
+#          name: "{{ option_space_name }}"
+#      register: option_space_info
+#
+#    - assert:
+#        that:
+#          - option_space is changed
+#          - option_space_info is not failed
+#          - option_space_info.objects | length == 0
+    - name: Create a DHCP Option Code (check mode)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: present
+      check_mode: true
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 0
+
+    - name: Create a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code.object.name
+
+    - name: Create a DHCP Option Code (idempotent)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: present
+      register: option_code
+    - assert:
+        that:
+          - option_code is not changed
+          - option_code is not failed
+
+    - name: Delete the DHCP Option Code (check mode)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: absent
+      check_mode: true
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+
+    - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        state: absent
+      register: option_code
+
+    - name: Create a DHCP Option Code with comment
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        comment: "This is a test comment"
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].comment == "This is a test comment"
+
+    - name: Create a DHCP Option Code with array
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "{{ option_item_type }}"
+        comment: "This is a test comment"
+        array: true
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].array == true
+
+    - name: Update a DHCP Option Code with Type
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "int16"
+        comment: "This is a test comment"
+        array: true
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].type == "int16"
+
+#    NORTHSTAR-1278 - This test case is failing due to the issue in the backend/UI
+#    - name: Update a DHCP Option Code
+#      infoblox.universal_ddi.dhcp_option_code:
+#        code: 235
+#        name: "{{ option_code_name }}"
+#        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+#        type: "{{ option_item_type }}"
+#        state: present
+#      register: option_code
+#    - name: Get Information about the DHCP Option Code
+#      infoblox.universal_ddi.dhcp_option_code_info:
+#        filters:
+#          name: "{{ option_code_name }}"
+#          code: 235
+#          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+#      register: option_code_info
+#    - assert:
+#        that:
+#          - option_code is changed
+#          - option_code_info is not failed
+#          - option_code_info.objects | length == 1
+#          - option_code_info.objects[0].id == option_code.id
+#          - option_code_info.objects[0].name == option_code.object.name
+
+    - name: Create multiple DHCP Option Codes
+      infoblox.universal_ddi.dhcp_option_code:
+        code: "{{ item.code }}"
+        name: "{{ item.name }}"
+        option_space: "{{ item.option_space }}"
+        type: "{{ item.type }}"
+        state: present
+      loop:
+        - { code: 234, name: "basic_opt_code_1", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "int16" }
+        - { code: 235, name: "basic_opt_code_2", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "text" }
+        - { code: 236, name: "basic_opt_code_3", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "int16" }
+      register: option_code
+    - name: Get Information about DHCP Option Codes
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 3
+
+  always:
+    - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "int16"
+        state: absent
+
+    - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 235
+        name: "basic_opt_code_2"
+        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        type: "text"
+        state: absent
+
+    - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+          code: 236
+          name: "basic_opt_code_3"
+          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          type: "int16"
+          state: absent
