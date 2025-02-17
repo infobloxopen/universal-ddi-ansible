@@ -1,25 +1,24 @@
 # Contributing to infoblox.universal_ddi collection
 
-Welcome to the Universal DDI Ansible Repository! We are excited that you are interested in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure.
-
+Welcome to the Universal DDI Ansible Repository ! We are excited that you are interested in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
 ## Workflow Summary
 
-1. [Clone the repository](#cloning)
-2. [Make the desired Code Change](#writing-new-code)
-3. [Run integration tests locally and ensure that they pass](#writing-integration-tests)
-4. [Create a PR](#pr-creation)
+1. [Setup](#setup)
+2. [Implementing the Code Changes](#implementing-the-code-changes)
+3. [Testing the Code Changes](#testing-the-code-changes)
+4. [Creating a PR](#creating-a-pr)
 
-## Cloning
+## Setup
 
 The `ansible-test` command expects that the repository is in a directory that matches it's collection,
-under a directory `ansible_collections`. Clone ensuring that hierarchy:
+under the directory `ansible_collections`. Clone the repository from GitHub ensuring the hierarchy:
 
 ```shell
 mkdir -p $TARGET_DIR/ansible_collections/infoblox
 git clone <url> $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 ```
 
-The python requirements must be installed separately. It is recommended to use a venv to keep the dependencies local. 
+The python requirements must be installed separately. It is recommended to use a Virtual Environment to isolate the dependencies and maintain a clean setup. 
 Set up your Python virtual environment
 
 ```shell
@@ -28,17 +27,22 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip3 install ansible
 pip3 install -r requirements.txt
+pip3 install -r test-requirements.txt
 ```
 
 You can run ```ansible-test sanity``` to test if your collection is ready for development
 
-## Writing New Code
+## Implementing the Code Changes
 
-### Writing New Modules
+### Reference Documentation
+
+Before you start contributing, it is essential to familiarize yourself with the [Infoblox API Documentation](https://csp.infoblox.com/apidoc), which provides detailed information on attributes and functionality relevant to the modules you may wish to contribute.
+
+### Developing New Modules
  
 Create two files for each module:
-- `module_name.py`: The main module code.
-- `module_name_info.py`: For gathering module resource information.
+- `module_name.py`: Module for performing CRUD operations.
+- `module_name_info.py`: Module to List / Read the object.
 
 Place these files under `/plugins/modules`.
 
@@ -48,7 +52,9 @@ Place these files under `/plugins/modules`.
 
 **Examples Section** Provides practical usage examples demonstrating standard and edge case scenarios.
 
-**Return Section** Clearly document what values the module returns.
+**Return Section** It defines what data is supposed to be returned and how it is structured.
+
+## Testing the Code Changes
 
 ### Writing Integration Tests
 
@@ -58,31 +64,32 @@ Place these files under `/plugins/modules`.
 
 - Each module must also be added to the all group in meta/runtime.yml. This will allow to reuse common variables like portal_key in the test. 
 
+### Expected test criteria
 
-#### Expected test criteria:
 - Resource creation under check mode
 - Resource creation
 - Resource creation again (idempotency)
-- Resource deletion under check mode
-- Resource deletion
-- Resource deletion again (idempotency)
-- Resource creation with additional parameters
-- Resource modification
+- Resource updation with all additional attributes under the object
 
-#### Running Tests Locally
+### Configuration
 
 For local testing, ensure you set up your integration test configuration
 1. Navigate to `tests/integration` folder
 2. Create the integration_config.yaml file with necessary environment-specific configurations such as portal_url and portal_key as shown below.
 
    ```yaml
-   portal_url: https://csp.infoblox.com
-   portal_key: "your-portal-secret-key"
+    portal_url: https://csp.infoblox.com
+    portal_key: "your-portal-secret-key"
    ```
    - The default URL for the Cloud Services Portal is https://csp.infoblox.com
    - An API key is required to access Infoblox API. You can obtain an API key by following the instructions in the guide for [Configuring User API Keys](https://docs.infoblox.com/space/BloxOneCloud/35430405/Configuring+User+API+Keys).
-
-
+   - These global defaults are applied to all modules in the `infoblox.universal_ddi` collection via `module_defaults`, ensuring consistent API connectivity for playbook operations:
+   ```yaml
+      - module_defaults:
+          group/infoblox.universal_ddi.all:
+            portal_url: "{{ portal_url }}"
+            portal_key: "{{ portal_key }}"
+   ```
 Run tests for the desired module(s):
 
 ```shell
@@ -94,10 +101,14 @@ If you want more detailed output, run the command with -vvv
 ansible-test integration <module_name> -vvv
 ```
 
-## PR Creation
+## Creating a PR
 
-- Before raising your PR, you must make sure the PR is merge worthy.
-- The PR will trigger some check actions in Github. The PR can be only merged when these tests pass. You can also test your PR locally with these commands. 
+When you are ready to submit your Pull Request (PR), ensure it is ready for review 
+
+- **Ensure Merge-Worthiness**: Before raising your PR, double-check that your branch is up-to-date with the main branch, conflicts are resolved, and your changes adhere to the project guidelines and quality standards.
+- **Automated Tests**: Upon creating a PR, automated checks will be triggered on GitHub. These are configured to ensure that any new or modified code meets the necessary criteria for code health and functionality.
+
+You can also test your PR locally with these commands. 
 
 ```shell
 ansible-test sanity
@@ -107,6 +118,9 @@ ansible-test sanity
 ansible-test integration
 ```
 
+- Your PR will be reviewed by repository maintainers. During this phase, maintainers may suggest or request changes. This feedback might relate to coding standards, functionality issues, or improvements in the logic or structure of the code.
+- It is essential that you actively engage in the discussion of your PR. Respond to comments, clarify your choices when asked, and incorporate feedback appropriately.
+- Once maintainers are satisfied with the updated PR and all checks are passed, the maintainer will approve the PR. 
 ## Reporting an issue
 
 - When you find a bug, you can help tremendously by reporting an issue.
