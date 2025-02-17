@@ -10,10 +10,12 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_fixed_address_info
-short_description: Manage FixedAddress
+short_description: Retrieves Fixed Address
 description:
-    - Manage FixedAddress
-version_added: 2.0.0
+    - Retrieves information about existing Fixed Addresses
+    - The Fixed Address object reserves an address for a specific client. 
+    - It must have a _match_type_ and a valid corresponding _match_value_ so that it can match that client.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -61,7 +63,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_fixed_address_info:
         filters:
           address: "10.0.0.1"
-          ip_space: "{{ _ip_space.id }}"
+          ip_space: "{{ ip_space.id }}"
     
     - name: Get information about the Fixed Address using ID
       infoblox.universal_ddi.dhcp_fixed_address_info:
@@ -70,30 +72,29 @@ EXAMPLES = r"""
     - name: Get Fixed Address information by name
       infoblox.universal_ddi.dhcp_fixed_address_info:
         filters:
-          name: "{{ name }}"
+          name: "example_fixed_address_ansible"
                
     - name: Get Fixed Address information by match type
       infoblox.universal_ddi.dhcp_fixed_address_info:
         filters:
           match_type: "mac"
-      register: fixed_address_info
       
     - name: Get Fixed Address information by tag_filters
       infoblox.universal_ddi.dhcp_fixed_address_info:
         tag_filters:
-          location: "{{ tag_value }}"
+          location: "site-1"
 
 """  # noqa: E501
 
 RETURN = r"""
 id:
     description:
-        - ID of the FixedAddress object
+        - ID of the Fixed Address object
     type: str
     returned: Always
 objects:
     description:
-        - FixedAddress object
+        - Fixed Address object
     type: list
     elements: dict
     returned: Always

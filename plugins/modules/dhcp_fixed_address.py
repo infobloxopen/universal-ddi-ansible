@@ -10,10 +10,12 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_fixed_address
-short_description: Manage FixedAddress
+short_description: Manage a Fixed Address
 description:
-    - Manage FixedAddress
-version_added: 2.0.0
+    - Manage a Fixed Address
+    - The Fixed Address object reserves an address for a specific client.
+    - It must have a _match_type_ and a valid corresponding _match_value_ so that it can match that client.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -199,7 +201,7 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: "Create an IP Space (required as parent)"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "example-ipspace"
+        name: "example-ip_space"
         state: "present"
       register: ip_space
       
@@ -213,25 +215,42 @@ EXAMPLES = r"""
     - name: Create a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
-        name: "test_fixed_address_ansible"
+        name: "example_fixed_address_ansible"
         match_type: "mac"
         match_value: "00:00:00:00:00:00"
-        ip_space: "{{ _ip_space.id }}"
+        ip_space: "{{ ip_space.id }}"
+        state: "present"
+        
+    - name: Create a Fixed Address with additional fields
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        name: "example_fixed_address_ansible"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        ip_space: "{{ ip_space.id }}"
+        comment: "this range is created by terraform"
+        disable_dhcp: "false"
+        header_option_filename: "example-header-option-filename"
+        header_option_server_address: "10.0.0.12"
+        header_option_server_name: "example-header-option-server-name"
+        hostname: "example-hostname"
+        tags:
+          location: "site-1"
         state: "present"
 
     - name: Create a Next Available Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
-        next_available_ip: "{{ _subnet.id }}"
-        name: "test_fixed_address_ansible"
+        next_available_ip: "{{ subnet.id }}"
+        name: "example_fixed_address_ansible"
         match_type: "mac"
         match_value: "00:00:00:00:00:01"
-        ip_space: "{{ _ip_space.id }}"
+        ip_space: "{{ ip_space.id }}"
         state: "present"
         
     - name: Delete a Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
-        ip_space: "{{ _ip_space.id }}"
+        ip_space: "{{ ip_space.id }}"
         match_type: "mac"
         match_value: "00:00:00:00:00:00"
         state: "absent"
@@ -240,12 +259,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the FixedAddress object
+        - ID of the Fixed Address object
     type: str
     returned: Always
 item:
     description:
-        - FixedAddress object
+        - Fixed Address object
     type: complex
     returned: Always
     contains:
@@ -641,7 +660,7 @@ class FixedAddressModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple FixedAddress: {resp.results}")
+                self.fail_json(msg=f"Found multiple Fixed Address: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -681,16 +700,16 @@ class FixedAddressModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "FixedAddress created"
+                result["msg"] = "Fixed Address created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "FixedAddress updated"
+                    result["msg"] = "Fixed Address updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "FixedAddress deleted"
+                result["msg"] = "Fixed Address deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
