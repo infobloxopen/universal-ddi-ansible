@@ -12,8 +12,8 @@ DOCUMENTATION = r"""
 module: dhcp_option_space
 short_description: Manage a OptionSpace
 description:
-    - Manages a DHCP Option Code by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations.
-version_added: 2.0.0
+    - Manages a set of DHCP Option Codes by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -42,6 +42,10 @@ options:
         description:
             - "The type of protocol for the option space (I(ip4) or I(ip6))."
         type: str
+        choices:
+            - ip4
+            - ip6
+        default: ip4
     tags:
         description:
             - "The tags for the option space in JSON format."
@@ -52,18 +56,20 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create a OptionSpace
+    - name: Create a Option Space
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
+        State: present
 
-    - name: Create a OptionSpace with additional fields
+    - name: Create a Option Space with additional fields
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
         comment: "example comment"
+        State: present
         tags:
-            tag1: "value1"
+            location: "site-1"
     
     - name: Delete a OptionSpace
       infoblox.universal_ddi.dhcp_option_space:
@@ -255,14 +261,14 @@ def main():
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
         name=dict(type="str"),
-        protocol=dict(type="str"),
+        protocol=dict(type="str", choices=["ip4", "ip6"], default="ip4"),
         tags=dict(type="dict"),
     )
 
     module = OptionSpaceModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["name", "protocol"])],
+        required_if=[("state", "present", ["name"])],
     )
 
     module.run_command()
