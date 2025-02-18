@@ -2710,8 +2710,8 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from universal_ddi_client import ApiException, NotFoundException
     from ipam import Server, ServerApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
@@ -2823,7 +2823,9 @@ class ServerModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -2846,59 +2848,86 @@ def main():
         ddns_ttl_percent=dict(type="float"),
         ddns_update_on_renew=dict(type="bool"),
         ddns_use_conflict_resolution=dict(type="bool"),
-        ddns_zones=dict(type="list", elements="dict", options=dict(
-            fqdn=dict(type="str"),
-            gss_tsig_enabled=dict(type="bool"),
-            nameservers=dict(type="list", elements="dict", options=dict(
-                client_principal=dict(type="str"),
-                gss_tsig_fallback=dict(type="bool"),
-                kerberos_rekey_interval=dict(type="int"),
-                kerberos_retry_interval=dict(type="int"),
-                kerberos_tkey_lifetime=dict(type="int"),
-                kerberos_tkey_protocol=dict(type="str"),
-                nameserver=dict(type="str"),
-                server_principal=dict(type="str"),
-            )),
-            tsig_enabled=dict(type="bool"),
-            tsig_key=dict(type="dict", options=dict(
-                algorithm=dict(type="str"),
-                comment=dict(type="str"),
-                key=dict(type="str"),
-                name=dict(type="str"),
-                secret=dict(type="str"),
-            )),
-            view=dict(type="str"),
-            zone=dict(type="str"),
-        )),
-        dhcp_config=dict(type="dict", options=dict(
-            abandoned_reclaim_time=dict(type="int"),
-            abandoned_reclaim_time_v6=dict(type="int"),
-            allow_unknown=dict(type="bool"),
-            allow_unknown_v6=dict(type="bool"),
-            echo_client_id=dict(type="bool"),
-            filters=dict(type="list", elements="str"),
-            filters_large_selection=dict(type="list", elements="str"),
-            filters_v6=dict(type="list", elements="str"),
-            ignore_client_uid=dict(type="bool"),
-            ignore_list=dict(type="list", elements="dict", options=dict(
+        ddns_zones=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                fqdn=dict(type="str"),
+                gss_tsig_enabled=dict(type="bool"),
+                nameservers=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        client_principal=dict(type="str"),
+                        gss_tsig_fallback=dict(type="bool"),
+                        kerberos_rekey_interval=dict(type="int", no_log=True),
+                        kerberos_retry_interval=dict(type="int"),
+                        kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                        kerberos_tkey_protocol=dict(type="str", no_log=True),
+                        nameserver=dict(type="str"),
+                        server_principal=dict(type="str"),
+                    ),
+                ),
+                tsig_enabled=dict(type="bool"),
+                tsig_key=dict(
+                    type="dict",
+                    options=dict(
+                        algorithm=dict(type="str"),
+                        comment=dict(type="str"),
+                        key=dict(type="str", no_log=True),
+                        name=dict(type="str"),
+                        secret=dict(type="str", no_log=True),
+                    ),
+                    no_log=True,
+                ),
+                view=dict(type="str"),
+                zone=dict(type="str"),
+            ),
+        ),
+        dhcp_config=dict(
+            type="dict",
+            options=dict(
+                abandoned_reclaim_time=dict(type="int"),
+                abandoned_reclaim_time_v6=dict(type="int"),
+                allow_unknown=dict(type="bool"),
+                allow_unknown_v6=dict(type="bool"),
+                echo_client_id=dict(type="bool"),
+                filters=dict(type="list", elements="str"),
+                filters_large_selection=dict(type="list", elements="str"),
+                filters_v6=dict(type="list", elements="str"),
+                ignore_client_uid=dict(type="bool"),
+                ignore_list=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        type=dict(type="str"),
+                        value=dict(type="str"),
+                    ),
+                ),
+                lease_time=dict(type="int"),
+                lease_time_v6=dict(type="int"),
+            ),
+        ),
+        dhcp_options=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                group=dict(type="str"),
+                option_code=dict(type="str"),
+                option_value=dict(type="str"),
                 type=dict(type="str"),
-                value=dict(type="str"),
-            )),
-            lease_time=dict(type="int"),
-            lease_time_v6=dict(type="int"),
-        )),
-        dhcp_options=dict(type="list", elements="dict", options=dict(
-            group=dict(type="str"),
-            option_code=dict(type="str"),
-            option_value=dict(type="str"),
-            type=dict(type="str"),
-        )),
-        dhcp_options_v6=dict(type="list", elements="dict", options=dict(
-            group=dict(type="str"),
-            option_code=dict(type="str"),
-            option_value=dict(type="str"),
-            type=dict(type="str"),
-        )),
+            ),
+        ),
+        dhcp_options_v6=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                group=dict(type="str"),
+                option_code=dict(type="str"),
+                option_value=dict(type="str"),
+                type=dict(type="str"),
+            ),
+        ),
         gss_tsig_fallback=dict(type="bool"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
@@ -2906,148 +2935,261 @@ def main():
         hostname_rewrite_char=dict(type="str"),
         hostname_rewrite_enabled=dict(type="bool"),
         hostname_rewrite_regex=dict(type="str"),
-        inheritance_sources=dict(type="dict", options=dict(
-            ddns_block=dict(type="dict", options=dict(
-                action=dict(type="str"),
-                value=dict(type="dict", options=dict(
-                    client_principal=dict(type="str"),
-                    ddns_domain=dict(type="str"),
-                    ddns_enabled=dict(type="bool"),
-                    ddns_send_updates=dict(type="bool"),
-                    ddns_zones=dict(type="list", elements="dict", options=dict(
-                        fqdn=dict(type="str"),
-                        gss_tsig_enabled=dict(type="bool"),
-                        nameservers=dict(type="list", elements="dict", options=dict(
-                            client_principal=dict(type="str"),
-                            gss_tsig_fallback=dict(type="bool"),
-                            kerberos_rekey_interval=dict(type="int"),
-                            kerberos_retry_interval=dict(type="int"),
-                            kerberos_tkey_lifetime=dict(type="int"),
-                            kerberos_tkey_protocol=dict(type="str"),
-                            nameserver=dict(type="str"),
-                            server_principal=dict(type="str"),
-                        )),
-                        tsig_enabled=dict(type="bool"),
-                        tsig_key=dict(type="dict", options=dict(
-                            algorithm=dict(type="str"),
-                            comment=dict(type="str"),
-                            key=dict(type="str"),
-                            name=dict(type="str"),
-                            secret=dict(type="str"),
-                        )),
-                        view=dict(type="str"),
-                        zone=dict(type="str"),
-                    )),
-                    gss_tsig_fallback=dict(type="bool"),
-                    kerberos_kdc=dict(type="str"),
-                    kerberos_keys=dict(type="list", elements="dict", options=dict(
-                        key=dict(type="str"),
-                    )),
-                    kerberos_rekey_interval=dict(type="int"),
-                    kerberos_retry_interval=dict(type="int"),
-                    kerberos_tkey_lifetime=dict(type="int"),
-                    kerberos_tkey_protocol=dict(type="str"),
-                    server_principal=dict(type="str"),
-                )),
-            )),
-            ddns_client_update=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            ddns_conflict_resolution_mode=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            ddns_hostname_block=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            ddns_ttl_percent=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            ddns_update_on_renew=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            ddns_use_conflict_resolution=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            dhcp_config=dict(type="dict", options=dict(
-                abandoned_reclaim_time=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                abandoned_reclaim_time_v6=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                allow_unknown=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                allow_unknown_v6=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                echo_client_id=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                filters=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                    value=dict(type="list", elements="str"),
-                )),
-                filters_v6=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                    value=dict(type="list", elements="str"),
-                )),
-                ignore_client_uid=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                ignore_list=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                lease_time=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-                lease_time_v6=dict(type="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-            )),
-            dhcp_options=dict(type="dict", options=dict(
-                action=dict(type="str"),
-                value=dict(type="list", elements="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-            )),
-            dhcp_options_v6=dict(type="dict", options=dict(
-                action=dict(type="str"),
-                value=dict(type="list", elements="dict", options=dict(
-                    action=dict(type="str"),
-                )),
-            )),
-            header_option_filename=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            header_option_server_address=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            header_option_server_name=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            hostname_rewrite_block=dict(type="dict", options=dict(
-                action=dict(type="str"),
-            )),
-            vendor_specific_option_option_space=dict(type="dict", options=dict(
-                action=dict(type="str"),
-                value=dict(type="str"),
-            )),
-        )),
+        inheritance_sources=dict(
+            type="dict",
+            options=dict(
+                ddns_block=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(
+                            type="dict",
+                            options=dict(
+                                client_principal=dict(type="str"),
+                                ddns_domain=dict(type="str"),
+                                ddns_enabled=dict(type="bool"),
+                                ddns_send_updates=dict(type="bool"),
+                                ddns_zones=dict(
+                                    type="list",
+                                    elements="dict",
+                                    options=dict(
+                                        fqdn=dict(type="str"),
+                                        gss_tsig_enabled=dict(type="bool"),
+                                        nameservers=dict(
+                                            type="list",
+                                            elements="dict",
+                                            options=dict(
+                                                client_principal=dict(type="str"),
+                                                gss_tsig_fallback=dict(type="bool"),
+                                                kerberos_rekey_interval=dict(type="int", no_log=True),
+                                                kerberos_retry_interval=dict(type="int"),
+                                                kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                                                kerberos_tkey_protocol=dict(type="str", no_log=True),
+                                                nameserver=dict(type="str"),
+                                                server_principal=dict(type="str"),
+                                            ),
+                                        ),
+                                        tsig_enabled=dict(type="bool"),
+                                        tsig_key=dict(
+                                            type="dict",
+                                            options=dict(
+                                                algorithm=dict(type="str"),
+                                                comment=dict(type="str"),
+                                                key=dict(type="str", no_log=True),
+                                                name=dict(type="str"),
+                                                secret=dict(type="str", no_log=True),
+                                            ),
+                                            no_log=True,
+                                        ),
+                                        view=dict(type="str"),
+                                        zone=dict(type="str"),
+                                    ),
+                                ),
+                                gss_tsig_fallback=dict(type="bool"),
+                                kerberos_kdc=dict(type="str"),
+                                kerberos_keys=dict(
+                                    type="list",
+                                    elements="dict",
+                                    options=dict(
+                                        key=dict(type="str", no_log=True),
+                                    ),
+                                    no_log=True,
+                                ),
+                                kerberos_rekey_interval=dict(type="int", no_log=True),
+                                kerberos_retry_interval=dict(type="int"),
+                                kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                                kerberos_tkey_protocol=dict(type="str", no_log=True),
+                                server_principal=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
+                ddns_client_update=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                ddns_conflict_resolution_mode=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                ddns_hostname_block=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                ddns_ttl_percent=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                ddns_update_on_renew=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                ddns_use_conflict_resolution=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                dhcp_config=dict(
+                    type="dict",
+                    options=dict(
+                        abandoned_reclaim_time=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        abandoned_reclaim_time_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        allow_unknown=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        allow_unknown_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        echo_client_id=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        filters=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                                value=dict(type="list", elements="str"),
+                            ),
+                        ),
+                        filters_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                                value=dict(type="list", elements="str"),
+                            ),
+                        ),
+                        ignore_client_uid=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        ignore_list=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        lease_time=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        lease_time_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
+                dhcp_options=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(
+                            type="list",
+                            elements="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
+                dhcp_options_v6=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(
+                            type="list",
+                            elements="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
+                header_option_filename=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                header_option_server_address=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                header_option_server_name=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                hostname_rewrite_block=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                    ),
+                ),
+                vendor_specific_option_option_space=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(type="str"),
+                    ),
+                ),
+            ),
+        ),
         kerberos_kdc=dict(type="str"),
-        kerberos_keys=dict(type="list", elements="dict", options=dict(
-            key=dict(type="str"),
-        )),
-        kerberos_rekey_interval=dict(type="int"),
+        kerberos_keys=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                key=dict(type="str", no_log=True),
+            ),
+            no_log=True,
+        ),
+        kerberos_rekey_interval=dict(type="int", no_log=True),
         kerberos_retry_interval=dict(type="int"),
-        kerberos_tkey_lifetime=dict(type="int"),
-        kerberos_tkey_protocol=dict(type="str"),
+        kerberos_tkey_lifetime=dict(type="int", no_log=True),
+        kerberos_tkey_protocol=dict(type="str", no_log=True),
         name=dict(type="str"),
         profile_type=dict(type="str"),
         server_principal=dict(type="str"),
         tags=dict(type="dict"),
         vendor_specific_option_option_space=dict(type="str"),
-
     )
 
     module = ServerModule(
