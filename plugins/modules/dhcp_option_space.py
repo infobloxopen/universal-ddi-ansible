@@ -60,14 +60,14 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
-        State: present
+        state: present
 
     - name: Create a Option Space with additional fields
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
         comment: "example comment"
-        State: present
+        state: present
         tags:
             location: "site-1"
     
