@@ -63,7 +63,7 @@
       register: fixed_address_info
     - assert:
         that:
-          - fixed_address_info.objects | length != 0
+          - fixed_address_info.objects | length == 1
 
     - name: Get Fixed Address information by match type
       infoblox.universal_ddi.dhcp_fixed_address_info:
@@ -80,7 +80,7 @@
       register: fixed_address_info
     - assert:
         that:
-          - fixed_address_info.objects | length != 0
+          - fixed_address_info.objects | length == 1
           - fixed_address_info.objects[0].id == fixed_address.id
 
   always:
