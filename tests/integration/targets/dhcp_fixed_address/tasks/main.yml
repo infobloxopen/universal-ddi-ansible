@@ -275,7 +275,7 @@
 
     - name: Create a Fixed Address Match type ( mac )
       infoblox.universal_ddi.dhcp_fixed_address:
-        next_available_id: "{{ _subnet.id }}"
+        address: "10.0.0.1"
         name: "test_client_hex_fixed_address"
         match_type: "mac"
         match_value: "00:1a:2b:3c:4d:5e"
