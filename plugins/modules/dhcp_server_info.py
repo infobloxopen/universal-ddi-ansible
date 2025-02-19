@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_server_info
-short_description: Retrieves Server
+short_description: Retrieves DHCP Server
 description:
-    - Retrieves information about existing dhcp server
+    - Retrieves information about existing DHCP Servers(DHCP Config Profile).
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:

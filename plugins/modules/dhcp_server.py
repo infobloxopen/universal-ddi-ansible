@@ -10,9 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_server
-short_description: Manage a Server
+short_description: Manages a DHCP Server.
 description:
-    - Manage a Server
+    - Manages a DHCP Server.
+    - A DHCP Server is a named configuration profile that can be shared for specified list of hosts.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
