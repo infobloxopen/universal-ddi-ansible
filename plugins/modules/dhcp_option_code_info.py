@@ -139,8 +139,8 @@ objects:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from universal_ddi_client import ApiException, NotFoundException
     from ipam import OptionCodeApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
@@ -165,8 +165,11 @@ class OptionCodeInfoModule(UniversalDDIAnsibleModule):
         filter_str = None
         if self.params["filters"] is not None:
             filter_str = " and ".join(
-                [f"{k}=={v}" if isinstance(v, int) else f"{k}=='{v}'" for k, v in self.params["filters"].items() if
-                 v is not None]
+                [
+                    f"{k}=={v}" if isinstance(v, int) else f"{k}=='{v}'"
+                    for k, v in self.params["filters"].items()
+                    if v is not None
+                ]
             )
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
@@ -176,9 +179,7 @@ class OptionCodeInfoModule(UniversalDDIAnsibleModule):
 
         while True:
             try:
-                resp = OptionCodeApi(self.client).list(
-                    offset=offset, limit=self._limit, filter=filter_str
-                )
+                resp = OptionCodeApi(self.client).list(offset=offset, limit=self._limit, filter=filter_str)
 
                 # If no results, set results to empty list
                 if not resp.results:
