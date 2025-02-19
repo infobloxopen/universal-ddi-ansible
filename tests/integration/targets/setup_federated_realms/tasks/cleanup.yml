@@ -1,0 +1,17 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+      - name: "Delete Federated Realm 1"
+        infoblox.universal_ddi.ipam_federated_realm:
+          name: "{{ federated_realm1_name }}"
+          state: absent
+        ignore_errors: true
+
+      - name: "Delete Federated Realm 2"
+        infoblox.universal_ddi.ipam_federated_realm:
+          name: "{{ federated_realm2_name }}"
+          state: absent
+        ignore_errors: true
