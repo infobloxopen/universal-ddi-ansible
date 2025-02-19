@@ -49,8 +49,13 @@ options:
             - "* I(ignore): DHCP server always updates DNS, even if the client says not to."
             - "* I(over_client_update): Same as I(server). DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates."
             - "* I(over_no_update): DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it."
-            - "Defaults to I(client)."
         type: str
+        choices:
+            - client
+            - server
+            - ignore
+            - over_client_update
+            - over_no_update
     ddns_conflict_resolution_mode:
         description:
             - "The mode used for resolving conflicts while performing DDNS updates."
@@ -340,6 +345,9 @@ options:
                     - "* I(group)"
                     - "* I(option)"
                 type: str
+                choices:
+                    - "group"
+                    - "option"
     gss_tsig_fallback:
         description:
             - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
@@ -973,6 +981,9 @@ options:
             - "* I(server): The server profile type."
             - "* I(subnet): The subnet profile type."
         type: str
+        choices:
+            - server
+            - subnet
     server_principal:
         description:
             - "The Kerberos principal name of the external DNS server that will receive updates."
@@ -992,12 +1003,12 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create a dhcp server
+    - name: Create a DHCP server
       infoblox.universal_ddi.dhcp_server:
         name: "example-dhcp-server"
         state: present
 
-    - name: Create a dhcp server with additional fields
+    - name: Create a DHCP server with additional fields
       infoblox.universal_ddi.dhcp_server:
         name: "test-dhcp-server"
         comment: "example-comment"
@@ -1007,7 +1018,7 @@ EXAMPLES = r"""
           location: "site-1"
         state: present
 
-    - name: Delete a dhcp server
+    - name: Delete a DHCP server
       infoblox.universal_ddi.dhcp_server:
         name: "example-dhcp-server"
         state: absent        
@@ -2827,7 +2838,9 @@ def main():
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         client_principal=dict(type="str"),
         comment=dict(type="str"),
-        ddns_client_update=dict(type="str"),
+        ddns_client_update=dict(
+            type="str", choices=["client", "server", "ignore", "over_client_update", "over_no_update"]
+        ),
         ddns_conflict_resolution_mode=dict(
             type="str", choices=["check_with_dhcid", "no_check_with_dhcid", "check_exists_with_dhcid"]
         ),
@@ -2916,7 +2929,7 @@ def main():
                 group=dict(type="str"),
                 option_code=dict(type="str"),
                 option_value=dict(type="str"),
-                type=dict(type="str"),
+                type=dict(type="str", choices=["group", "option"]),
             ),
         ),
         gss_tsig_fallback=dict(type="bool"),
@@ -3177,7 +3190,7 @@ def main():
         kerberos_tkey_lifetime=dict(type="int", no_log=True),
         kerberos_tkey_protocol=dict(type="str", no_log=True),
         name=dict(type="str"),
-        profile_type=dict(type="str"),
+        profile_type=dict(type="str", choices=["server", "subnet"]),
         server_principal=dict(type="str"),
         tags=dict(type="dict"),
         vendor_specific_option_option_space=dict(type="str"),

@@ -57,21 +57,21 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get dhcp server information by ID
+    - name: Get DHCP server information by ID
       infoblox.universal_ddi.dhcp_server_info:
         id: "{{ dhcp_server.id }}"
 
-    - name: Get dhcp server information by name
+    - name: Get DHCP server information by name
       infoblox.universal_ddi.dhcp_server_info:
         filters:
           name: "example-dhcp-server"
 
-    - name: Get dhcp server information by tag_filters
+    - name: Get DHCP server information by tag_filters
       infoblox.universal_ddi.dhcp_server_info:
         tag_filters:
           location: "site-1"
           
-    - name: Get dhcp server information by filter query
+    - name: Get DHCP server information by filter query
       infoblox.universal_ddi.dns_acl_info:
         filter_query: "name=='example-dhcp-server'"
         
