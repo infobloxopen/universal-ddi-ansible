@@ -115,6 +115,26 @@
         that:
           - fixed_address_info.objects | length == 0
 
+    - name: Delete a Fixed Address (idempotent)
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        ip_space: "{{ _ip_space.id }}"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        state: "absent"
+      register: fixed_address
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address is not changed
+          - fixed_address is not failed
+          - fixed_address_info.objects | length == 0
+
     - name: Create a Fixed Address with comment
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
