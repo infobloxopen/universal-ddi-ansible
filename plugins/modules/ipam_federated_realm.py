@@ -256,16 +256,16 @@ class FederatedRealmModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "FederatedRealm created"
+                result["msg"] = "Federated Realm created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "FederatedRealm updated"
+                    result["msg"] = "Federated Realm updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "FederatedRealm deleted"
+                result["msg"] = "Federated Realm deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
