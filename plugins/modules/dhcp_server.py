@@ -61,6 +61,10 @@ options:
             - "* I(no_check_without_dhcid): This ignores conflict detection and will not add a DHCID record when creating/updating a DDNS entry."
             - "Defaults to I(check_with_dhcid)."
         type: str
+        choices:
+            - "check_with_dhcid"
+            - "no_check_with_dhcid"
+            - "check_exists_with_dhcid"
     ddns_domain:
         description:
             - "The domain suffix for DDNS updates. FQDN, may be empty."
@@ -161,7 +165,7 @@ options:
                             - "Defaults to I(tcp)."
                         type: str
                     nameserver:
-                        description: ""
+                        description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                         type: str
                     server_principal:
                         description:
@@ -464,7 +468,7 @@ options:
                                                     - "Defaults to I(tcp)."
                                                 type: str
                                             nameserver:
-                                                description: ""
+                                                description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                                                 type: str
                                             server_principal:
                                                 description:
@@ -998,23 +1002,7 @@ EXAMPLES = r"""
         name: "test-dhcp-server"
         comment: "example-comment"
         profile_type: "server"
-        server_principal: "example.com"
-        ddns_client_update: "client"
-        ddns_domain: "example.com"
-        ddns_enabled: true
-        ddns_generate_name: true
-        ddns_generated_prefix: "myhost-prefix"
-        ddns_conflict_resolution_mode: "check_with_dhcid"
         ddns_ttl_percent: 50
-        ddns_update_on_renew: true
-        ddns_use_conflict_resolution: true
-        dhcp_config:
-          allow_unknown: true
-          allow_unknown_v6: true
-          ignore_client_uid: true
-          lease_time: 50
-          lease_time_v6: 60
-        gss_tsig_fallback: true
         tags: 
           location: "site-1"
         state: present
@@ -1194,7 +1182,7 @@ item:
                             type: str
                             returned: Always
                         nameserver:
-                            description: ""
+                            description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                             type: str
                             returned: Always
                         server_principal:
@@ -1580,7 +1568,7 @@ item:
                                                     type: str
                                                     returned: Always
                                                 nameserver:
-                                                    description: ""
+                                                    description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                                                     type: str
                                                     returned: Always
                                                 server_principal:
@@ -2717,9 +2705,9 @@ except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
 
-class ServerModule(UniversalDDIAnsibleModule):
+class DHCPServerModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(ServerModule, self).__init__(*args, **kwargs)
+        super(DHCPServerModule, self).__init__(*args, **kwargs)
 
         exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
@@ -2840,7 +2828,9 @@ def main():
         client_principal=dict(type="str"),
         comment=dict(type="str"),
         ddns_client_update=dict(type="str"),
-        ddns_conflict_resolution_mode=dict(type="str"),
+        ddns_conflict_resolution_mode=dict(
+            type="str", choices=["check_with_dhcid", "no_check_with_dhcid", "check_exists_with_dhcid"]
+        ),
         ddns_domain=dict(type="str"),
         ddns_enabled=dict(type="bool"),
         ddns_generate_name=dict(type="bool"),
@@ -3193,7 +3183,7 @@ def main():
         vendor_specific_option_option_space=dict(type="str"),
     )
 
-    module = ServerModule(
+    module = DHCPServerModule(
         argument_spec=module_args,
         supports_check_mode=True,
         required_if=[("state", "present", ["name"])],

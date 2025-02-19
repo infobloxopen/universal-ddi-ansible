@@ -247,7 +247,7 @@ objects:
                             type: str
                             returned: Always
                         nameserver:
-                            description: ""
+                            description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                             type: str
                             returned: Always
                         server_principal:
@@ -633,7 +633,7 @@ objects:
                                                     type: str
                                                     returned: Always
                                                 nameserver:
-                                                    description: ""
+                                                    description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
                                                     type: str
                                                     returned: Always
                                                 server_principal:
@@ -1770,9 +1770,9 @@ except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
 
-class ServerInfoModule(UniversalDDIAnsibleModule):
+class DHCPServerInfoModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(ServerInfoModule, self).__init__(*args, **kwargs)
+        super(DHCPServerInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
@@ -1850,7 +1850,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = ServerInfoModule(
+    module = DHCPServerInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[
