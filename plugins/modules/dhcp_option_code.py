@@ -72,6 +72,30 @@ extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Create a DHCP Option Space (Required as parent)
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: present
+      check_mode: true
+      register: option_space
+    
+    - name: Create a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+          name: "example_option_code_name"
+          code: "145"
+          option_space: "{{ option_space.id }}"
+          type: "int64"
+          state: present
+      register: option_code
+    
+    - name: Delete a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        id: "{{ option_code.id }}"
+        state: absent
+      register: option_code
+"""  # noqa: E501
+
 RETURN = r"""
 id:
     description:

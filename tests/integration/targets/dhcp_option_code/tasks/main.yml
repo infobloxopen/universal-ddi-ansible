@@ -9,31 +9,11 @@
         option_code: 234
         option_item_type: "boolean"
 
-#after spcae PR is mergered we can use this
-#    - name: Create a DHCP Option Space (check mode)
-#      infoblox.universal_ddi.dhcp_option_space:
-#        name: "{{ option_space_name }}"
-#        protocol: "ip4"
-#        state: present
-#      check_mode: true
-#      register: option_space
-#
-#    - name: Get Information about the DHCP Option Space
-#      infoblox.universal_ddi.dhcp_option_space_info:
-#        filters:
-#          name: "{{ option_space_name }}"
-#      register: option_space_info
-#
-#    - assert:
-#        that:
-#          - option_space is changed
-#          - option_space_info is not failed
-#          - option_space_info.objects | length == 0
     - name: Create a DHCP Option Code (check mode)
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: present
       check_mode: true
@@ -43,7 +23,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -55,7 +35,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: present
       register: option_code
@@ -64,7 +44,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -78,7 +58,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: present
       register: option_code
@@ -91,7 +71,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: absent
       check_mode: true
@@ -101,7 +81,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -113,7 +93,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: absent
       register: option_code
@@ -122,7 +102,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         comment: "This is a test comment"
         state: present
@@ -132,7 +112,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -147,7 +127,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         comment: "This is a test comment"
         array: true
@@ -158,7 +138,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -173,7 +153,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "int16"
         comment: "This is a test comment"
         array: true
@@ -184,7 +164,7 @@
         filters:
           name: "{{ option_code_name }}"
           code: 234
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -200,7 +180,7 @@
 #      infoblox.universal_ddi.dhcp_option_code:
 #        code: 235
 #        name: "{{ option_code_name }}"
-#        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+#        option_space: "{{_option_space.id}}"
 #        type: "{{ option_item_type }}"
 #        state: present
 #      register: option_code
@@ -209,7 +189,7 @@
 #        filters:
 #          name: "{{ option_code_name }}"
 #          code: 235
-#          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+#          option_space: "{{_option_space.id}}"
 #      register: option_code_info
 #    - assert:
 #        that:
@@ -227,14 +207,14 @@
         type: "{{ item.type }}"
         state: present
       loop:
-        - { code: 234, name: "basic_opt_code_1", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "int16" }
-        - { code: 235, name: "basic_opt_code_2", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "text" }
-        - { code: 236, name: "basic_opt_code_3", option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f", type: "int16" }
+        - { code: 234, name: "basic_opt_code_1", option_space: "{{_option_space.id}}", type: "int16" }
+        - { code: 235, name: "basic_opt_code_2", option_space: "{{_option_space.id}}", type: "text" }
+        - { code: 236, name: "basic_opt_code_3", option_space: "{{_option_space.id}}", type: "int16" }
       register: option_code
     - name: Get Information about DHCP Option Codes
       infoblox.universal_ddi.dhcp_option_code_info:
         filters:
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -247,7 +227,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "int16"
         state: absent
 
@@ -255,7 +235,7 @@
       infoblox.universal_ddi.dhcp_option_code:
         code: 235
         name: "basic_opt_code_2"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "text"
         state: absent
 
@@ -263,6 +243,11 @@
       infoblox.universal_ddi.dhcp_option_code:
           code: 236
           name: "basic_opt_code_3"
-          option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+          option_space: "{{_option_space.id}}"
           type: "int16"
           state: absent
+
+    - name: Delete the DHCP Option Space
+      ansible.builtin.include_role:
+        name: setup_option_space
+        tasks_from: cleanup.yml

@@ -31,31 +31,27 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    inherit:
-        description:
-            - Return inheritance information
-        type: str
-        required: false
-        choices:
-            - full
-            - partial
-            - none
-        default: full
-    tag_filters:
-        description:
-            - Filter dict to filter objects by tags
-        type: dict
-        required: false
-    tag_filter_query:
-        description:
-            - Filter query to filter objects by tags
-        type: str
-        required: false
-
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Get OptionCode by ID
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          id: "{{ option_code.id }}"
+      register: option_code_info
+      
+    - name: Get DHCP Option Code information by filter query
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filter_query: "name=='{{ option_code_name }}'"
+        
+    - name: Get Information about the DHCP Option Code by Name
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+            
+"""  # noqa: E501
 RETURN = r"""
 id:
     description:
@@ -157,7 +153,7 @@ class OptionCodeInfoModule(UniversalDDIAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = OptionCodeApi(self.client).read(self.params["id"], inherit="full")
+            resp = OptionCodeApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
@@ -168,7 +164,6 @@ class OptionCodeInfoModule(UniversalDDIAnsibleModule):
 
         filter_str = None
         if self.params["filters"] is not None:
-            #filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["filters"].items()])
             filter_str = " and ".join(
                 [f"{k}=={v}" if isinstance(v, int) else f"{k}=='{v}'" for k, v in self.params["filters"].items() if
                  v is not None]
@@ -181,16 +176,14 @@ class OptionCodeInfoModule(UniversalDDIAnsibleModule):
 
         while True:
             try:
-                #self.fail_json(msg=filter_str)
                 resp = OptionCodeApi(self.client).list(
                     offset=offset, limit=self._limit, filter=filter_str
                 )
-                #self.fail_json(msg="after")
+
                 # If no results, set results to empty list
                 if not resp.results:
                     resp.results = []
 
-                #self.fail_json(msg=resp.results)
                 all_results.extend(resp.results)
 
                 if len(resp.results) < self._limit:

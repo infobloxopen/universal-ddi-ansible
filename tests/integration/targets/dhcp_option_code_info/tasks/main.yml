@@ -15,7 +15,7 @@
         name: "{{ option_code_name }}"
         code: "{{ option_code }}"
         type: "{{ option_item_type }}"
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         state: present
       register: option_code
 
@@ -52,7 +52,11 @@
       infoblox.universal_ddi.dhcp_option_code:
         name: "{{ option_code_name }}"
         code: 234
-        option_space: "dhcp/option_space/360d199f-c09b-47f6-883f-4c981945a74f"
+        option_space: "{{_option_space.id}}"
         type: "{{ option_item_type }}"
         state: absent
 
+    - name: Delete the DHCP Option Space
+      ansible.builtin.include_role:
+        name: setup_option_space
+        tasks_from: cleanup.yml

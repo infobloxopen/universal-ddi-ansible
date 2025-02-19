@@ -1,0 +1,12 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - name: "Delete DHCP Option space"
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        state: "absent"
+      ignore_errors: true

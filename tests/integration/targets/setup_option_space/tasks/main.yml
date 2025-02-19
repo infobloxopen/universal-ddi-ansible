@@ -1,0 +1,16 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        option_space_name: "test-infra-service-{{ 999999 | random | string }}"
+
+    # Create an option code
+    - name: "Create an Option Code"
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        state: "present"
+      register: _option_space
