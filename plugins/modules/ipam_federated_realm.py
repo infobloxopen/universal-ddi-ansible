@@ -12,6 +12,7 @@ DOCUMENTATION = r"""
 module: ipam_federated_realm
 short_description: Manages the Federated Realm
 description:
+    - Manages the Federated Realm
     - The Federated Realm object is a unique set of federated blocks per realm.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
@@ -74,7 +75,6 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_federated_realm:
         name: "example_federated_realm"
         state: "present"
-      register: federated_realm
 
     - name: Create a Federated Realm with Additional Parameters
       infoblox.universal_ddi.ipam_federated_realm:
@@ -83,7 +83,6 @@ EXAMPLES = r"""
         state: "present"
         tags:
             location: "site-1"
-      register: federated_realm
 
     - name: Delete the Federated Realm
       infoblox.universal_ddi.ipam_federated_realm:
@@ -94,12 +93,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the FederatedRealm object
+        - ID of the Federated Realm object
     type: str
     returned: Always
 item:
     description:
-        - FederatedRealm object
+        - Federated Realm object
     type: complex
     returned: Always
     contains:

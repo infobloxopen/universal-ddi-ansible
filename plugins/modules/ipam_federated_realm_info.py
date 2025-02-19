@@ -12,6 +12,7 @@ DOCUMENTATION = r"""
 module: ipam_federated_realm_info
 short_description: Retrieves information about existing Federated Realm
 description:
+    - Retrieves information about existing Federated Realm
     - The Federated Realm object is a unique set of federated blocks per realm.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
@@ -69,12 +70,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the FederatedRealm object
+        - ID of the Federated Realm object
     type: str
     returned: Always
 objects:
     description:
-        - FederatedRealm object
+        - Federated Realm object
     type: list
     elements: dict
     returned: Always
