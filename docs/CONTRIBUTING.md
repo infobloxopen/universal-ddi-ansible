@@ -1,4 +1,4 @@
-_# Contributing to infoblox.universal_ddi collection
+# Contributing to infoblox.universal_ddi collection
 
 Welcome to the Universal DDI Ansible Repository ! We are excited that you are interested in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
 ## Workflow Summary
