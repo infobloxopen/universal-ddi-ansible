@@ -1,4 +1,4 @@
-# Contributing to infoblox.universal_ddi collection
+_# Contributing to infoblox.universal_ddi collection
 
 Welcome to the Universal DDI Ansible Repository ! We are excited that you are interested in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
 ## Workflow Summary
@@ -10,9 +10,27 @@ Welcome to the Universal DDI Ansible Repository ! We are excited that you are in
 
 ## Setup
 
-The `ansible-test` command expects that the repository is in a directory that matches it's collection,
-under the directory `ansible_collections`. Clone the repository from GitHub ensuring the hierarchy:
+The `ansible-test` command expects that the repository is in a directory that matches it's collection. Here's the required directory structure you need to set up in your development environment:
 
+```
+<target_directory>/ansible_collections/infoblox/universal_ddi/
+├── changelogs/
+├── docs/
+├── meta/
+├── plugins/
+│   ├── doc_fragments/
+│   ├── lookup/
+│   ├── module_utils/
+│   ├── modules/
+│   └── plugin_utils/
+├── tests
+│   ├── integration/
+│   │   └── targets/
+│   └── unit/
+└── venv/
+```
+
+Clone the repository from GitHub ensuring the hierarchy.
 ```shell
 mkdir -p $TARGET_DIR/ansible_collections/infoblox
 git clone <url> $TARGET_DIR/ansible_collections/infoblox/universal_ddi
@@ -46,7 +64,7 @@ Create two files for each module:
 
 Place these files under `/plugins/modules`.
 
-#### Documentation Examples and Return section inside modules
+#### Documentation, Examples and Return section inside modules
 
 **Documentation Section** Each module file should start with a comprehensive documentation section. [Module format and documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html#module-format-and-documentation) guide gives  details about how to document.
 
@@ -58,18 +76,59 @@ Place these files under `/plugins/modules`.
 
 ### Writing Integration Tests
 
-- All modules MUST have integration tests for new features. Bug fixes for modules that currently have integration tests SHOULD have tests added.
-
-- Start by adding tests in tests/integration/targets/MODULE_NAME for your new feature.
-
 - Each module must also be added to the all group in meta/runtime.yml. This will allow to reuse common variables like portal_key in the test. 
 
+- All modules MUST have integration tests for new features. Bug fixes for modules that currently have integration tests SHOULD have tests added.
+
+- Start by adding tests in tests/integration/targets/MODULE_NAME for your new feature. The tests are supposed to be added for all writable attributes of the object. The complete list of attributes can be found in the [API Documentation](https://csp.infoblox.com/apidoc).
+
+### Coding Style Guidelines
+
+-  **Properly Naming Tasks** : Each task within your tests should have a specific, descriptive name that clearly states what the test does.
+      ```
+    - name: "Create an IP space"
+      infoblox.universal_ddi.ipam_ip_space:
+          name: "{{ name }}"
+          state: "present"
+          .....
+   ``` 
+
+- Use well-defined and easily readable variable names.
+
+     ```name: "test-ip-space"```
+
+- If your playbook has many debug statements consider using the `verbosity` parameter that allows you to control when certain messages appear.
+  ```
+  - debug:
+      msg: "This message always appears on the console."
+
+  - debug:
+      msg: "This message only appears on the console with ansible-playbook -vv+"
+      verbosity: 2
+    ```
+
+- **Clean Up After Tests**: Always clean up test artifacts to ensure tests do not interfere with each other.
+
+    ```yaml
+  always:
+    # Cleanup if the test fails
+    - name: "Delete IP Space"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        state: "absent"
+      ignore_errors: true
+    ```
 ### Expected test criteria
 
 - Resource creation under check mode
 - Resource creation
 - Resource creation again (idempotency)
 - Resource updation with all additional attributes under the object
+- Resource deletion under check mode
+- Resource deletion
+- Resource deletion again (idempotency)
+
+For more detailed example, refer to [/tests/integration/targets/ipam_ip_space/tasks/main.yml](../tests/integration/targets/ipam_ip_space/tasks/main.yml)
 
 ### Configuration
 
@@ -90,11 +149,25 @@ For local testing, ensure you set up your integration test configuration
             portal_url: "{{ portal_url }}"
             portal_key: "{{ portal_key }}"
    ```
-Run tests for the desired module(s):
+### Linting
+
+To facilitate consistent coding style across the project, please run the following command before running the tests
+
+```shell
+make lint
+```
+
+The `make lint` command leverages `flynt`, `black` and `isort` ensuring proper formatting and alignment with style guidelines.
+
+These libraries are included in `test-requirements.txt` and must be installed prior to use.
+
+### Running Tests
+Run tests for the desired module(s) using the following command
 
 ```shell
 ansible-test integration <module_name> 
 ```
+
 If you want more detailed output, run the command with -vvv 
 
 ```shell
@@ -135,7 +208,7 @@ https://docs.ansible.com/ansible/latest/community/index.html).
 
 - [Contributing to Collections](https://docs.ansible.com/ansible/devel/dev_guide/developing_collections.html#contributing-to-collections) - How to check out collection git repositories correctly
  
-- `infoblox.universal_ddi` modules uses the Universal DDI Python client library. This provides a more consistent experience across the modules and supports a wider range of BloxOne services.
+- `infoblox.universal_ddi` modules uses the Universal DDI Python client library. This provides a more consistent experience across the modules and supports a wider range of UniversalDDI services.
 Information about its usage can be found [here](https://github.com/infobloxopen/universal-ddi-python-client/blob/main/README.md)
 
 ## Code of Conduct 
