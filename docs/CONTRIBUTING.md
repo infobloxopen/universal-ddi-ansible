@@ -1,6 +1,6 @@
 # Contributing to infoblox.universal_ddi collection
 
-Welcome to the Universal DDI Ansible Repository ! We are excited that you are interested in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
+Welcome to the Universal DDI Ansible Repository ! We're thrilled about your interest in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
 ## Workflow Summary
 
 1. [Setup](#setup)
@@ -29,11 +29,12 @@ The `ansible-test` command expects that the repository is in a directory that ma
 │   └── unit/
 └── venv/
 ```
+Before making any changes, it's essential to fork the repository. This allows you to work on your own copy of the project and makes it easy to contribute your changes back to the main repository through a pull request.
 
 Clone the repository from GitHub ensuring the hierarchy.
 ```shell
 mkdir -p $TARGET_DIR/ansible_collections/infoblox
-git clone <url> $TARGET_DIR/ansible_collections/infoblox/universal_ddi
+git clone https://github.com/<your_username>/universal-ddi-ansible.git $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 ```
 
 The python requirements must be installed separately. It is recommended to use a Virtual Environment to isolate the dependencies and maintain a clean setup. 
@@ -74,62 +75,6 @@ Place these files under `/plugins/modules`.
 
 ## Testing the Code Changes
 
-### Writing Integration Tests
-
-- Each module must also be added to the all group in meta/runtime.yml. This will allow to reuse common variables like portal_key in the test. 
-
-- All modules MUST have integration tests for new features. Bug fixes for modules that currently have integration tests SHOULD have tests added.
-
-- Start by adding tests in tests/integration/targets/MODULE_NAME for your new feature. The tests are supposed to be added for all writable attributes of the object. The complete list of attributes can be found in the [API Documentation](https://csp.infoblox.com/apidoc).
-
-### Coding Style Guidelines
-
--  **Properly Naming Tasks** : Each task within your tests should have a specific, descriptive name that clearly states what the test does.
-      ```
-    - name: "Create an IP space"
-      infoblox.universal_ddi.ipam_ip_space:
-          name: "{{ name }}"
-          state: "present"
-          .....
-   ``` 
-
-- Use well-defined and easily readable variable names.
-
-     ```name: "test-ip-space"```
-
-- If your playbook has many debug statements consider using the `verbosity` parameter that allows you to control when certain messages appear.
-  ```
-  - debug:
-      msg: "This message always appears on the console."
-
-  - debug:
-      msg: "This message only appears on the console with ansible-playbook -vv+"
-      verbosity: 2
-    ```
-
-- **Clean Up After Tests**: Always clean up test artifacts to ensure tests do not interfere with each other.
-
-    ```yaml
-  always:
-    # Cleanup if the test fails
-    - name: "Delete IP Space"
-      infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        state: "absent"
-      ignore_errors: true
-    ```
-### Expected test criteria
-
-- Resource creation under check mode
-- Resource creation
-- Resource creation again (idempotency)
-- Resource updation with all additional attributes under the object
-- Resource deletion under check mode
-- Resource deletion
-- Resource deletion again (idempotency)
-
-For more detailed example, refer to [/tests/integration/targets/ipam_ip_space/tasks/main.yml](../tests/integration/targets/ipam_ip_space/tasks/main.yml)
-
 ### Configuration
 
 For local testing, ensure you set up your integration test configuration
@@ -149,6 +94,54 @@ For local testing, ensure you set up your integration test configuration
             portal_url: "{{ portal_url }}"
             portal_key: "{{ portal_key }}"
    ```
+
+### Writing Integration Tests
+
+- Each module must also be added to the all group in meta/runtime.yml. This will allow to reuse common variables like portal_key in the test. 
+
+- All modules MUST have integration tests for new features. Bug fixes for modules that currently have integration tests SHOULD have tests added.
+
+- Start by adding tests in tests/integration/targets/MODULE_NAME for your new feature. The tests are supposed to be added for all writable attributes of the object. The complete list of attributes can be found in the [API Documentation](https://csp.infoblox.com/apidoc).
+
+### Expected test criteria
+
+- Resource creation under check mode
+- Resource creation
+- Resource creation again (idempotency)
+- Resource deletion under check mode
+- Resource deletion
+- Resource deletion again (idempotency)
+- Resource updation with all additional attributes under the object
+
+For more detailed example, refer to [/tests/integration/targets/ipam_ip_space/tasks/main.yml](../tests/integration/targets/ipam_ip_space/tasks/main.yml)
+
+### Coding Style Guidelines
+
+-  **Properly Naming Tasks** : Each task within your tests should have a specific, descriptive name that clearly states what the test does.
+      ```
+    - name: "Create an IP space"
+      infoblox.universal_ddi.ipam_ip_space:
+          name: "{{ name }}"
+          state: "present"
+          .....
+   ``` 
+
+- Use well-defined and easily readable variable names.
+
+     ```name: "test-ip-space"```
+
+- **Clean Up After Tests**: Always clean up test artifacts to ensure tests do not interfere with each other.
+
+    ```yaml
+  always:
+    # Cleanup if the test fails
+    - name: "Delete IP Space"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        state: "absent"
+      ignore_errors: true
+    ```
+
 ### Linting
 
 To facilitate consistent coding style across the project, please run the following command before running the tests
