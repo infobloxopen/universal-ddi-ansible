@@ -31,27 +31,6 @@ options:
             - present
             - absent
         default: present
-    allocation_v4:
-        description:
-            - "The aggregate of all Federated Blocks within the Realm."
-        type: dict
-        suboptions:
-            allocated:
-                description:
-                    - "Percent of total space allocated."
-                type: int
-            delegated:
-                description:
-                    - "Percent of total space delegated."
-                type: int
-            overlapping:
-                description:
-                    - "Percent of total space in overlapping blocks."
-                type: int
-            reserved:
-                description:
-                    - "Percent of total space reserved."
-                type: int
     comment:
         description:
             - "The description of the federated realm. May contain 0 to 1024 characters. Can include UTF-8."
@@ -289,7 +268,6 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        allocation_v4=dict(type="dict", options=dict()),
         comment=dict(type="str"),
         name=dict(type="str", required=True),
         tags=dict(type="dict"),
