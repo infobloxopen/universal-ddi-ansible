@@ -1,0 +1,221 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        option_group_name: "test-option-group-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Group ( check mode )
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "present"
+      check_mode: yes
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+        filters:
+          name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group is not failed
+          - option_group_info.objects | length == 0
+
+    - name: Create a DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+        name: "{{ option_group_name }}"
+        state: "present"
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+        filters:
+          name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+
+    - name: Create the DHCP Option Group (idempotent)
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "present"
+      register: option_group
+    - assert:
+        that:
+          - option_group is not changed
+          - option_group is not failed
+
+    - name: Delete the DHCP Option Group (check mode)
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "absent"
+      check_mode: yes
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+            name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 1
+
+    - name: Delete the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "absent"
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 0
+
+    - name: Delete the DHCP Option Group (idempotent)
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "absent"
+      register: option_group
+    - assert:
+        that:
+          - option_group is not changed
+          - option_group is not failed
+
+    - name: Create a DHCP Option Group with a comment
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          comment: "This is a test DHCP Option Group"
+          state: "present"
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group is not failed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].comment == "This is a test DHCP Option Group"
+
+    - name: Delete the DHCP Option Group with protocol ip6
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}_ip6"
+          protocol: "ip6"
+          state: "present"
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}_ip6"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group is not failed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].protocol == "ip6"
+
+    - name: Create a DHCP option Group with tags
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          tags:
+              location: "my-location"
+          state: "present"
+      register: option_group
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group is not failed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].tags.location == "my-location"
+
+    - name: Create a second DHCP option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}_2"
+          state: "present"
+      register: option_group_2
+    - name: Get information about the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}_2"
+      register: option_group_info_2
+    - assert:
+        that:
+          - option_group_2 is changed
+          - option_group_2 is not failed
+          - option_group_info_2 is not failed
+          - option_group_info_2.objects | length == 1
+          - option_group_info_2.objects[0].id == option_group_2.object.id
+          - option_group_info_2.objects[0].name == option_group_2.object.name
+
+    - name: Create a DHCP Option for the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          dhcp_options:
+            - type: "group"
+              group: "{{ option_group_2.id }}"
+          state: "present"
+      register: option_group
+    - name: Get information about the DHCP Option
+      infoblox.universal_ddi.dhcp_option_group_info:
+          filters:
+              name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group is changed
+          - option_group is not failed
+          - option_group_info is not failed
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.object.id
+          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].dhcp_options[0].type == "group"
+          - option_group_info.objects[0].dhcp_options[0].group == option_group_2.id
+          
+  always:
+    - name: Delete the DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          state: "absent"
+      ignore_errors: yes
+
+    - name: Delete the DHCP Option Group with protocol ip6
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}_ip6"
+          protocol: "ip6"
+          state: "absent"
+      ignore_errors: yes
+
+    - name: Delete the second DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}_2"
+          state: "absent"
+      ignore_errors: yes

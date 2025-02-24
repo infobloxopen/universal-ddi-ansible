@@ -66,3 +66,5 @@ action_groups:
     - dhcp_fixed_address_info
     - dhcp_server
     - dhcp_server_info
+    - dhcp_option_group
+    - dhcp_option_group_info
