@@ -209,7 +209,7 @@ ansible-test integration
 - Your PR will be reviewed by repository maintainers. During this phase, maintainers may suggest or request changes. This feedback might relate to coding standards, functionality issues, or improvements in the logic or structure of the code.
 - It is essential that you actively engage in the discussion of your PR. Respond to comments, clarify your choices when asked, and incorporate feedback appropriately.
 - Once maintainers are satisfied with the updated PR and all checks are passed, the maintainer will approve the PR. 
-## Reporting an issue
+## Reporting an Issue
 
 - When you find a bug, you can help tremendously by reporting an issue.
 - Please [search in the issue list](https://github.com/infobloxopen/universal-ddi-ansible/issues) and if it has not been already reported, [open a new issue](https://github.com/infobloxopen/universal-ddi-ansible/issues/new)
