@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_federation_federated_realm_info
-short_description: Retrieves information about existing Federated Realm
+short_description: Retrieves Federated Realms
 description:
-    - Retrieves information about existing Federated Realm
+    - Retrieves information about existing Federated Realms.
     - The Federated Realm object is a unique set of federated blocks per realm.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)

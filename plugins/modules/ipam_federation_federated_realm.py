@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: ipam_federation_federated_realm
 short_description: Manages the Federated Realm
 description:
-    - Manages the Federated Realm
+    - Manages the Federated Realm.
     - The Federated Realm object is a unique set of federated blocks per realm.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
