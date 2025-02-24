@@ -67,5 +67,5 @@
 
     - name: "Delete the Federated Realms"
       ansible.builtin.include_role:
-        name: setup_federated_realms
+        name: setup_federation_federated_realms
         tasks_from: cleanup.yml

@@ -28,7 +28,7 @@
 
     - name: Create a Federated Block
       infoblox.universal_ddi.ipam_federation_federated_block:
-        address: "45.85.0.0/16" #This cidr is prioritised over the cidr in the address
+        address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm1.id }}"
         state: present
       register: federated_block
@@ -129,7 +129,7 @@
       infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm1.id }}"
-        comment: "Test Comment"
+        comment: "Test Federated Block"
         state: present
       register: federated_block
     - name: Get Information about the Federated Block
@@ -143,7 +143,7 @@
           - federated_block_info is not failed
           - federated_block_info.objects | length == 1
           - federated_block_info.objects[0].id == federated_block.id
-          - federated_block_info.objects[0].comment == "Test Comment"
+          - federated_block_info.objects[0].comment == "Test Federated Block"
           - federated_block_info.objects[0].federated_realm == federated_block.object.federated_realm
 
     - name: Create a Federated Block with Tags
@@ -239,6 +239,7 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "98.0.0.0/8"
+        # federated_realm: "{{ _federated_realm2.id }}" #[NORTHSTAR-12774] Due to this bug federated realm cannot be currently added as a filter
       register: federated_block_info
     - assert:
         that:
@@ -264,6 +265,7 @@
         address: "98.0.0.0/8"
         federated_realm: "{{ _federated_realm2.id }}"
         state: absent
+      ignore_errors: true
 
     - name: "Delete Federated Block"
       infoblox.universal_ddi.ipam_federation_federated_block:
@@ -274,5 +276,5 @@
 
     - name: "Delete the Federated Realms"
       ansible.builtin.include_role:
-        name: setup_federated_realms
+        name: setup_federation_federated_realms
         tasks_from: cleanup.yml
