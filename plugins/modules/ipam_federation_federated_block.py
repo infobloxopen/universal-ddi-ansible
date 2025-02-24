@@ -82,7 +82,7 @@ EXAMPLES = r"""
     - name: Create a Federated Block with Additional Fields
       infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
-        federated_realm: "{{ _federated_realm.id }}"
+        federated_realm: "{{ federated_realm.id }}"
         name: "example_federated_block"
         comment: "This is an example federated block"
         tags:
@@ -255,6 +255,10 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
             filter = f"address=='{address}/{cidr}'"
             resp = FederatedBlockApi(self.client).list(filter=filter)
 
+            for index, val in enumerate(resp.results):
+                if getattr(val, "federated_realm") != self.params["federated_realm"]:
+                    return resp.results.pop(index)
+
             if not resp.results:
                 resp.results = []
 
@@ -319,7 +323,9 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -337,7 +343,6 @@ def main():
         name=dict(type="str"),
         parent=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = FederatedBlockModule(

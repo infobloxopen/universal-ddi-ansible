@@ -30,7 +30,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -39,7 +38,7 @@
 
     - name: Get Information about the Federated Block by filter query
       infoblox.universal_ddi.ipam_federation_federated_block_info:
-        #filter_query: "address=='45.85.0.0/16' and federated_realm=='{{ _federated_realm1.id }}'"
+        #filter_query: "address=='45.85.0.0/16' and federated_realm=='{{ _federated_realm1.id }}'" #[NORTHSTAR-12774] Due to this bug federated realm cannot be currently added as a filter
         filter_query: "address=='45.85.0.0/16'"
       register: federated_block_info
     - assert:

@@ -19,7 +19,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -30,7 +29,6 @@
     - name: Create a Federated Block
       infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16" #This cidr is prioritised over the cidr in the address
-        cidr: 17
         federated_realm: "{{ _federated_realm1.id }}"
         state: present
       register: federated_block
@@ -38,7 +36,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -72,7 +69,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -90,7 +86,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -120,7 +115,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-         #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -142,7 +136,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -165,7 +158,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -186,7 +178,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm1.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -206,7 +197,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
-          #federated_realm: "{{ _federated_realm2.id }}"
       register: federated_block_info
     - assert:
         that:
@@ -226,7 +216,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/24"
-          #federated_realm: "{{ _federated_realm2.id }}"
       register: federated_child_block_info
     - assert:
         that:
@@ -239,6 +228,28 @@
           - federated_child_block_info.objects[0].cidr == 24
           - federated_child_block_info.objects[0].parent == federated_block.id
 
+    - name: Create a Federated Block with conflicting CIDR
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "98.0.0.0/8"
+        cidr: 9
+        federated_realm: "{{ _federated_realm2.id }}"
+        state: present
+      register: federated_block
+    - name: Get Information about the Federated Block
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
+        filters:
+          address: "98.0.0.0/8"
+      register: federated_block_info
+    - assert:
+        that:
+          - federated_block is changed
+          - federated_block_info is not failed
+          - federated_block_info.objects | length == 1
+          - federated_block_info.objects[0].id == federated_block.id
+          - federated_block_info.objects[0].address == "98.0.0.0"
+          - federated_block_info.objects[0].cidr == 8 #The CIDR value in the address is prioritised over the CIDR in the cidr field
+          - federated_block_info.objects[0].federated_realm == federated_block.object.federated_realm
+
   always:
     # Cleanup if the test fails
     - name: "Delete the child federated block"
@@ -247,6 +258,12 @@
         federated_realm: "{{ _federated_realm2.id }}"
         state: absent
       ignore_errors: true
+
+    - name: "Delete the Federated Block"
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "98.0.0.0/8"
+        federated_realm: "{{ _federated_realm2.id }}"
+        state: absent
 
     - name: "Delete Federated Block"
       infoblox.universal_ddi.ipam_federation_federated_block:
