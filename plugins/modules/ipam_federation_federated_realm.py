@@ -9,12 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_federated_realm
+module: ipam_federation_federated_realm
 short_description: Manages the Federated Realm
 description:
     - Manages the Federated Realm
     - The Federated Realm object is a unique set of federated blocks per realm.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -72,12 +72,12 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
     - name: Create a Federated Realm
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "example_federated_realm"
         state: "present"
 
     - name: Create a Federated Realm with Additional Parameters
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "example_federated_realm"
         comment: "This is a federated realm"
         state: "present"
@@ -85,7 +85,7 @@ EXAMPLES = r"""
             location: "site-1"
 
     - name: Delete the Federated Realm
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "example_federated_realm"
         state: "absent"
 """
@@ -221,7 +221,7 @@ class FederatedRealmModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple FederatedRealm: {resp.results}")
+                self.fail_json(msg=f"Found multiple Federated Realms: {resp.results}")
             if len(resp.results) == 0:
                 return None
 

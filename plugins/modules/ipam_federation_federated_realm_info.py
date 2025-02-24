@@ -9,12 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_federated_realm_info
+module: ipam_federation_federated_realm_info
 short_description: Retrieves information about existing Federated Realm
 description:
     - Retrieves information about existing Federated Realm
     - The Federated Realm object is a unique set of federated blocks per realm.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -49,20 +49,20 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
     - name: Get Information about the Federated Realm by ID
-      infoblox.universal_ddi.ipam_federated_realm_info:
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
         id: "{{ federated_realm.id }}"
 
     - name: Get Information about the Federated Realm by filters (Name)
-      infoblox.universal_ddi.ipam_federated_realm_info:
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
         filters:
           name: "example_federated_realm"
 
     - name: Get Information about the Federated Realm by filter query
-      infoblox.universal_ddi.ipam_federated_realm_info:
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
         filter_query: "name=='example_federated_realm'"
 
     - name: Get Information about the Federated Realm by tag filters
-      infoblox.universal_ddi.ipam_federated_realm_info:
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
         tag_filters:
           location: "site-1"
 """
