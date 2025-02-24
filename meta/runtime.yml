@@ -48,14 +48,12 @@ action_groups:
     - ipam_address
     - ipam_address_info
     - ipam_next_available_ip_info
-    - ipam_federated_realm
-    - ipam_federated_realm_info
-    - ipam_federated_block
-    - ipam_federated_block_info
 
   ipam_federation:
     - ipam_federation_federated_realm
     - ipam_federation_federated_realm_info
+    - ipam_federation_federated_block
+    - ipam_federation_federated_block_info
 
   keys:
     - tsig_key

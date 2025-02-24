@@ -9,7 +9,7 @@
         tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a Federated Block
-      infoblox.universal_ddi.ipam_federated_block:
+      infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm1.id }}"
         tags:
@@ -18,7 +18,7 @@
       register: federated_block
 
     - name: Get Information about the Federated Block by ID
-      infoblox.universal_ddi.ipam_federated_block_info:
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           id: "{{ federated_block.id }}"
       register: federated_block_info
@@ -27,7 +27,7 @@
           - federated_block_info.objects | length == 1
 
     - name: Get Information about the Federated Block by filters
-      infoblox.universal_ddi.ipam_federated_block_info:
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "45.85.0.0/16"
           #federated_realm: "{{ _federated_realm1.id }}"
@@ -38,7 +38,7 @@
           - federated_block_info.objects[0].id == federated_block.id
 
     - name: Get Information about the Federated Block by filter query
-      infoblox.universal_ddi.ipam_federated_block_info:
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
         #filter_query: "address=='45.85.0.0/16' and federated_realm=='{{ _federated_realm1.id }}'"
         filter_query: "address=='45.85.0.0/16'"
       register: federated_block_info
@@ -48,7 +48,7 @@
           - federated_block_info.objects[0].id == federated_block.id
 
     - name: Get Information about the Federated Block by tag filters
-      infoblox.universal_ddi.ipam_federated_block_info:
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
           tag_filters:
             location: "{{ tag_value }}"
       register: federated_block_info
@@ -60,7 +60,7 @@
   always:
     # Cleanup if the test fails
     - name: "Delete Federated Block"
-      infoblox.universal_ddi.ipam_federated_block:
+      infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm1.id }}"
         state: absent

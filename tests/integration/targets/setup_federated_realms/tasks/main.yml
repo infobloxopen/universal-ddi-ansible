@@ -10,13 +10,13 @@
         federated_realm2_name: "test-federated-realm-{{ 999999 | random | string }}"
 
     - name: Create a Federated Realm 1
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "{{ federated_realm1_name }}"
         state: present
       register: _federated_realm1
 
     - name: Create a Federated Realm 2
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "{{ federated_realm2_name }}"
         state: present
       register: _federated_realm2

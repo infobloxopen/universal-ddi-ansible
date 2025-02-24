@@ -9,11 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_federated_block_info
-short_description: Retrieves information about existing Federated Blocks.
+module: ipam_federation_federated_block_info
+short_description: Retrieves Federated Blocks
 description:
+    - Retrieves information about existing Federated Blocks.
     - The Federated Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -48,23 +49,23 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
   - name: Get Federated Block information by ID
-    infoblox.universal_ddi.ipam_federated_block_info:
+    infoblox.universal_ddi.ipam_federation_federated_block_info:
       filters:
         id: "{{ federated_block_id }}"
 
   - name: Get Federated Block information by filters 
-    infoblox.universal_ddi.ipam_federated_block_info:
+    infoblox.universal_ddi.ipam_federation_federated_block_info:
       filters:
         address: "45.85.0.0/16"
         #federated_realm: "{{ _federated_realm_id }}"
 
   - name: Get Federated Block information by raw filter query
-    infoblox.universal_ddi.ipam_federated_block_info:
+    infoblox.universal_ddi.ipam_federation_federated_block_info:
       #filter_query: "address=='45.85.0.0/16' and federated_realm=='{{ _federated_realm_id }}'" 
       filter_query: "address=='45.85.0.0/16'"
-        
+
   - name: Get Federated Block information by tag filters
-    infoblox.universal_ddi.ipam_federated_block_info:
+    infoblox.universal_ddi.ipam_federation_federated_block_info:
       tag_filters:
         location: "site-1"
 """  # noqa: E501

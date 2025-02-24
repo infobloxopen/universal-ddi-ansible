@@ -9,11 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_federated_block
+module: ipam_federation_federated_block
 short_description: Manages a Federated Block
 description:
+    - Manages a Federated Block.
     - The Federated Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -35,27 +36,6 @@ options:
             - "The address field in form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
         type: str
         required: true
-    allocation_v4:
-        description:
-            - "The percentage of the Federated Block's total address space that is consumed by Leaf Terminals."
-        type: dict
-        suboptions:
-            allocated:
-                description:
-                    - "Percent of total space allocated."
-                type: int
-            delegated:
-                description:
-                    - "Percent of total space delegated."
-                type: int
-            overlapping:
-                description:
-                    - "Percent of total space in overlapping blocks."
-                type: int
-            reserved:
-                description:
-                    - "Percent of total space reserved."
-                type: int
     cidr:
         description:
             - "The CIDR of the federated block. This is required, if I(address) does not specify it in its input."
@@ -85,21 +65,22 @@ options:
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
+
 EXAMPLES = r"""
     - name: Create a Federated Realm (required as parent)
-      infoblox.universal_ddi.ipam_federated_realm:
+      infoblox.universal_ddi.ipam_federation_federated_realm:
         name: "example_federated_realm"
         state: present
-      register: _federated_realm
-      
+      register: federated_realm
+
     - name: Create a Federated Block
-      infoblox.universal_ddi.ipam_federated_block:
+      infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
-        federated_realm: "{{ _federated_realm.id }}"
+        federated_realm: "{{ federated_realm.id }}"
         state: present
-    
+
     - name: Create a Federated Block with Additional Fields
-      infoblox.universal_ddi.ipam_federated_block:
+      infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm.id }}"
         name: "example_federated_block"
@@ -107,23 +88,23 @@ EXAMPLES = r"""
         tags:
             location: "site-1"
         state: present
-    
+
     - name: Delete the Federated Block
-      infoblox.universal_ddi.ipam_federated_block:
+      infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
-        federated_realm: "{{ _federated_realm.id }}"
+        federated_realm: "{{ federated_realm.id }}"
         state: absent
 """  # noqa: E501
 
 RETURN = r"""
 id:
     description:
-        - ID of the FederatedBlock object
+        - ID of the Federated Block object
     type: str
     returned: Always
 item:
     description:
-        - FederatedBlock object
+        - Federated Block object
     type: complex
     returned: Always
     contains:
@@ -280,7 +261,7 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple FederatedBlock: {resp.results}")
+                self.fail_json(msg=f"Found multiple Federated Blocks: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -318,16 +299,16 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "FederatedBlock created"
+                result["msg"] = "Federated Block created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "FederatedBlock updated"
+                    result["msg"] = "Federated Block updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "FederatedBlock deleted"
+                result["msg"] = "Federated Block deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -338,9 +319,7 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = (
-                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
-            )
+            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -352,13 +331,13 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         address=dict(type="str", required=True),
-        allocation_v4=dict(type="dict", options=dict()),
         cidr=dict(type="int"),
         comment=dict(type="str"),
         federated_realm=dict(type="str", required=True),
         name=dict(type="str"),
         parent=dict(type="str"),
         tags=dict(type="dict"),
+
     )
 
     module = FederatedBlockModule(
