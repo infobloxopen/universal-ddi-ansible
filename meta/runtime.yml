@@ -4,6 +4,7 @@ action_groups:
     - metadata:
         extend_group:
           - ipam
+          - ipam_federation
           - dns
           - keys
           - infra
@@ -47,6 +48,10 @@ action_groups:
     - ipam_address
     - ipam_address_info
     - ipam_next_available_ip_info
+
+  ipam_federation:
+    - ipam_federation_federated_realm
+    - ipam_federation_federated_realm_info
 
   keys:
     - tsig_key
