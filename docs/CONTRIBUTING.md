@@ -1,14 +1,27 @@
 # Contributing to infoblox.universal_ddi collection
 
 Welcome to the Universal DDI Ansible Repository ! We're thrilled about your interest in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
+
 ## Workflow Summary
 
-1. [Setup](#setup)
-2. [Implementing the Code Changes](#implementing-the-code-changes)
-3. [Testing the Code Changes](#testing-the-code-changes)
-4. [Creating a PR](#creating-a-pr)
+- [Setup](#setup)
+    - [Directory Structure](#directory-structure)
+    - [Installing the Requirements](#installing-the-requirements)
+- [Implementing the Code Changes](#implementing-the-code-changes)
+    - [Reference Documentation](#reference-documentation)
+    - [Developing New Modules](#developing-new-modules)
+- [Testing the Code Changes](#testing-the-code-changes)
+    - [Configuration](#configuration)
+    - [Writing Integration Tests](#writing-integration-tests)
+    - [Expected Test Criteria](#expected-test-criteria)
+    - [Coding Style Guidelines](#coding-style-guidelines)
+    - [Linting](#linting)
+    - [Running Tests](#running-tests)
+- [Creating a PR](#creating-a-pr)
 
 ## Setup
+
+### Directory Structure
 
 The `ansible-test` command expects that the repository is in a directory that matches it's collection. Here's the required directory structure you need to set up in your development environment:
 
@@ -37,13 +50,21 @@ mkdir -p $TARGET_DIR/ansible_collections/infoblox
 git clone https://github.com/<your_username>/universal-ddi-ansible.git $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 ```
 
+### Installing the Requirements
+
 The python requirements must be installed separately. It is recommended to use a Virtual Environment to isolate the dependencies and maintain a clean setup. 
-Set up your Python virtual environment
+
+Setting up the Python virtual environment
 
 ```shell
 cd $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+Installing the requirements
+
+```
 pip3 install ansible
 pip3 install -r requirements.txt
 pip3 install -r test-requirements.txt
@@ -113,8 +134,7 @@ For local testing, ensure you set up your integration test configuration
 - Resource deletion again (idempotency)
 - Resource updation with all additional attributes under the object
 
-For more detailed example, refer to [/tests/integration/targets/ipam_ip_space/tasks/main.yml](../tests/integration/targets/ipam_ip_space/tasks/main.yml)
-
+For more detailed example, refer to any of test [files](../tests/integration/targets/ipam_ip_space/tasks/main.yml)
 ### Coding Style Guidelines
 
 -  **Properly Naming Tasks** : Each task within your tests should have a specific, descriptive name that clearly states what the test does.
@@ -144,7 +164,7 @@ For more detailed example, refer to [/tests/integration/targets/ipam_ip_space/ta
 
 ### Linting
 
-To facilitate consistent coding style across the project, please run the following command before running the tests
+To facilitate consistent formatting across the project, please run the following command before running the tests
 
 ```shell
 make lint
