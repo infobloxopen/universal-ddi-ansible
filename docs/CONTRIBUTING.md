@@ -2,7 +2,7 @@
 
 Welcome to the Universal DDI Ansible Repository ! We're thrilled about your interest in contributing to our project. This document outlines the process for contributing to the repository and how you can make submissions that add value and are in harmony with the current structure and coding standards.
 
-## Workflow Summary
+## Index
 
 - [Setup](#setup)
     - [Directory Structure](#directory-structure)
@@ -18,7 +18,9 @@ Welcome to the Universal DDI Ansible Repository ! We're thrilled about your inte
     - [Linting](#linting)
     - [Running Tests](#running-tests)
 - [Creating a PR](#creating-a-pr)
-
+- [Reporting an Issue](#reporting-an-issue)
+- [More Information about Contributing](#more-information-about-contributing)
+- [Code of Conduct](#code-of-conduct)
 ## Setup
 
 ### Directory Structure
@@ -46,7 +48,7 @@ Before making any changes, it's essential to fork the repository. This allows yo
 
 Clone the repository from GitHub ensuring the hierarchy.
 ```shell
-mkdir -p $TARGET_DIR/ansible_collections/infoblox
+mkdir -p $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 git clone https://github.com/<your_username>/universal-ddi-ansible.git $TARGET_DIR/ansible_collections/infoblox/universal_ddi
 ```
 
@@ -88,11 +90,11 @@ Place these files under `/plugins/modules`.
 
 #### Documentation, Examples and Return section inside modules
 
-**Documentation Section** Each module file should start with a comprehensive documentation section. [Module format and documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html#module-format-and-documentation) guide gives  details about how to document.
+**Documentation Section** : Each module file should start with a comprehensive documentation section. [Module format and documentation](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_documenting.html#module-format-and-documentation) guide gives  details about how to document.
 
-**Examples Section** Provides practical usage examples demonstrating standard and edge case scenarios.
+**Examples Section** : Provides practical usage examples demonstrating standard and edge case scenarios.
 
-**Return Section** It defines what data is supposed to be returned and how it is structured.
+**Return Section** : It defines what data is supposed to be returned and how it is structured.
 
 ## Testing the Code Changes
 
@@ -213,7 +215,7 @@ ansible-test integration
 - Please [search in the issue list](https://github.com/infobloxopen/universal-ddi-ansible/issues) and if it has not been already reported, [open a new issue](https://github.com/infobloxopen/universal-ddi-ansible/issues/new)
 - If you discover that the bug you're trying to file already exists in an issue, you can help by verifying the behavior of the reported bug with a comment in that issue, or by reporting any additional information
 
-## More information about contributing
+## More Information about Contributing
 
 - General information about setting up your Python environment, testing modules,
 Ansible coding styles, and more can be found in the [Ansible Community Guide](
@@ -224,7 +226,7 @@ https://docs.ansible.com/ansible/latest/community/index.html).
 - `infoblox.universal_ddi` modules uses the Universal DDI Python client library. This provides a more consistent experience across the modules and supports a wider range of UniversalDDI services.
 Information about its usage can be found [here](https://github.com/infobloxopen/universal-ddi-python-client/blob/main/README.md)
 
-## Code of Conduct 
+## Code of Conduct
 
 The `infoblox.universal_ddi` collection follows the Ansible project's
 [Code of Conduct](https://docs.ansible.com/ansible/devel/community/code_of_conduct.html).
