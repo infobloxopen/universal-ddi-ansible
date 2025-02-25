@@ -1,0 +1,64 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random Federated Realm name to avoid conflicts
+    - ansible.builtin.set_fact:
+        federated_realm_name: "test-federated-realm-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+      # Basic Test for IPAM Federated Realm
+    - name: Create a Federated Realm
+      infoblox.universal_ddi.ipam_federation_federated_realm:
+        name: "{{ federated_realm_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: federated_realm
+
+    - name: Get Information about the Federated Realm by ID
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
+        filters:
+          id: "{{ federated_realm.id }}"
+      register: federated_realm_info
+    - assert:
+        that:
+          - federated_realm_info.objects | length == 1
+          - federated_realm_info.objects[0].id == federated_realm.object.id
+
+    - name: Get Federated Realm information by filters (Name)
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
+        filters:
+          name: "{{ federated_realm_name }}"
+      register: federated_realm_info
+    - assert:
+        that:
+          - federated_realm_info.objects | length == 1
+          - federated_realm_info.objects[0].id == federated_realm.id
+
+    - name: Get Federated Realm information by raw filter query
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
+          filter_query: "name=='{{ federated_realm_name }}'"
+    - assert:
+        that:
+          - federated_realm_info.objects | length == 1
+          - federated_realm_info.objects[0].id == federated_realm.id
+
+    - name: Get Federated Realm information by tag filters
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+    - assert:
+        that:
+          - federated_realm_info.objects | length == 1
+          - federated_realm_info.objects[0].id == federated_realm.id
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete the Federated Realm"
+      infoblox.universal_ddi.ipam_federation_federated_realm:
+        name: "{{ federated_realm_name }}"
+        state: "absent"
+      ignore_errors: true
