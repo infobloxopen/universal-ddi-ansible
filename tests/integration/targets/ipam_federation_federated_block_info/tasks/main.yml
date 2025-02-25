@@ -25,6 +25,7 @@
     - assert:
         that:
           - federated_block_info.objects | length == 1
+          - federated_block_info.objects[0].id == federated_block.id
 
     - name: Get Information about the Federated Block by filters
       infoblox.universal_ddi.ipam_federation_federated_block_info:
@@ -48,13 +49,25 @@
 
     - name: Get Information about the Federated Block by tag filters
       infoblox.universal_ddi.ipam_federation_federated_block_info:
-          tag_filters:
-            location: "{{ tag_value }}"
+        tag_filters:
+          location: "{{ tag_value }}"
       register: federated_block_info
     - assert:
         that:
           - federated_block_info.objects | length == 1
           - federated_block_info.objects[0].id == federated_block.id
+          - federated_block_info.objects[0].tags.location == federated_block.object.tags.location
+
+    - name: Get Information about the federated Block using tag filter query
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: federated_block_info
+    - assert:
+        that:
+          - federated_block_info.objects | length == 1
+          - federated_block_info.objects[0].id == federated_block.id
+          - federated_block_info.objects[0].tags.location == federated_block.object.tags.location
+          - federated_block_info.objects[0].tags.location == tag_value
 
   always:
     # Cleanup if the test fails

@@ -219,8 +219,8 @@
       register: federated_child_block_info
     - assert:
         that:
-          - federated_block is changed
-          - federated_block_info is not failed
+          - federated_child_block is changed
+          - federated_child_block_info is not failed
           - federated_child_block_info.objects | length == 1
           - federated_child_block_info.objects[0].id == federated_child_block.id
           - federated_child_block_info.objects[0].federated_realm == federated_block.object.federated_realm
@@ -248,7 +248,7 @@
           - federated_block_info.objects | length == 1
           - federated_block_info.objects[0].id == federated_block.id
           - federated_block_info.objects[0].address == "98.0.0.0"
-          - federated_block_info.objects[0].cidr == 8 #The CIDR value in the address is prioritised over the CIDR in the cidr field
+          - federated_block_info.objects[0].cidr == 8 #The CIDR value in the address is prioritised over the CIDR given separately
           - federated_block_info.objects[0].federated_realm == federated_block.object.federated_realm
 
   always:
@@ -262,14 +262,14 @@
 
     - name: "Delete the Federated Block"
       infoblox.universal_ddi.ipam_federation_federated_block:
-        address: "98.0.0.0/8"
+        address: "45.85.0.0/16"
         federated_realm: "{{ _federated_realm2.id }}"
         state: absent
       ignore_errors: true
 
-    - name: "Delete Federated Block"
+    - name: "Delete the Federated Block"
       infoblox.universal_ddi.ipam_federation_federated_block:
-        address: "45.85.0.0/16"
+        address: "98.0.0.0/8"
         federated_realm: "{{ _federated_realm2.id }}"
         state: absent
       ignore_errors: true

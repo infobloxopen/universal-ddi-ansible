@@ -57,7 +57,6 @@ EXAMPLES = r"""
     infoblox.universal_ddi.ipam_federation_federated_block_info:
       filters:
         address: "45.85.0.0/16"
-        #federated_realm: "{{ federated_realm_id }}"
 
   - name: Get Federated Block information by raw filter query
     infoblox.universal_ddi.ipam_federation_federated_block_info:
@@ -68,6 +67,10 @@ EXAMPLES = r"""
     infoblox.universal_ddi.ipam_federation_federated_block_info:
       tag_filters:
         location: "site-1"
+
+  - name: Get Information about the federated Block using tag filter query
+    infoblox.universal_ddi.ipam_federation_federated_block_info:
+      tag_filter_query: "location=='{{ tag_value }}'"
 """  # noqa: E501
 
 RETURN = r"""
