@@ -5,8 +5,12 @@
       portal_key: "{{ portal_key }}"
   block:
     - ansible.builtin.set_fact:
-        option_code_name: "basic_opt_code_1"
-        option_code: 234
+        option_code_name: "test-basic-opt-{{ 999999 | random | string }}"
+        option_code_name2: "test-basic-opt-{{ 999999 | random | string }}"
+        option_code_name3: "test-basic-opt-{{ 999999 | random | string }}"
+        option_code:  234
+        option_code2: 235
+        option_code3: 236
         option_item_type: "boolean"
 
     - name: Create a DHCP Option Code (check mode)
@@ -53,6 +57,7 @@
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
           - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].type == option_code.object.type
 
     - name: Create a DHCP Option Code (idempotent)
       infoblox.universal_ddi.dhcp_option_code:
@@ -90,6 +95,15 @@
           - option_code_info.objects | length == 1
 
     - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: absent
+      register: option_code
+
+    - name: Delete the DHCP Option Code (idempotent)
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
@@ -178,7 +192,7 @@
 #    NORTHSTAR-1278 - This test case is failing due to the issue in the backend/UI
 #    - name: Update a DHCP Option Code
 #      infoblox.universal_ddi.dhcp_option_code:
-#        code: 235
+#        code: {{ option_code2 }}
 #        name: "{{ option_code_name }}"
 #        option_space: "{{_option_space.id}}"
 #        type: "{{ option_item_type }}"
@@ -188,7 +202,7 @@
 #      infoblox.universal_ddi.dhcp_option_code_info:
 #        filters:
 #          name: "{{ option_code_name }}"
-#          code: 235
+#          code: {{ option_code2 }}
 #          option_space: "{{_option_space.id}}"
 #      register: option_code_info
 #    - assert:
@@ -207,9 +221,9 @@
         type: "{{ item.type }}"
         state: present
       loop:
-        - { code: 234, name: "basic_opt_code_1", option_space: "{{_option_space.id}}", type: "int16" }
-        - { code: 235, name: "basic_opt_code_2", option_space: "{{_option_space.id}}", type: "text" }
-        - { code: 236, name: "basic_opt_code_3", option_space: "{{_option_space.id}}", type: "int16" }
+        - { code: 234, name: "{{ option_code_name }}", option_space: "{{_option_space.id}}", type: "int16" }
+        - { code: 235, name: "{{ option_code_name2 }}", option_space: "{{_option_space.id}}", type: "text" }
+        - { code: 236, name: "{{ option_code_name3 }}", option_space: "{{_option_space.id}}", type: "int16" }
       register: option_code
     - name: Get Information about DHCP Option Codes
       infoblox.universal_ddi.dhcp_option_code_info:
@@ -234,7 +248,7 @@
     - name: Delete the DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
         code: 235
-        name: "basic_opt_code_2"
+        name: "{{ option_code_name2 }}"
         option_space: "{{_option_space.id}}"
         type: "text"
         state: absent
@@ -242,7 +256,7 @@
     - name: Delete the DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
           code: 236
-          name: "basic_opt_code_3"
+          name: "{{ option_code_name3}}"
           option_space: "{{_option_space.id}}"
           type: "int16"
           state: absent

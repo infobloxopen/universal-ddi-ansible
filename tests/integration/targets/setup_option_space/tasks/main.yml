@@ -5,10 +5,9 @@
       portal_key: "{{ portal_key }}"
   block:
     - ansible.builtin.set_fact:
-        option_space_name: "test-infra-service-{{ 999999 | random | string }}"
+        option_space_name: "test-option-space-{{ 999999 | random | string }}"
 
-    # Create an option code
-    - name: "Create an Option Code"
+    - name: Create an Option Space
       infoblox.universal_ddi.dhcp_option_space:
         name: "{{ option_space_name }}"
         protocol: "ip4"

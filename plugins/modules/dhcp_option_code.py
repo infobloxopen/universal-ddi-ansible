@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_code
-short_description: Manage OptionCode
+short_description: Manage an Option Code
 description:
     - Manage OptionCode
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -75,10 +75,9 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Create a DHCP Option Space (Required as parent)
       infoblox.universal_ddi.dhcp_option_space:
-        name: "{{ option_space_name }}"
+        name: "example-option-space"
         state: present
       check_mode: true
-      register: option_space
     
     - name: Create a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
@@ -87,13 +86,22 @@ EXAMPLES = r"""
           option_space: "{{ option_space.id }}"
           type: "int64"
           state: present
-      register: option_code
+      
+    - name: Create a DHCP Option Code with additional parameters
+      infoblox.universal_ddi.dhcp_option_code:
+          name: "example_option_code_name"
+          code: "145"
+          option_space: "{{ option_space.id }}"
+          type: "int64"
+          comment: "This is an example comment"
+          tags:
+            location: "site-1"   
+          state: present
     
     - name: Delete a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
         id: "{{ option_code.id }}"
         state: absent
-      register: option_code
 """  # noqa: E501
 
 RETURN = r"""

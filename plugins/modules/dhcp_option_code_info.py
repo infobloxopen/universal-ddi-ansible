@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_code_info
-short_description: Manage OptionCode
+short_description: Retrieve an Option Code
 description:
     - Manage OptionCode
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -36,11 +36,10 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get OptionCode by ID
+    - name: Get Option Code by ID
       infoblox.universal_ddi.dhcp_option_code_info:
         filters:
           id: "{{ option_code.id }}"
-      register: option_code_info
       
     - name: Get DHCP Option Code information by filter query
       infoblox.universal_ddi.dhcp_option_code_info:

@@ -19,7 +19,7 @@
         state: present
       register: option_code
 
-    - name: Get Information about the DHCP Option Code by Name
+    - name: Get Information about the DHCP Option Code by filters
       infoblox.universal_ddi.dhcp_option_code_info:
         filters:
           name: "{{ option_code_name }}"
@@ -38,6 +38,7 @@
         that:
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].name == "basic_opt_code_1"
+          - option_code_info.objects[0].id == option_code.id
 
     - name: Get DHCP Option Code information by filter query
       infoblox.universal_ddi.dhcp_option_code_info:
