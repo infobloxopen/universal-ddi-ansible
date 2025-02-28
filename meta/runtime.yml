@@ -4,9 +4,12 @@ action_groups:
     - metadata:
         extend_group:
           - ipam
+          - ipam_federation
           - dns
           - keys
           - infra
+          - dhcp
+
   dns:
     - dns_view
     - dns_view_info
@@ -48,6 +51,10 @@ action_groups:
     - dhcp_option_space
     - dhcp_option_space_info
 
+  ipam_federation:
+    - ipam_federation_federated_realm
+    - ipam_federation_federated_realm_info
+
   keys:
     - tsig_key
     - tsig_key_info
@@ -60,3 +67,9 @@ action_groups:
     - infra_host_info
     - infra_service
     - infra_service_info
+
+  dhcp:
+    - dhcp_fixed_address
+    - dhcp_fixed_address_info
+    - dhcp_server
+    - dhcp_server_info
