@@ -6,14 +6,13 @@
   block:
     - ansible.builtin.set_fact:
         option_code_name: "basic_opt_code_1"
-        option_code: 234
         option_item_type: "boolean"
         tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
         name: "{{ option_code_name }}"
-        code: "{{ option_code }}"
+        code:  234
         type: "{{ option_item_type }}"
         option_space: "{{_option_space.id}}"
         state: present
