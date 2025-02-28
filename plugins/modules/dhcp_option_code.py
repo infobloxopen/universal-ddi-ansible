@@ -104,7 +104,7 @@ EXAMPLES = r"""
           code: "145"
           option_space: "{{ option_space.id }}"
           type: "int64"
-        state: absent
+          state: absent
 """  # noqa: E501
 
 RETURN = r"""
