@@ -52,6 +52,8 @@ action_groups:
   ipam_federation:
     - ipam_federation_federated_realm
     - ipam_federation_federated_realm_info
+    - ipam_federation_federated_block
+    - ipam_federation_federated_block_info
 
   keys:
     - tsig_key
