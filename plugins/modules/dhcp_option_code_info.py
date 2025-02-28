@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dhcp_option_code_info
 short_description: Retrieve an Option Code
 description:
-    - Manage OptionCode
+    - Manage Option Code
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -43,23 +43,23 @@ EXAMPLES = r"""
       
     - name: Get DHCP Option Code information by filter query
       infoblox.universal_ddi.dhcp_option_code_info:
-        filter_query: "name=='{{ option_code_name }}'"
+        filter_query: "name=='example-option-code'"
         
     - name: Get Information about the DHCP Option Code by Name
       infoblox.universal_ddi.dhcp_option_code_info:
         filters:
-          name: "{{ option_code_name }}"
+          name: "example-option-code"
             
 """  # noqa: E501
 RETURN = r"""
 id:
     description:
-        - ID of the OptionCode object
+        - ID of the Option Code object
     type: str
     returned: Always
 objects:
     description:
-        - OptionCode object
+        - Option Code object
     type: list
     elements: dict
     returned: Always

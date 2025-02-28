@@ -77,7 +77,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         state: present
-      check_mode: true
+      register: option_space
     
     - name: Create a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
@@ -107,12 +107,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the OptionCode object
+        - ID of the Option Code object
     type: str
     returned: Always
 item:
     description:
-        - OptionCode object
+        - Option Code object
     type: complex
     returned: Always
     contains:
@@ -248,7 +248,7 @@ class OptionCodeModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple OptionCode: {resp.results}")
+                self.fail_json(msg=f"Found multiple Option Code: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -283,16 +283,16 @@ class OptionCodeModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "OptionCode created"
+                result["msg"] = "Option Code created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "OptionCode updated"
+                    result["msg"] = "Option Code updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "OptionCode deleted"
+                result["msg"] = "Option Code deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state

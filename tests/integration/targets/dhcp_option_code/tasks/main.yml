@@ -8,9 +8,6 @@
         option_code_name: "test-basic-opt-{{ 999999 | random | string }}"
         option_code_name2: "test-basic-opt-{{ 999999 | random | string }}"
         option_code_name3: "test-basic-opt-{{ 999999 | random | string }}"
-        option_code:  234
-        option_code2: 235
-        option_code3: 236
         option_item_type: "boolean"
 
     - name: Create a DHCP Option Code (check mode)
