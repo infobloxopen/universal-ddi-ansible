@@ -160,7 +160,7 @@
           - option_space_info.objects[0].name == option_space.object.name
           - option_space_info.objects[0].tags.location == "my-location"
 
-    - name: Create a DHCP Option Space with protocol as  ipv6
+    - name: Create a DHCP Option Space with protocol as  ip6
       infoblox.universal_ddi.dhcp_option_space:
         name: "{{ option_space_name }}_v6"
         protocol: "ip6"

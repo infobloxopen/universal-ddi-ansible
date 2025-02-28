@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_space_info
-short_description: Retrieve a Option Space
+short_description: Retrieve an Option Space
 description:
     - Retrieves information about existing DHCP Option Spaces.
     - The Option Space object represents a set of DHCP option codes.
