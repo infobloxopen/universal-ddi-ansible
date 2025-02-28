@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_space
-short_description: Manage a OptionSpace
+short_description: Manage a Option Space
 description:
-    - Manages a set of DHCP Option Codes by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations
+    - Manages a set of DHCP Option Codes by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -71,7 +71,7 @@ EXAMPLES = r"""
         tags:
             location: "site-1"
     
-    - name: Delete a OptionSpace
+    - name: Delete a Option Space
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
         protocol: "ip4"
@@ -81,12 +81,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the OptionSpace object
+        - ID of the Option Space object
     type: str
     returned: Always
 item:
     description:
-        - OptionSpace object
+        - Option Space object
     type: complex
     returned: Always
     contains:
@@ -188,7 +188,7 @@ class OptionSpaceModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple OptionSpace: {resp.results}")
+                self.fail_json(msg=f"Found multiple Option Space: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -226,16 +226,16 @@ class OptionSpaceModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "OptionSpace created"
+                result["msg"] = "Option Space created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "OptionSpace updated"
+                    result["msg"] = "Option Space updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "OptionSpace deleted"
+                result["msg"] = "Option Space deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state

@@ -48,20 +48,20 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get OptionSpace by ID
+    - name: Get Option Space by ID
       infoblox.universal_ddi.dhcp_option_space_info:
             id: "{{ option_space_id }}"
     
-    - name: Get OptionSpace by filters
+    - name: Get Option Space by filters
       infoblox.universal_ddi.dhcp_option_space_info:
             filters:
                 name: "example_option_space"
         
-    - name: Get OptionSpace by filter query
+    - name: Get Option Space by filter query
       infoblox.universal_ddi.dhcp_option_space_info:
             filter_query: name=='example_option_space'
         
-    - name: Get OptionSpace by tag filters
+    - name: Get Option Space by tag filters
       infoblox.universal_ddi.dhcp_option_space_info:
             tag_filters:
                  location: "site-1"
@@ -70,12 +70,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the OptionSpace object
+        - ID of the Option Space object
     type: str
     returned: Always
 objects:
     description:
-        - OptionSpace object
+        - Option Space object
     type: list
     elements: dict
     returned: Always

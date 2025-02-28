@@ -95,7 +95,7 @@
     - assert:
         that:
           - option_space is not changed
-          - option_space.failed == false
+          - option_space is not failed
 
     - name: Create a DHCP Option Space with protocol as ip4
       infoblox.universal_ddi.dhcp_option_space:
