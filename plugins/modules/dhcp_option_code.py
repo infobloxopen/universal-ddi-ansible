@@ -98,9 +98,12 @@ EXAMPLES = r"""
             location: "site-1"   
           state: present
     
-    - name: Delete a DHCP Option Code
+    - name: Delete the DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
-        id: "{{ option_code.id }}"
+          name: "example_option_code_name"
+          code: "145"
+          option_space: "{{ option_space.id }}"
+          type: "int64"
         state: absent
 """  # noqa: E501
 

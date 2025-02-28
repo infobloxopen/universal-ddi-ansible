@@ -36,7 +36,7 @@
     - assert:
         that:
           - option_code_info.objects | length == 1
-          - option_code_info.objects[0].name == "basic_opt_code_1"
+          - option_code_info.objects[0].name == option_code.name
           - option_code_info.objects[0].id == option_code.id
 
     - name: Get DHCP Option Code information by filter query
