@@ -60,7 +60,6 @@ EXAMPLES = r"""
 
   - name: Get Federated Block information by raw filter query
     infoblox.universal_ddi.ipam_federation_federated_block_info:
-      #filter_query: "address=='45.85.0.0/16' and federated_realm=='{{ federated_realm_id }}'" #[NORTHSTAR-12774] Due to this bug federated realm cannot be currently added as a filter
       filter_query: "address=='45.85.0.0/16'"
 
   - name: Get Federated Block information by tag filters
@@ -70,7 +69,7 @@ EXAMPLES = r"""
 
   - name: Get Information about the federated Block using tag filter query
     infoblox.universal_ddi.ipam_federation_federated_block_info:
-      tag_filter_query: "location=='{{ tag_value }}'"
+      tag_filter_query: "location=='site-1'"
 """  # noqa: E501
 
 RETURN = r"""

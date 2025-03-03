@@ -239,7 +239,6 @@
       infoblox.universal_ddi.ipam_federation_federated_block_info:
         filters:
           address: "98.0.0.0/8"
-        # federated_realm: "{{ _federated_realm2.id }}" #[NORTHSTAR-12774] Due to this bug federated realm cannot be currently added as a filter
       register: federated_block_info
     - assert:
         that:
