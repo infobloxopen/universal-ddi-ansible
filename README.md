@@ -139,7 +139,7 @@ Adjust the number of `v`'s to modify the verbosity level.
 
 ### Using debug module
 
-Ansible’s built-in debug module can be used to print variable values or message outputs during playbook execution.
+Ansible's built-in debug module can be used to print variable values or message outputs during playbook execution.
 You can use the `debug` module to print the output of a task. For example:
 
 ```yaml
