@@ -125,6 +125,38 @@ The following example demonstrates how to use the `infoblox.universal_ddi` colle
 
 Demo usage for each module can be found in the `Examples` section of the module documentation.
 
+## Debugging
+
+### Verbose Logging
+
+Ansible provides increasing levels of verbosity to help with debugging. The verbosity level can be controlled by appending `-v` to the ansible-playbook command.
+
+```bash
+ansible-playbook playbook.yml -vvv
+```
+
+Adjust the number of `v`'s to modify the verbosity level.
+
+### Using debug module
+
+Ansible’s built-in debug module can be used to print variable values or message outputs during playbook execution.
+You can use the `debug` module to print the output of a task. For example:
+
+```yaml
+- name: Create a DNS View
+  infoblox.universal_ddi.dns_view:
+    name: "example_view"
+    state: present
+  register: dns_view
+  
+- name: Print the output of the DNS View
+  ansible.builtin.debug:
+    var: dns_view
+    verbosity: 2
+```
+
+Please refer to the [Ansible Debug Module](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/debug_module.html) for more information.
+
 ## Release Notes
 
 For detailed information about the latest updates, new features, bug fixes, and improvements, please visit our [Changelog](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/CHANGELOG.rst)
