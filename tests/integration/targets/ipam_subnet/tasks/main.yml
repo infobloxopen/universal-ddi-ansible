@@ -507,8 +507,134 @@
           - next_available_subnet is not failed
           - next_available_subnet_info.objects | length == 1
 
+    - name: "Create a Subnet and associate it to a Federated Realm"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "61.61.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: ["{{ _federated_realm1.id }}"]
+        state: "present"
+      register: subnet
+    - name: Get information about the Subnet
+      infoblox.universal_ddi.ipam_subnet_info:
+        filters:
+          address: "61.61.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: subnet_info
+    - assert:
+        that:
+          - subnet is not failed
+          - subnet_info.objects | length == 1
+          - subnet_info.objects[0].federated_realms | length == 1
+          - subnet_info.objects[0].federated_realms == [ _federated_realm1.id ]
+
+    - name: "Disassociate the Subnet from the Federated Realm"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "61.61.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: []
+        state: "present"
+      register: subnet
+    - name: Get information about the Subnet
+      infoblox.universal_ddi.ipam_subnet_info:
+        filters:
+          address: "61.61.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: subnet_info
+    - assert:
+        that:
+          - subnet is not failed
+          - subnet_info.objects | length == 1
+          - subnet_info.objects[0].federated_realms | length == 0
+          - subnet_info.objects[0].federated_realms == []
+          - subnet_info.objects[0].delegation == ""
+
+    - name: "Associate the Subnet to multiple Federated Realms"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "61.61.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: [
+          "{{ _federated_realm1.id }}",
+          "{{ _federated_realm2.id }}",
+          "{{ _federated_realm3.id }}",
+          "{{ _federated_realm4.id }}",
+          "{{ _federated_realm5.id }}" ]
+        state: "present"
+      register: subnet
+    - name: Get information about the Subnet
+      infoblox.universal_ddi.ipam_subnet_info:
+        filters:
+          address: "61.61.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: subnet_info
+    - assert:
+        that:
+          - subnet is not failed
+          - subnet_info.objects | length == 1
+          - subnet_info.objects[0].federated_realms | length == 5
+          - (subnet_info.objects[0].federated_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm2.id,
+            _federated_realm3.id,
+            _federated_realm4.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Create a Subnet inside the Federated Block Range"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "72.72.1.0"
+        space: "{{ _ip_space.id }}"
+        cidr: 24
+        federated_realms: [ "{{ _federated_realm1.id }}" ]
+        state: "present"
+      register: subnet
+    - name: Get information about the Subnet
+      infoblox.universal_ddi.ipam_subnet_info:
+        filters:
+          address: "72.72.1.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 24
+      register: subnet_info
+    - assert:
+        that:
+          - subnet is not failed
+          - subnet_info.objects | length == 1
+          - subnet_info.objects[0].federated_realms | length == 1
+          - subnet_info.objects[0].federated_realms == [ _federated_realm1.id ]
+
   always:
     # Cleanup if the test fails
+    - name: "Delete the Subnet"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.0.0/24"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete the Subnet associated with Federated Realms"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "61.61.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete the Subnet inside the Federated Block Range"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "72.72.1.0/24"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - ansible.builtin.include_role:
+        name: setup_federation_federated_block
+        tasks_from: cleanup.yml
+
+    - ansible.builtin.include_role:
+        name: setup_multiple_realms
+        tasks_from: cleanup.yml
+
     - name: "Delete IP Space"
       ansible.builtin.include_role:
         name: setup_ip_space
