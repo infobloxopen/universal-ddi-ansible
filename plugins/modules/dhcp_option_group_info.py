@@ -7,8 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from infoblox.universal_ddi.plugins.lookup.universal_ddi import EXAMPLES
-
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group_info
@@ -55,7 +53,7 @@ options:
         required: false
 
 extends_documentation_fragment:
-    - infoblox.bloxone.common
+    - infoblox.universal_ddi.common
 """  # noqa: E501
 
 EXAMPLES = r"""
@@ -63,21 +61,21 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           state: "present"
-          
+
     - name: Get information about the DHCP Option Group by ID
       infoblox.universal_ddi.dhcp_option_group_info:
         filters:
           id: "{{ option_group.id }}"
-    
+
     - name: Get information about the DHCP option Group by filter (Name)
       infoblox.universal_ddi.dhcp_option_group_info:
         filters:
           name: "{{ option_group_name }}"
-          
+
     - name: Get information about the DHCP Option Group by filter query
       infoblox.universal_ddi.dhcp_option_group_info:
         filter_query: "name=='{{ option_group_name }}'"
-        
+
     - name: Get information about the DHCP Option Group by tag filters
       infoblox.universal_ddi.dhcp_option_group_info:
         tag_filters:
