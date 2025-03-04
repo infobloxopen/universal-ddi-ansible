@@ -76,6 +76,27 @@ extends_documentation_fragment:
     - infoblox.bloxone.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Create a DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+        name: "option_group_name"
+        state: "present"
+      
+    - name: Create a DHCP Option Group with additional parameters
+      infoblox.universal_ddi.dhcp_option_group:
+        name: "option_group_name"
+        comment: "This is a test DHCP Option Group"
+        dhcp_options:
+            - type: "group"
+              group: "{{ option_group.id }}"
+        state: "present"
+    
+    - name: Delete the DHCP Option Group with protocol ip6
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "option_group_name"
+          state: "absent"
+"""  # noqa: E501
+
 RETURN = r"""
 id:
     description:
@@ -158,8 +179,8 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from universal_ddi_client import ApiException, NotFoundException
     from ipam import OptionGroup, OptionGroupApi
+    from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by BloxoneAnsibleModule
 
@@ -271,7 +292,9 @@ class OptionGroupModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -283,16 +306,19 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        dhcp_options=dict(type="list", elements="dict", options=dict(
-            group=dict(type="str"),
-            option_code=dict(type="str"),
-            option_value=dict(type="str"),
-            type=dict(type="str"),
-        )),
+        dhcp_options=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                group=dict(type="str"),
+                option_code=dict(type="str"),
+                option_value=dict(type="str"),
+                type=dict(type="str"),
+            ),
+        ),
         name=dict(type="str"),
         protocol=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = OptionGroupModule(

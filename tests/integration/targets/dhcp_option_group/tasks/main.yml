@@ -182,6 +182,9 @@
           dhcp_options:
             - type: "group"
               group: "{{ option_group_2.id }}"
+            - type: "option"
+              option_code: "{{_option_code.id}}"
+              option_value: "False"
           state: "present"
       register: option_group
     - name: Get information about the DHCP Option
@@ -199,7 +202,7 @@
           - option_group_info.objects[0].name == option_group.object.name
           - option_group_info.objects[0].dhcp_options[0].type == "group"
           - option_group_info.objects[0].dhcp_options[0].group == option_group_2.id
-          
+
   always:
     - name: Delete the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
@@ -219,3 +222,8 @@
           name: "{{ option_group_name }}_2"
           state: "absent"
       ignore_errors: yes
+
+    - name: Delete the DHCP Option Space
+      ansible.builtin.include_role:
+        name: setup_option_space
+        tasks_from: cleanup.yml
