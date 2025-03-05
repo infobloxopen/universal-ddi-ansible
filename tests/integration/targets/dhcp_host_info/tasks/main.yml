@@ -1,0 +1,71 @@
+---
+# TODO
+# - Get dhcp host using Tag Filters
+
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        host_display_name: "TF_TEST_HOST_01"
+
+    - name: Get Infra Host Information
+      infoblox.universal_ddi.infra_host_info:
+        filters:
+          display_name: "{{ host_display_name }}"
+      register: infra_host_info
+    - name: Assert Infra Host Exists
+      assert:
+        that:
+          - infra_host_info is not failed
+          - infra_host_info.objects | length == 1
+
+    - name: Update DHCP Host
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        server: "{{ _dhcp_server.id }}"
+        state: present
+      register: dhcp_host
+
+    - name: Get Information about the dhcp Host
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ host_display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host_info.objects | length == 1
+          - dhcp_host_info.objects[0].name == host_display_name
+
+    - name: Get dhcp host information by filter query
+      infoblox.universal_ddi.dhcp_host_info:
+        filter_query: "name=='{{ host_display_name }}'"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host_info.objects | length == 1
+          - dhcp_host_info.objects[0].id == dhcp_host.id
+
+    - name: Get DHCP Option Space information by tag filters
+      infoblox.universal_ddi.dhcp_host_info:
+        tag_filters:
+          used_for: "Terraform Provider Acceptance Tests"
+    - assert:
+        that:
+          # There can be more than one host with that tag, so we just check that the results is not empty
+          - dhcp_host_info.objects | length > 0
+          - dhcp_host_info.objects[0].tags.used_for == "Terraform Provider Acceptance Tests"
+
+  always:
+    # Cleanup if the test fails
+    - name: "Dissociate dhcp Host"
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Cleanup dhcp Host"
+      ansible.builtin.include_role:
+        name: "setup_dhcp_server"
+        tasks_from: cleanup.yml
