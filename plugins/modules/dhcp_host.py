@@ -53,16 +53,17 @@ EXAMPLES = r"""
       infoblox.universal_ddi.infra_host_info:
         filters:
           display_name: "example_infra_host"
+      register: infra_host_info
 
     - name: Create a DHCP Server (required as parent)
       infoblox.universal_ddi.dhcp_server:
         name: "example_server"
         state: present
+      register: server
 
     - name: Update DHCP Host
       infoblox.universal_ddi.dhcp_host:
-        id: "{{ infra_host.id }}"
-        absolute_name: "example_server_name"
+        id: "{{ infra_host_info.id }}"
         server: "{{ server.id }}"
         state: present
 

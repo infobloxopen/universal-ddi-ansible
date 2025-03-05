@@ -55,11 +55,11 @@ EXAMPLES = r"""
     - name: Get DHCP Host information by filters (e.g. absolute_name)
       infoblox.universal_ddi.dhcp_host_info:
         filters:
-          absolute_name: "example_host"
+          name: "example_host"
 
     - name: Get DHCP Host information by raw filter query
       infoblox.universal_ddi.dhcp_host_info:
-        filter_query: "absolute_name=='example_host'"
+        filter_query: "name=='example_host'"
 """
 
 RETURN = r"""
