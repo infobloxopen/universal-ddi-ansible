@@ -7,34 +7,32 @@
 - [Renaming and Module Reorganization](#renaming-and-module-reorganization)
 - [New Modules](#new-modules)
 - [Enhancement and New Features](#enhancement-and-new-features)
+    - [Added Return Section in Documentation](#added-return-section-in-documentation)
+    - [Simplified Configuration with Module Defaults](#simplified-configuration-with-module-defaults)
+    - [Module States](#module-states)
+    - [Check Mode Support](#check-mode-support)
+    - [Difference in Authorization](#difference-in-authorization)
+    - [Comprehensive Testing](#comprehensive-testing)
 - [Example Migrations](#example-migrations)
     - [IPAM Subnet](#ipam-subnet)
-    - [IPAM Address Block](#ipam-address-block)
-    - [IPAM Next Available Address Block](#ipam-next-available-address-block)
     - [IPAM Next Available Subnet](#ipam-next-available-subnet)
-    - [IPAM Next Available IP](#ipam-next-available-ip)
-    - [IPAM Address](#ipam-address)
+    - [IPAM Address and IPAM Next Available IP](#ipam-address-and-ipam-next-available-ip)
     - [DNS Auth Zone](#dns-auth-zone)
     - [DNS Record](#dns-record)
 - [Support](#support)
 
 ## Introduction
 
-This document provides a comprehensive guide for transitioning from the Bloxone Ansible modules to the new Universal DDI Ansible modules. It highlights deprecated features, introduces new and enhanced modules, and provides detailed migration examples to facilitate a smooth transition.
-
-### Background on Repository Changes
-Originally, all development was done through the [Bloxone Ansible](https://github.com/infobloxopen/bloxone-ansible) repository, with updates and new modules introduced in the v2 branch. This branch also marked the beginning of the deprecation phase for older modules, signaling upcoming changes and the need for users to transition to newer modules.
-
-### Now Transitioning
-With the launch of the [Universal DDI Ansible](https://github.com/infobloxopen/universal-ddi-ansible) repository, which exclusively contains new and improved modules, we have ceased updates to the [Bloxone Ansible](https://github.com/infobloxopen/bloxone-ansible) v2 branch modules. This new repository simplifies module management and ensures users have access to the most advanced features with continued support.
-
-### Detailed Migration Steps
-In the following sections of this guide, detailed steps are provided for migrating modules. This includes comparisons of configurations, parameter changes, and the enhanced functionalities offered by the Universal DDI Ansible modules.
+This document provides a comprehensive guide for transitioning from the [Bloxone Ansible](https://github.com/infobloxopen/bloxone-ansible) modules to the new Universal DDI Ansible modules. It highlights deprecated features, introduces new and enhanced modules, and provides detailed migration examples to facilitate a smooth transition.
 
 ## Overview of Changes
 
 - **Renaming:** The collection has transitioned from `b1ddi_modules` to `universal_ddi`, reflecting broader support and functionality.
-- **Module Reorganization:** The modules are renamed to follow the Universal DDI naming conventions. The old module names are deprecated and will be removed in the next major release.
+    ```
+    infoblox.bloxone.b1_ipam_ip_space -> infoblox.universal_ddi.ipam_ip_space
+    ```
+- **Directory Structure:** The organization of the Universal DDI Ansible collection follows a specific hierarchy. For an in-depth understanding of how we structure our directories, please refer to the detailed [Directory Structure section](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/docs/CONTRIBUTING.md#directory-structure).
+- **Module Reorganization:** The modules are renamed to follow the Universal DDI naming conventions.
 - **Dependency Updates:** The modules are rewritten to use the [Universal DDI Python](https://github.com/infobloxopen/universal-ddi-python-client) client library. This provides a more consistent experience across the modules and supports a wider range of BloxOne services.
 
 ## Renaming and Module Reorganization
@@ -58,18 +56,7 @@ In the following sections of this guide, detailed steps are provided for migrati
 | b1_ipam_ipv4_reservation        | ipam_address            |
 | b1_ipam_ipv4_reservation_gather | ipam_address_info       |
  
-> **_NOTE:_** A single module dns_record is now capable of handling all types of DNS records
-
-| Bloxone Ansible        | Universal DDI Ansible |
-|------------------------|-----------------------|
-| b1_a_record            | dns_record            |
-| b1_cname_record        | dns_record            |
-| b1_ns_record           | dns_record            |
-| b1_ptr_record          | dns_record            |
-| b1_a_record_gather     | dns_record_info       |
-| b1_cname_record_gather | dns_record_info       |
-| b1_ns_record_gather    | dns_record_info       |
-| b1_ptr_record_gather   | dns_record_info       |
+> **_NOTE:_** A single module of dns_record is now capable of handling different types of DNS records. The modules a_record, cname_record, ns_record, ptr_record are unified under a single module `dns_record` and its corresponding gather modules a_record_gather, cname_record_gather, ns_record_gather, ptr_record_gather are unified under `dns_record_info`.
 
 ## New Modules
 
@@ -91,12 +78,22 @@ Several new features and modules have been added to enhance functionality and pr
   - `dns_acl`
   - `dns_acl_info`
 
-#### IPAM Management
+#### IPAM / DHCP Management
   - `ipam_range`
   - `ipam_range_info`
   - `ipam_next_available_address_block_info`
   - `ipam_next_available_subnet_info`
   - `ipam_next_available_ip_info`
+  - `ipam_federation_federated_realm`
+  - `ipam_federation_federated_realm_info`
+  - `ipam_federation_federated_block`
+  - `ipam_federation_federated_block_info`
+  - `dhcp_fixed_address`
+  - `dhcp_fixed_address_info`
+  - `dhcp_server`
+  - `dhcp_server_info`
+  - `dhcp_option_space`
+  - `dhcp_option_space_info`
 
 #### Infrastructure Management
   - `infra_host`
@@ -115,7 +112,7 @@ Several new features and modules have been added to enhance functionality and pr
 
 ### Added Return Section in Documentation
 
-Documentation has been significantly improved to include a **Return** section detailing the data types and values returned by module executions.
+In addition to the Documentation , **Return** section has been added to return the detailed information  about the data types and values returned by module response.
 
 ### Simplified Configuration with Module Defaults
 
@@ -184,14 +181,14 @@ In _gather.py files
 
 One of the significant enhancements in Universal DDI Ansible is the addition of support for **Check Mode**. This feature allows users to run playbooks in a dry-run mode, enabling them to review the potential changes and effects without making any actual modifications to the target environment.
 
-#### Example Usage
-``` 
-- name: "Create an IP space (check mode)"
-  infoblox.universal_ddi.ipam_ip_space:
-    name: "{{ name }}"
-    state: "present"
-  check_mode: true
-```
+### Difference in Authorization
+
+In Universal DDI Ansible, we have transitioned to using a portal url and portal key instead of csp url and api key. Support for other environment variables is also added. For more details, please refer to the [Authorization section in our README](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/README.md#authorization).
+
+### Comprehensive Testing
+
+To ensure the reliability and stability of our modules, comprehensive testing practices have been employed. We've added extensive tests covering all objects, and have set up GitHub Actions to automatically run sanity and integration checks upon any new commits or pull requests. For more details, refer to any of [tests](../tests/integration/targets).
+
 ## Example Migrations
 
 ### IPAM Subnet
@@ -234,108 +231,7 @@ Universal DDI Ansible uses the IP Space id, which is a more precise and programm
     state: "present"
 ```
 
-### IPAM Address Block
-
-In Bloxone Ansible, IP Spaces were directly referenced by their names where as in Universal DDI Ansible it is referenced by id
-
-#### Creation in Bloxone Ansible
-```
-- name: Create IP space
-  b1_ipam_ip_space:
-    name: "qa-space-1"
-    host: "{{ host }}"
-    api_key: "{{ api }}"
-    state: present
-
-- name: Create Address Block in a given IP Space
-  b1_ipam_address_block:
-    space: "qa-space-1"
-    address: "40.0.0.0/24"
-    name: "qa-block-1"
-    comment: "This is created by QA"
-    tags:
-      - "Org": "Infoblox"
-      - "Dept": "Engineering"
-    api_key: "{{ api }}"
-    host: "{{ host }}"
-    state: present
-```
-
-#### Creation in Universal DDI Ansible
-```
-- name: "Create an IP space (required as parent)"
-  infoblox.universal_ddi.ipam_ip_space:
-    name: "my-ip-space"
-    state: "present"
-    register: ip_space
-
-- name: "Create an address block"
-  infoblox.universal_ddi.ipam_address_block:
-    address: "10.0.0.0/16"
-    space: "{{ ip_space.id }}"
-    state: "present"
-    register: address_block
-```
-
-### IPAM Next Available Address Block
-
-#### Creation in Bloxone Ansible : 
-
-The implementation for creating a next available address block was accomplished by specifying a complex structured input within the address field
-
-```
-- name: Create IP space
-  b1_ipam_ip_space:
-    name: "qa-space-1"
-    host: "{{ host }}"
-    api_key: "{{ api }}"
-    state: present
-
-- name: Create Address Block in a given IP Space
-  b1_ipam_address_block:
-    space: "qa-space-1"
-    address: "40.0.0.0/24"
-    name: "qa-block-1"
-    host: "{{ host }}"
-    api_key: "{{ api }}"
-    state: present
-        
-- name: Create Address Block using next-available subnet
-  b1_ipam_address_block:
-    space: "qa-space-1"
-    address: '{"next_available_address_block": {"cidr": "28", "count": "5", "parent_block": "40.0.0.0/24"}}'
-    name: "qa-nextAvailable"
-    comment: "Created by QA using nextavailable"
-    host: "{{ host }}"
-    api_key: "{{ api }}"
-    state: present
-```
-
-#### Creation in Universal DDI Ansible
-
-Universal DDI Ansible simplifies this process significantly, allowing for a more intuitive declaration of next available options directly
-
-```
-- name: "Create an IP space (required as parent)"
-  infoblox.universal_ddi.ipam_ip_space:
-    name: "my-ip-space"
-    state: "present"
-    register: ip_space
-
-- name: "Create an address block"
-  infoblox.universal_ddi.ipam_address_block:
-    address: "10.0.0.0/16"
-    space: "{{ ip_space.id }}"
-    state: "present"
-    register: address_block
-
-- name: "Create Next Available Address Block"
-  infoblox.universal_ddi.ipam_address_block:
-    space: "{{ ip_space.id }}"
-    cidr: 20
-    next_available_id: "{{ address_block.id }}"
-    state: "present"
-```
+> **_NOTE:_** For IPAM Address Block, the same behavior is seen where the ID is provided for the IP space instead of the name.
 
 ### IPAM Next Available Subnet
 
@@ -395,77 +291,13 @@ Universal DDI Ansible simplifies this process significantly, allowing for a more
 
 ```
 
-### IPAM Next Available IP
+> **_NOTE:_** IPAM Next Available Address Block, is also implemented in a similar way.
+
+### IPAM Address and IPAM Next Available IP
 
 #### Creation in Bloxone Ansible
 
-The implementation for creating a next available address in a subnet was accomplished by specifying a complex structured input within the address field
-
-```
-- name: Create IPv4 address reservation
-  b1_ipam_ipv4_reservation:
-    address: "{{ IP_address }}"
-    space: "{{ IP_space }}"
-    name: "{{ reservation_name }}"
-    tags:
-      - {{ key }}: "{{ value }}"
-    comment: "{{ comment }}"
-    api_key: "{{ api_token }}"
-    host: "{{ host_server }}"
-    state: present
-
-- name: Create IPv4 address reservation using next available IP functionality
-  b1_ipam_ipv4_reservation:
-    address: '{"next_available_ip": {"parent": "<subnet>"}}'
-    space: "{{ IP_space }}"
-    name: "{{ reservation_name }}"
-    tags:
-      - {{ key }}: "{{ value }}"
-    comment: "{{ comment }}"
-    api_key: "{{ api_token }}"
-    host: "{{ host_server }}"
-    state: present
-
-```
-
-#### Creation in Universal DDI Ansible
-
-Universal DDI Ansible simplifies this process significantly, allowing for a more intuitive declaration of next available options directly
-
-
-```
-- name: "Create an IP Space (required as parent)"
-  infoblox.universal_ddi.ipam_ip_space:
-    name: "example-ipspace"
-    state: "present"
-  register: ip_space
-
-- name: "Create a Subnet (required as parent)"
-  infoblox.universal_ddi.ipam_subnet:
-    address: "10.0.0.0/16"
-    space: "{{ ip_space.id }}"
-    state: "present"
-  register: subnet
-
-- name: Create an Address
-  infoblox.universal_ddi.ipam_address:
-    address: "10.0.0.3"
-    space: "{{ ip_space.id }}"
-    state: "present"
-
-- name: Create a Next Available Address in subnet
-  infoblox.universal_ddi.ipam_address:
-    space: "{{ _ip_space.id }}"
-    next_available_id: "{{ subnet.id }}"
-    state: "present"
-```
-
-
-### IPAM Address
-
-#### Creation in Bloxone Ansible
-
-Previously it was referred as an IPv4 reservation
+Previously IPAM Address was referred as an IPv4 reservation. The implementation for creating a next available address in a subnet was accomplished by specifying a complex structured input within the address field.
 
 ```
 - name: Create IP space
@@ -486,30 +318,37 @@ Previously it was referred as an IPv4 reservation
     api_key: "{{ api }}"
     host: "{{ host }}"
     state: present
+ 
+- name: Create ipv4 address reservation using next available IP functionality
+  b1_ipam_ipv4_reservation:
+    address: '{"next_available_ip": {"parent": "<subnet>"}}'
+    space: "qa-space-1"
+    name: "qa-res-1"
+    tags:
+      - "Org"}: "infoblox}"
+    comment: "next available IP"
+    api_key: "{{ api }}"
+    host: "{{ host }}"
+    state: present
+
 ```
 #### Creation in Universal DDI Ansible
 
- Here the setup involves creating an IP space and a subnet as prerequisites, after which you can create the address
+ Here the setup involves creating an IP space and a subnet as prerequisites as shown in IPAM Next Available Subnet creation, after which you can create the address and the next_available options in a more straightforward manner. 
 
 ```
-- name: "Create an IP Space (required as parent)"
-  infoblox.universal_ddi.ipam_ip_space:
-    name: "example-ipspace"
-    state: "present"
-  register: ip_space
-
-- name: "Create a Subnet (required as parent)"
-  infoblox.universal_ddi.ipam_subnet:
-    address: "10.0.0.0/16"
-    space: "{{ ip_space.id }}"
-    state: "present"
-  register: subnet
-
 - name: Create an Address
   infoblox.universal_ddi.ipam_address:
     address: "10.0.0.3"
     space: "{{ ip_space.id }}"
     state: "present"
+
+- name: Create a Next Available Address in subnet
+  infoblox.universal_ddi.ipam_address:
+    space: "{{ _ip_space.id }}"
+    next_available_id: "{{ subnet.id }}"
+    state: "present"
+
 ```
 
 ### DNS Auth Zone
