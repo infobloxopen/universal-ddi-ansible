@@ -12,7 +12,7 @@
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           state: "present"
-      check_mode: yes
+      check_mode: true
       register: option_group
     - name: Get information about the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group_info:
@@ -39,6 +39,7 @@
         that:
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
+          - option_group_info.objects[0].name == option_group.object.name
 
     - name: Create the DHCP Option Group (idempotent)
       infoblox.universal_ddi.dhcp_option_group:
@@ -54,7 +55,7 @@
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           state: "absent"
-      check_mode: yes
+      check_mode: true
       register: option_group
     - name: Get information about the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group_info:
@@ -111,7 +112,7 @@
           - option_group_info is not failed
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].name == option_group_name
           - option_group_info.objects[0].comment == "This is a test DHCP Option Group"
 
     - name: Delete the DHCP Option Group with protocol ip6
@@ -154,7 +155,7 @@
           - option_group_info is not failed
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].name == option_group_name
           - option_group_info.objects[0].tags.location == "my-location"
 
     - name: Create a second DHCP option Group
@@ -173,7 +174,7 @@
           - option_group_2 is not failed
           - option_group_info_2 is not failed
           - option_group_info_2.objects | length == 1
-          - option_group_info_2.objects[0].id == option_group_2.object.id
+          - option_group_info_2.objects[0].id == option_group_2.id
           - option_group_info_2.objects[0].name == option_group_2.object.name
 
     - name: Create a DHCP Option for the DHCP Option Group
@@ -210,7 +211,7 @@
           state: "absent"
       ignore_errors: yes
 
-    - name: Delete the DHCP Option Group with protocol ip6
+    - name: Delete the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}_ip6"
           protocol: "ip6"

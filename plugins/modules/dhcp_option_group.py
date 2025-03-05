@@ -12,8 +12,8 @@ DOCUMENTATION = r"""
 module: dhcp_option_group
 short_description: Manage OptionGroup
 description:
-    - Manage OptionGroup
-version_added: 2.0.0
+    - Manage Option Group
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -87,8 +87,9 @@ EXAMPLES = r"""
         name: "option_group_name"
         comment: "This is a test DHCP Option Group"
         dhcp_options:
-            - type: "group"
-              group: "{{ option_group.id }}"
+            - type: "option"
+              option_code: "234"
+              option_value: "False"
         state: "present"
     
     - name: Delete the DHCP Option Group with protocol ip6
@@ -100,12 +101,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the OptionGroup object
+        - ID of the Option Group object
     type: str
     returned: Always
 item:
     description:
-        - OptionGroup object
+        - Option Group object
     type: complex
     returned: Always
     contains:
@@ -182,7 +183,7 @@ try:
     from ipam import OptionGroup, OptionGroupApi
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
-    pass  # Handled by BloxoneAnsibleModule
+    pass  # Handled by UniversalDDIAnsibleModule
 
 
 class OptionGroupModule(UniversalDDIAnsibleModule):
@@ -220,7 +221,7 @@ class OptionGroupModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = OptionGroupApi(self.client).read(self.params["id"], inherit="full")
+                resp = OptionGroupApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -237,7 +238,7 @@ class OptionGroupModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple OptionGroup: {resp.results}")
+                self.fail_json(msg=f"Found multiple Option Group: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -272,16 +273,16 @@ class OptionGroupModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "OptionGroup created"
+                result["msg"] = "Option Group created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "OptionGroup updated"
+                    result["msg"] = "Option Group updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "OptionGroup deleted"
+                result["msg"] = "Option Group deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state

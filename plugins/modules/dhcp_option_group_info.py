@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group_info
-short_description: Manage OptionGroup
+short_description: Manage Option Group
 description:
-    - Manage OptionGroup
-version_added: 2.0.0
+    - Manage Option Group
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -31,16 +31,6 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    inherit:
-        description:
-            - Return inheritance information
-        type: str
-        required: false
-        choices:
-            - full
-            - partial
-            - none
-        default: full
     tag_filters:
         description:
             - Filter dict to filter objects by tags
@@ -57,24 +47,19 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create a DHCP Option Group
-      infoblox.universal_ddi.dhcp_option_group:
-          name: "{{ option_group_name }}"
-          state: "present"
-
     - name: Get information about the DHCP Option Group by ID
       infoblox.universal_ddi.dhcp_option_group_info:
         filters:
           id: "{{ option_group.id }}"
 
-    - name: Get information about the DHCP option Group by filter (Name)
+    - name: Get information about the DHCP Option Group by filter (Name)
       infoblox.universal_ddi.dhcp_option_group_info:
         filters:
-          name: "{{ option_group_name }}"
+          name: "example_option_group"
 
     - name: Get information about the DHCP Option Group by filter query
       infoblox.universal_ddi.dhcp_option_group_info:
-        filter_query: "name=='{{ option_group_name }}'"
+        filter_query: "name=='example_option_group'"
 
     - name: Get information about the DHCP Option Group by tag filters
       infoblox.universal_ddi.dhcp_option_group_info:
@@ -85,12 +70,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the OptionGroup object
+        - ID of the Option Group object
     type: str
     returned: Always
 objects:
     description:
-        - OptionGroup object
+        - Option Group object
     type: list
     elements: dict
     returned: Always
@@ -168,7 +153,7 @@ try:
     from ipam import OptionGroupApi
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
-    pass  # Handled by BloxoneAnsibleModule
+    pass  # Handled by UniversalDDIAnsibleModule
 
 
 class OptionGroupInfoModule(UniversalDDIAnsibleModule):
@@ -179,7 +164,7 @@ class OptionGroupInfoModule(UniversalDDIAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = OptionGroupApi(self.client).read(self.params["id"], inherit="full")
+            resp = OptionGroupApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
@@ -246,7 +231,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        inherit=dict(type="str", required=False, choices=["full", "partial", "none"], default="full"),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

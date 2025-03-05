@@ -26,6 +26,7 @@
         that:
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].id == option_group.id
 
     - name: Get information about the DHCP option Group by filter (Name)
       infoblox.universal_ddi.dhcp_option_group_info:
