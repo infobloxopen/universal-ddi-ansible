@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dhcp_host
 short_description: Manages DHCP Hosts
 description:
-    - Manage DHCP Host
+    - Manage DHCP Hosts.
     - A DHCP Host object associates a DHCP Config Profile with an on-prem host.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
