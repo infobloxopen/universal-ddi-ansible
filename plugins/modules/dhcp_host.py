@@ -10,9 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_host
-short_description: Manage DhcpHost
+short_description: Manages DHCP Hosts
 description:
-    - Manage DhcpHost
+    - Manage DHCP Host
+    - A DHCP Host object associates a DHCP Config Profile with an on-prem host.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -79,12 +80,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the DhcpHost object
+        - ID of the DHCP Host object
     type: str
     returned: Always
 item:
     description:
-        - DhcpHost object
+        - DHCP Host object
     type: complex
     returned: Always
     contains:
@@ -254,16 +255,16 @@ class DhcpHostModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "DhcpHost created"
+                result["msg"] = "DHCP Host created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "DhcpHost updated"
+                    result["msg"] = "DHCP Host updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "DhcpHost deleted"
+                result["msg"] = "DHCP Host deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state

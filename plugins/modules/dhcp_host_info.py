@@ -10,9 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_host_info
-short_description: Manage DhcpHost
+short_description: Retrieves DHCP Hosts
 description:
-    - Manage DhcpHost
+    - Retrieves information about existing DHCP Hosts.
+    - A DHCP Host object associates a DHCP Config Profile with an on-prem host.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -64,12 +65,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the DhcpHost object
+        - ID of the DHCP Host object
     type: str
     returned: Always
 objects:
     description:
-        - DhcpHost object
+        - DHCP Host object
     type: list
     elements: dict
     returned: Always

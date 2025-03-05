@@ -1,6 +1,4 @@
 ---
-# TODO
-# - Get dhcp host using Tag Filters
 
 - module_defaults:
     group/infoblox.universal_ddi.all:
@@ -28,7 +26,7 @@
         state: present
       register: dhcp_host
 
-    - name: Get Information about the dhcp Host
+    - name: Get Information about the DHCP Host
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "{{ host_display_name }}"
@@ -38,7 +36,7 @@
           - dhcp_host_info.objects | length == 1
           - dhcp_host_info.objects[0].name == host_display_name
 
-    - name: Get dhcp host information by filter query
+    - name: Get DHCP host information by filter query
       infoblox.universal_ddi.dhcp_host_info:
         filter_query: "name=='{{ host_display_name }}'"
       register: dhcp_host_info
@@ -59,13 +57,13 @@
 
   always:
     # Cleanup if the test fails
-    - name: "Dissociate dhcp Host"
+    - name: "Dissociate DHCP Host"
       infoblox.universal_ddi.dhcp_host:
         id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 
-    - name: "Cleanup dhcp Host"
+    - name: "Cleanup DHCP Host"
       ansible.builtin.include_role:
         name: "setup_dhcp_server"
         tasks_from: cleanup.yml
