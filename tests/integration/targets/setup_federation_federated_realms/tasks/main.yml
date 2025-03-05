@@ -1,0 +1,22 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random Federated Realm name to avoid conflicts
+    - ansible.builtin.set_fact:
+        federated_realm1_name: "test-federated-realm-{{ 999999 | random | string }}"
+        federated_realm2_name: "test-federated-realm-{{ 999999 | random | string }}"
+
+    - name: Create a Federated Realm 1
+      infoblox.universal_ddi.ipam_federation_federated_realm:
+        name: "{{ federated_realm1_name }}"
+        state: present
+      register: _federated_realm1
+
+    - name: Create a Federated Realm 2
+      infoblox.universal_ddi.ipam_federation_federated_realm:
+        name: "{{ federated_realm2_name }}"
+        state: present
+      register: _federated_realm2

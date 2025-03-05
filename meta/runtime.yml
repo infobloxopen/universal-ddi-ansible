@@ -52,6 +52,8 @@ action_groups:
   ipam_federation:
     - ipam_federation_federated_realm
     - ipam_federation_federated_realm_info
+    - ipam_federation_federated_block
+    - ipam_federation_federated_block_info
 
   keys:
     - tsig_key
@@ -71,3 +73,5 @@ action_groups:
     - dhcp_fixed_address_info
     - dhcp_server
     - dhcp_server_info
+    - dhcp_option_space
+    - dhcp_option_space_info
