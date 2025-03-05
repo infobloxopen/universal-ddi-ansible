@@ -175,7 +175,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from ipam import Host, DhcpHostApi
+    from ipam import DhcpHostApi, Host
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -276,7 +276,9 @@ class DhcpHostModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -290,7 +292,6 @@ def main():
         ip_space=dict(type="str"),
         server=dict(type="str"),
         tags=dict(type="dict"),
-
     )
 
     module = DhcpHostModule(
