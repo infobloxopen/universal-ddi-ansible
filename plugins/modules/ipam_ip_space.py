@@ -160,7 +160,8 @@ options:
         type: bool
         default: true
     default_realms:
-        description: Reserved for future use. 
+        description: 
+            - "The IDs of the default realms in which the IP Space participates."
         type: list
         elements: str
     dhcp_config:
@@ -1015,7 +1016,8 @@ item:
             type: bool
             returned: Always
         default_realms:
-            description: Reserved for future use. 
+            description: 
+                - "The IDs of the default realms in which the IP Space participates."
             type: list
             elements: str
             returned: Always
