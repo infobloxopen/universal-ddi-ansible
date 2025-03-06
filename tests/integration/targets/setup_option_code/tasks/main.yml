@@ -1,0 +1,17 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        option_code_name: "option-code-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{ _option_space.id }}"
+        type: "boolean"
+        state: present
+      register: _option_code
