@@ -10,9 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_address_block
-short_description: Manage AddressBlock
+short_description: Manages an Address Block
 description:
-    - Manage AddressBlock
+    - Manages an Address Block.
+    - The Address Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -223,6 +224,11 @@ options:
                     - "* I(group)"
                     - "* I(option)"
                 type: str
+    federated_realms:
+        description:
+            - "The IDs of the federated realms in which the address block participates."
+        type: list
+        elements: str
     header_option_filename:
         description:
             - "The configuration for header option filename field."
@@ -1086,6 +1092,12 @@ item:
             description:
                 - "The discovery metadata for this address block in JSON format."
             type: dict
+            returned: Always
+        federated_realms:
+            description:
+                - "The IDs of the federated realms in which the address block participates."
+            type: list
+            elements: str
             returned: Always
         header_option_filename:
             description:
@@ -2549,6 +2561,7 @@ def main():
                 type=dict(type="str"),
             ),
         ),
+        federated_realms=dict(type="list", elements="str"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
         header_option_server_name=dict(type="str"),
