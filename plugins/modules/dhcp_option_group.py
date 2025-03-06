@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group
-short_description: Manage OptionGroup
+short_description: Manage Option Group
 description:
     - Manage Option Group
 version_added: 1.0.0

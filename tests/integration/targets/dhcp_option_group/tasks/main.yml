@@ -200,7 +200,7 @@
           - option_group_info is not failed
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].name == option_group_name
           - option_group_info.objects[0].dhcp_options[0].type == "group"
           - option_group_info.objects[0].dhcp_options[0].group == option_group_2.id
 
