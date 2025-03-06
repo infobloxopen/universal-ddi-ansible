@@ -7,7 +7,6 @@
     - ansible.builtin.set_fact:
         option_code_name: "basic_opt_code_1"
         option_item_type: "boolean"
-        tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
@@ -22,6 +21,7 @@
       infoblox.universal_ddi.dhcp_option_code_info:
         filters:
           name: "{{ option_code_name }}"
+          option_space: "{{_option_space.id}}"
       register: option_code_info
     - assert:
         that:
@@ -41,7 +41,7 @@
 
     - name: Get DHCP Option Code information by filter query
       infoblox.universal_ddi.dhcp_option_code_info:
-        filter_query: "name=='{{ option_code_name }}'"
+        filter_query: "name=='{{ option_code_name }}' and option_space=='{{ _option_space.id }}'"
     - assert:
         that:
           - option_code_info.objects | length == 1

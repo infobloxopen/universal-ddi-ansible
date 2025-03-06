@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dhcp_option_code
 short_description: Manage an Option Code
 description:
-    - Manage OptionCode
+    - Manage Option Code
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -82,28 +82,26 @@ EXAMPLES = r"""
     - name: Create a DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
           name: "example_option_code_name"
-          code: "145"
+          code: "243"
           option_space: "{{ option_space.id }}"
-          type: "int64"
+          type: "int16"
           state: present
       
     - name: Create a DHCP Option Code with additional parameters
       infoblox.universal_ddi.dhcp_option_code:
           name: "example_option_code_name"
-          code: "145"
+          code: "243"
           option_space: "{{ option_space.id }}"
-          type: "int64"
-          comment: "This is an example comment"
-          tags:
-            location: "site-1"   
+          type: "int16"
+          comment: "This is an example comment" 
           state: present
     
     - name: Delete the DHCP Option Code
       infoblox.universal_ddi.dhcp_option_code:
           name: "example_option_code_name"
-          code: "145"
+          code: "243"
           option_space: "{{ option_space.id }}"
-          type: "int64"
+          type: "int16"
           state: absent
 """  # noqa: E501
 

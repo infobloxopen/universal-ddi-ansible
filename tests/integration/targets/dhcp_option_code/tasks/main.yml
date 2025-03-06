@@ -54,7 +54,7 @@
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
           - option_code_info.objects[0].name == option_code.object.name
-          - option_code_info.objects[0].type == option_code.object.type
+          - option_code_info.objects[0].type == option_item_type
 
     - name: Create a DHCP Option Code (idempotent)
       infoblox.universal_ddi.dhcp_option_code:
@@ -99,6 +99,18 @@
         type: "{{ option_item_type }}"
         state: absent
       register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code is not failed
+          - option_code_info.objects | length == 0
 
     - name: Delete the DHCP Option Code (idempotent)
       infoblox.universal_ddi.dhcp_option_code:
@@ -131,10 +143,10 @@
           - option_code_info is not failed
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
-          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].name == option_code_name
           - option_code_info.objects[0].comment == "This is a test comment"
 
-    - name: Create a DHCP Option Code with array
+    - name: Create a DHCP Option Code to accept Multiple values
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "{{ option_code_name }}"
@@ -234,30 +246,7 @@
           - option_code_info.objects | length == 3
 
   always:
-    - name: Delete the DHCP Option Code
-      infoblox.universal_ddi.dhcp_option_code:
-        code: 234
-        name: "{{ option_code_name }}"
-        option_space: "{{_option_space.id}}"
-        type: "int16"
-        state: absent
-
-    - name: Delete the DHCP Option Code
-      infoblox.universal_ddi.dhcp_option_code:
-        code: 235
-        name: "{{ option_code_name2 }}"
-        option_space: "{{_option_space.id}}"
-        type: "text"
-        state: absent
-
-    - name: Delete the DHCP Option Code
-      infoblox.universal_ddi.dhcp_option_code:
-          code: 236
-          name: "{{ option_code_name3}}"
-          option_space: "{{_option_space.id}}"
-          type: "int16"
-          state: absent
-
+    # Delete the DHCP Option Code which would delete all option code
     - name: Delete the DHCP Option Space
       ansible.builtin.include_role:
         name: setup_option_space
