@@ -8,7 +8,7 @@
     - ansible.builtin.set_fact:
         option_group_name: "test-option-group-{{ 999999 | random | string }}"
 
-    - name: Create a DHCP Option Group ( check mode )
+    - name: Create a DHCP Option Group (check mode)
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           state: "present"
@@ -39,7 +39,7 @@
         that:
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].name == option_group_name
 
     - name: Create the DHCP Option Group (idempotent)
       infoblox.universal_ddi.dhcp_option_group:
@@ -133,7 +133,7 @@
           - option_group_info is not failed
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group.object.name
+          - option_group_info.objects[0].name == option_group_name
           - option_group_info.objects[0].protocol == "ip6"
 
     - name: Create a DHCP option Group with tags
@@ -199,7 +199,7 @@
           - option_group is not failed
           - option_group_info is not failed
           - option_group_info.objects | length == 1
-          - option_group_info.objects[0].id == option_group.object.id
+          - option_group_info.objects[0].id == option_group.id
           - option_group_info.objects[0].name == option_group.object.name
           - option_group_info.objects[0].dhcp_options[0].type == "group"
           - option_group_info.objects[0].dhcp_options[0].group == option_group_2.id

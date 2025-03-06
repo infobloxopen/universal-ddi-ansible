@@ -41,6 +41,7 @@
     - name: Get information about the DHCP Option Group by filter query
       infoblox.universal_ddi.dhcp_option_group_info:
         filter_query: "name=='{{ option_group_name }}'"
+      register: option_group_info
     - assert:
         that:
           - option_group_info.objects | length == 1
@@ -50,6 +51,7 @@
       infoblox.universal_ddi.dhcp_option_group_info:
         tag_filters:
           location: "{{ tag_value }}"
+      register: option_group_info
     - assert:
         that:
           - option_group_info.objects | length == 1

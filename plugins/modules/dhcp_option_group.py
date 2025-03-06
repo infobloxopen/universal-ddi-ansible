@@ -92,7 +92,7 @@ EXAMPLES = r"""
               option_value: "False"
         state: "present"
     
-    - name: Delete the DHCP Option Group with protocol ip6
+    - name: Delete the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "option_group_name"
           state: "absent"
