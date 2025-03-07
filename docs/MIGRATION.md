@@ -37,7 +37,7 @@ This document provides a comprehensive guide for transitioning from the [Bloxone
 
 ## Renaming and Module Reorganization
 
- Modules have been renamed and reorganized to align with standard naming conventions. Here is a table with old and new names for quick reference
+Modules have been renamed and reorganized to align with standard naming conventions. Here is a table comparing the old and new nomenclature :
 
 | Bloxone Ansible                 | Universal DDI Ansible   |
 |---------------------------------|-------------------------|
@@ -58,9 +58,9 @@ This document provides a comprehensive guide for transitioning from the [Bloxone
  
 > **_NOTE:_** A single module of dns_record is now capable of handling different types of DNS records. The modules a_record, cname_record, ns_record, ptr_record are unified under a single module `dns_record` and its corresponding gather modules a_record_gather, cname_record_gather, ns_record_gather, ptr_record_gather are unified under `dns_record_info`.
 
-## New Modules
+## Modules Added to the Collection
 
-Several new features and modules have been added to enhance functionality and provide more comprehensive management capabilities across networking services:
+Several new features and modules have been added to enhance functionality, as outlined below:
 
 #### DNS Management
   - `dns_forward_zone`
@@ -77,6 +77,8 @@ Several new features and modules have been added to enhance functionality and pr
   - `dns_host_info`
   - `dns_acl`
   - `dns_acl_info`
+
+> **_NOTE:_**  Support for additional records like AAAA, CAA, DNAME, Generic, MX, NAPTR, SRV, SVCB and TXT is also added.
 
 #### IPAM / DHCP Management
   - `ipam_range`
@@ -112,7 +114,7 @@ Several new features and modules have been added to enhance functionality and pr
 
 ### Added Return Section in Documentation
 
-In addition to the Documentation , **Return** section has been added to return the detailed information  about the data types and values returned by module response.
+In addition to the Documentation , **Return** section has been added for all modules to return the detailed information  about the data types and values returned by module response.
 
 ### Simplified Configuration with Module Defaults
 
@@ -137,7 +139,7 @@ vars:
         state: present
    ```
 
-However, in Universal DDI Ansible, we have streamlined this setup by introducing `module_defaults`. This enhancement allows portal_key and portal_url to be set once for all modules in a block, eliminating redundancy and simplifying the configuration for all tasks within the block. This provides a cleaner, more maintainable setup
+In Universal DDI Ansible, configuration has been simplified with module_defaults, which allows portal_key and portal_url to be set once for all modules in a block, reducing redundancy and simplifying task configurations.
 
 ```
 - module_defaults:
@@ -179,7 +181,7 @@ In _gather.py files
 
 ### Check Mode Support
 
-One of the significant enhancements in Universal DDI Ansible is the addition of support for **Check Mode**. This feature allows users to run playbooks in a dry-run mode, enabling them to review the potential changes and effects without making any actual modifications to the target environment.
+One of the significant enhancements in Universal DDI Ansible is the addition of support for **Check Mode** which enables users to run playbooks in a dry-run mode to preview changes without affecting the target environment.
 
 ### Difference in Authorization
 
@@ -247,7 +249,7 @@ The implementation for creating a next available subnet was accomplished by spec
     api_key: "{{ api }}"
     state: present
 
-- name: Create Address Block using next-available subnet
+- name: Create Next Available Subnet using Address Block
   b1_ipam_subnet:
     space: "qa-space-1"
     address: '{"next_available_subnet": {"cidr": "28", "count": "2", "parent_block": "40.0.0.0/24"}}'
@@ -259,8 +261,6 @@ The implementation for creating a next available subnet was accomplished by spec
 ```
 
 #### Creation in Universal DDI Ansible
-
-Universal DDI Ansible simplifies this process significantly, allowing for a more intuitive declaration of next available options directly
 
 ```
 - name: "Create an IP Space (required as parent)"
@@ -276,19 +276,12 @@ Universal DDI Ansible simplifies this process significantly, allowing for a more
     state: "present"
   register: address_block
 
-- name: "Create a subnet"
-  infoblox.universal_ddi.ipam_subnet:
-    address: "10.0.0.0/24"
-    space: "{{ ip_space.id }}"
-    state: "present"
-
 - name: "Create a Next available Subnet"
   infoblox.universal_ddi.ipam_subnet:
     cidr: 24
     next_available_id: "{{ address_block.id }}"
     space: "{{ ip_space.id }}"
     state: "present"
-
 ```
 
 > **_NOTE:_** IPAM Next Available Address Block, is also implemented in a similar way.
@@ -300,13 +293,6 @@ Universal DDI Ansible simplifies this process significantly, allowing for a more
 Previously IPAM Address was referred as an IPv4 reservation. The implementation for creating a next available address in a subnet was accomplished by specifying a complex structured input within the address field.
 
 ```
-- name: Create IP space
-  b1_ipam_ip_space:
-    name: "qa-space-1"
-    host: "{{ host }}"
-    api_key: "{{ api }}"
-    state: present
-
 - name: Create ipv4 reserved address in a given IP Space
   b1_ipam_ipv4_reservation:
     space: "qa-space-1"
@@ -325,16 +311,15 @@ Previously IPAM Address was referred as an IPv4 reservation. The implementation 
     space: "qa-space-1"
     name: "qa-res-1"
     tags:
-      - "Org"}: "infoblox}"
+      - "Org": "Infoblox"
     comment: "next available IP"
     api_key: "{{ api }}"
     host: "{{ host }}"
     state: present
-
 ```
 #### Creation in Universal DDI Ansible
 
- Here the setup involves creating an IP space and a subnet as prerequisites as shown in IPAM Next Available Subnet creation, after which you can create the address and the next_available options in a more straightforward manner. 
+Here the setup involves creating an IP space and a subnet as prerequisites as shown in IPAM Next Available Subnet creation, after which you can create the address and the next_available options in a more straightforward manner. 
 
 ```
 - name: Create an Address
@@ -403,7 +388,8 @@ In Bloxone Ansible, view is directly referenced by its name where as in Universa
 ### DNS Record
 
 #### Creation in Bloxone Ansible:
-In Bloxone Ansible, managing different types of DNS records required the use of multiple distinct modules. Each record type such as A, CNAME, NS, and PTR had its specialized module. Here's how records were created in Bloxone Ansible:
+
+In Bloxone Ansible, each DNS record type, including A, CNAME, NS, and PTR, required a unique module for management.
 
 ```
 - name: CREATE A Record
@@ -455,7 +441,7 @@ This approach resulted in a large number of modules that essentially performed s
 
 #### Creation in Universal DDI Ansible:
 
-Universal DDI Ansible introduces a significant simplification. A single module, infoblox.universal_ddi.dns_record, is now capable of handling all types of DNS records.The module uses a generic structure with a type field and a flexible rdata dictionary to accommodate data specific to each record type.
+Universal DDI Ansible introduces a significant simplification. A single module `dns_record` is now capable of handling all types of DNS records.The module uses a generic structure with a type field and a flexible rdata dictionary to accommodate data specific to each record type.
 
 ```
 - name: Create an A Record in the Auth Zone
@@ -580,7 +566,7 @@ Universal DDI Ansible introduces a significant simplification. A single module, 
 If you have any questions or issues, you can reach out to us using the following channels:
 
 - Github Issues:
-  - Submit your issues or requests for enhancements on the [Github Issues Page](https://github.com/infobloxopen/universal-ddi-ansible/issues)
+  - Submit your issues or requests for enhancements on the [GitHub Issues Page](https://github.com/infobloxopen/universal-ddi-ansible/issues)
 - Infoblox Support:
   - For any questions or issues, please contact [Infoblox Support](https://info.infoblox.com/contact-form/).
 
