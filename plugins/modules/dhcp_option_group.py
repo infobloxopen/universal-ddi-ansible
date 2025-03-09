@@ -63,6 +63,7 @@ options:
         description:
             - "The name of the option group. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
+        required: true
     protocol:
         description:
             - "The type of protocol (I(ip4) or I(ip6))."
