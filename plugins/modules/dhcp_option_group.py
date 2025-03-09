@@ -317,7 +317,7 @@ def main():
                 type=dict(type="str"),
             ),
         ),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         protocol=dict(type="str"),
         tags=dict(type="dict"),
     )
