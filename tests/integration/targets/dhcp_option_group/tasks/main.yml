@@ -175,7 +175,7 @@
           - option_group_info_2 is not failed
           - option_group_info_2.objects | length == 1
           - option_group_info_2.objects[0].id == option_group_2.id
-          - option_group_info_2.objects[0].name == option_group_2.object.name
+          - option_group_info_2.objects[0].name == option_group_name_2
 
     - name: Create a DHCP Option for the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
@@ -209,20 +209,20 @@
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           state: "absent"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Delete the DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}_ip6"
           protocol: "ip6"
           state: "absent"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Delete the second DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}_2"
           state: "absent"
-      ignore_errors: yes
+      ignore_errors: true
 
     - name: Delete the DHCP Option Space
       ansible.builtin.include_role:

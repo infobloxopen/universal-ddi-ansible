@@ -88,7 +88,7 @@ EXAMPLES = r"""
         comment: "This is a test DHCP Option Group"
         dhcp_options:
             - type: "option"
-              option_code: "234"
+              option_code: 234
               option_value: "False"
         state: "present"
     
