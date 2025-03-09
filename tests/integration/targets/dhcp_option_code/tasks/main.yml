@@ -1,0 +1,255 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        option_code_name: "test-basic-opt-{{ 999999 | random | string }}"
+        option_code_name2: "test-basic-opt-{{ 999999 | random | string }}"
+        option_code_name3: "test-basic-opt-{{ 999999 | random | string }}"
+        option_item_type: "boolean"
+
+    - name: Create a DHCP Option Code (check mode)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: present
+      check_mode: true
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 0
+
+    - name: Create a DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code_name
+          - option_code_info.objects[0].type == option_item_type
+
+    - name: Create a DHCP Option Code (idempotent)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: present
+      register: option_code
+    - assert:
+        that:
+          - option_code is not changed
+          - option_code is not failed
+
+    - name: Delete the DHCP Option Code (check mode)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: absent
+      check_mode: true
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+
+    - name: Delete the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: absent
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code is not failed
+          - option_code_info.objects | length == 0
+
+    - name: Delete the DHCP Option Code (idempotent)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        state: absent
+      register: option_code
+
+    - name: Create a DHCP Option Code with comment
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        comment: "This is a test comment"
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code_name
+          - option_code_info.objects[0].comment == "This is a test comment"
+
+    - name: Create a DHCP Option Code to accept Multiple values
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "{{ option_item_type }}"
+        comment: "This is a test comment"
+        array: true
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code_name
+          - option_code_info.objects[0].array == true
+
+    - name: Update a DHCP Option Code with Type
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "{{ option_code_name }}"
+        option_space: "{{_option_space.id}}"
+        type: "int16"
+        comment: "This is a test comment"
+        array: true
+        state: present
+      register: option_code
+    - name: Get Information about the DHCP Option Code
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          name: "{{ option_code_name }}"
+          code: 234
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 1
+          - option_code_info.objects[0].id == option_code.id
+          - option_code_info.objects[0].name == option_code_name
+          - option_code_info.objects[0].type == "int16"
+
+#     NORTHSTAR-12782-  Unable to update the option code during its initial creation;
+#     encountering an "already exists" error even when the option code does not exist;
+#     This is a backend bug
+#    - name: Update a DHCP Option Code
+#      infoblox.universal_ddi.dhcp_option_code:
+#        code: {{ option_code2 }}
+#        name: "{{ option_code_name }}"
+#        option_space: "{{_option_space.id}}"
+#        type: "{{ option_item_type }}"
+#        state: present
+#      register: option_code
+#    - name: Get Information about the DHCP Option Code
+#      infoblox.universal_ddi.dhcp_option_code_info:
+#        filters:
+#          name: "{{ option_code_name }}"
+#          code: {{ option_code2 }}
+#          option_space: "{{_option_space.id}}"
+#      register: option_code_info
+#    - assert:
+#        that:
+#          - option_code is changed
+#          - option_code_info is not failed
+#          - option_code_info.objects | length == 1
+#          - option_code_info.objects[0].id == option_code.id
+#          - option_code_info.objects[0].name == option_code.object.name
+
+    - name: Create multiple DHCP Option Codes
+      infoblox.universal_ddi.dhcp_option_code:
+        code: "{{ item.code }}"
+        name: "{{ item.name }}"
+        option_space: "{{ item.option_space }}"
+        type: "{{ item.type }}"
+        state: present
+      loop:
+        - { code: 234, name: "{{ option_code_name }}", option_space: "{{_option_space.id}}", type: "int16" }
+        - { code: 235, name: "{{ option_code_name2 }}", option_space: "{{_option_space.id}}", type: "text" }
+        - { code: 236, name: "{{ option_code_name3 }}", option_space: "{{_option_space.id}}", type: "int16" }
+      register: option_code
+    - name: Get Information about DHCP Option Codes
+      infoblox.universal_ddi.dhcp_option_code_info:
+        filters:
+          option_space: "{{_option_space.id}}"
+      register: option_code_info
+    - assert:
+        that:
+          - option_code is changed
+          - option_code_info is not failed
+          - option_code_info.objects | length == 3
+
+  always:
+    # Delete the DHCP Option Code which would delete all option code
+    - name: Delete the DHCP Option Space
+      ansible.builtin.include_role:
+        name: setup_option_space
+        tasks_from: cleanup.yml
