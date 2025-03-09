@@ -27,6 +27,7 @@
         that:
           - option_space_info.objects | length == 1
           - option_space_info.objects[0].name == option_space.object.name
+          - option_space_info.objects[0].id == option_space.id
 
     - name: Get DHCP Option Space information by filters (Name)
       infoblox.universal_ddi.dhcp_option_space_info:
