@@ -53,7 +53,7 @@
           - option_code_info is not failed
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
-          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].name == option_code_name
           - option_code_info.objects[0].type == option_item_type
 
     - name: Create a DHCP Option Code (idempotent)
@@ -169,7 +169,7 @@
           - option_code_info is not failed
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
-          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].name == option_code_name
           - option_code_info.objects[0].array == true
 
     - name: Update a DHCP Option Code with Type
@@ -195,10 +195,12 @@
           - option_code_info is not failed
           - option_code_info.objects | length == 1
           - option_code_info.objects[0].id == option_code.id
-          - option_code_info.objects[0].name == option_code.object.name
+          - option_code_info.objects[0].name == option_code_name
           - option_code_info.objects[0].type == "int16"
 
-#    NORTHSTAR-1278 - This test case is failing due to the issue in the backend/UI
+#     NORTHSTAR-12782-  Unable to update the option code during its initial creation;
+#     encountering an "already exists" error even when the option code does not exist;
+#     This is a backend bug
 #    - name: Update a DHCP Option Code
 #      infoblox.universal_ddi.dhcp_option_code:
 #        code: {{ option_code2 }}

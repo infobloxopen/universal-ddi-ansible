@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_code
-short_description: Manage an Option Code
+short_description: Manages Option Codes
 description:
-    - Manage Option Code
+    - Manage Option Codes
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -38,6 +38,7 @@ options:
         description:
             - "The option code."
         type: int
+        required: true
     comment:
         description:
             - "The description for the option code. May contain 0 to 1024 characters. Can include UTF-8."
@@ -46,10 +47,12 @@ options:
         description:
             - "The name of the option code. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
+        required: true
     option_space:
         description:
             - "The resource identifier."
         type: str
+        required: true
     type:
         description:
             - "The option type for the option code."
@@ -318,10 +321,10 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         array=dict(type="bool"),
-        code=dict(type="int"),
+        code=dict(type="int", required=True),
         comment=dict(type="str"),
-        name=dict(type="str"),
-        option_space=dict(type="str"),
+        name=dict(type="str", required=True),
+        option_space=dict(type="str", required=True),
         type=dict(type="str"),
     )
 

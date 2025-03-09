@@ -49,7 +49,6 @@ action_groups:
     - ipam_address_info
     - ipam_next_available_ip_info
 
-
   ipam_federation:
     - ipam_federation_federated_realm
     - ipam_federation_federated_realm_info
