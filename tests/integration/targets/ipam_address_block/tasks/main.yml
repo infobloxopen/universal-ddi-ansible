@@ -396,8 +396,193 @@
           - address_block_info.objects | length == 1
           - address_block_info.objects[0].compartment_id == ""
 
+    - name: "Create an Address Block and associate it to a Federated Realm"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: ["{{ _federated_realm1.id }}"]
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "51.51.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 1
+          - address_block_info.objects[0].federated_realms == [ _federated_realm1.id ]
+
+    - name: "Disassociate the Address Block from the Federated Realm"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: []
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "51.51.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 0
+          - address_block_info.objects[0].federated_realms == []
+          - address_block_info.objects[0].delegation == ""
+
+    - name: "Associate the Address Block to multiple Federated Realms"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms: [
+         "{{ _federated_realm1.id }}",
+         "{{ _federated_realm2.id }}",
+         "{{ _federated_realm3.id }}",
+         "{{ _federated_realm4.id }}",
+         "{{ _federated_realm5.id }}"
+        ]
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "51.51.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 5
+          - (address_block_info.objects[0].federated_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm2.id,
+            _federated_realm3.id,
+            _federated_realm4.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Remove few realms from the Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms:
+          - "{{ _federated_realm1.id }}"
+          - "{{ _federated_realm3.id }}"
+          - "{{ _federated_realm5.id }}"
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "51.51.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 3
+          - (address_block_info.objects[0].federated_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm3.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Add one of the removed realms back to the Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        federated_realms:
+          - "{{ _federated_realm1.id }}"
+          - "{{ _federated_realm2.id }}"
+          - "{{ _federated_realm3.id }}"
+          - "{{ _federated_realm5.id }}"
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "51.51.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 4
+          - (address_block_info.objects[0].federated_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm2.id,
+            _federated_realm3.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Create an Address Block inside the Federated Block Range"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "72.72.1.0"
+        space: "{{ _ip_space.id }}"
+        cidr: 24
+        federated_realms: ["{{ _federated_realm1.id }}"]
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "72.72.1.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 24
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].federated_realms | length == 1
+          - address_block_info.objects[0].federated_realms == [ _federated_realm1.id ]
+
   always:
     # Cleanup if the test fails
+    - name: "Delete the Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete the Address Block associated with Federated Realms"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "51.51.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Delete the Address Block inside the Federated Block Range"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "72.72.1.0/24"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - ansible.builtin.include_role:
+        name: setup_federation_federated_block
+        tasks_from: cleanup.yml
+
+    - ansible.builtin.include_role:
+        name: setup_multiple_realms
+        tasks_from: cleanup.yml
+
     - ansible.builtin.include_role:
         name: setup_ip_space
         tasks_from: cleanup.yml

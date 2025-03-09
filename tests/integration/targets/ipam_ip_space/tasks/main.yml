@@ -500,8 +500,132 @@
           - ip_space_info.objects[0].inheritance_sources.hostname_rewrite_block.action == "inherit"
           - ip_space_info.objects[0].inheritance_sources.vendor_specific_option_option_space.action == "inherit"
 
+    - name: "Create an IP Space with Default Realm"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms:
+         - "{{ _federated_realm1.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 1
+          - ip_space_info.objects[0].default_realms == [
+            _federated_realm1.id
+            ]
+
+    - name: "Disassociate the IP Space from Default Realm"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms: []
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 0
+          - ip_space_info.objects[0].default_realms == []
+
+    - name: "Associate IP Space to Multiple Realms"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms:
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm2.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm4.id }}"
+         - "{{ _federated_realm5.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 5
+          - (ip_space_info.objects[0].default_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm2.id,
+            _federated_realm3.id,
+            _federated_realm4.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Remove few realms from the IP Space"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms:
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm5.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 3
+          - (ip_space_info.objects[0].default_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm3.id,
+            _federated_realm5.id
+            ] | sort)
+
+    - name: "Add one of the removed realms back to the IP Space"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms:
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm2.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm5.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 4
+          - (ip_space_info.objects[0].default_realms | sort) == ([
+            _federated_realm1.id,
+            _federated_realm2.id,
+            _federated_realm3.id,
+            _federated_realm5.id
+            ] | sort)
+
   always:
     # Cleanup if the test fails
+    - ansible.builtin.include_role:
+        name: "setup_multiple_realms"
+        tasks_from: "cleanup.yml"
+
     - name: "Delete IP Space"
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
