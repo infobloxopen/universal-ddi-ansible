@@ -1,0 +1,84 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a cloud discovery with a random name to avoid conflicts
+    - ansible.builtin.set_fact:
+        cloud_discovery_provider_aws_name: "test_aws_{{ 999999 | random | string }}"
+        config_access_id: "arn:aws:iam::{{ 999999999999 | random | string }}:role/infoblox_discovery"
+
+    - name: Create an AWS cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_aws_name }}"
+        provider_type: "Amazon Web Services"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+        tags:
+          location: "site-1"
+        state: present
+      register: aws_provider
+
+    - name: Get Infoblox AWS cloud discovery provider by name
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_aws_name }}"
+      register: aws_provider_info
+    - assert:
+        that:
+          - aws_provider_info.objects | length == 1
+          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
+          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
+          - aws_provider_info.objects[0].account_preference == "single"
+          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
+          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - aws_provider_info.objects[0].tags.location == "site-1"
+
+    - name: Get Infoblox AWS cloud discovery provider by ID
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+          id: "{{ aws_provider.id }}"
+      register: aws_provider_info_by_id
+    - assert:
+        that:
+          - aws_provider_info_by_id.objects | length == 1
+          - aws_provider_info_by_id.objects[0].id == aws_provider.id
+
+    - name: Get Infoblox AWS cloud discovery provider by filter query
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filter_query: "name=='{{ cloud_discovery_provider_aws_name }}'"
+      register: aws_provider_info_by_query
+    - assert:
+        that:
+          - aws_provider_info_by_query.objects | length == 1
+          - aws_provider_info_by_query.objects[0].name == cloud_discovery_provider_aws_name
+
+    - name: Get Infoblox AWS cloud discovery provider by tag filters
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        tag_filters:
+          location: "site-1"
+      register: aws_provider_info_by_tag
+    - assert:
+        that:
+          - aws_provider_info_by_tag.objects | length == 1
+          - aws_provider_info_by_tag.objects[0].name == cloud_discovery_provider_aws_name
+
+  always:
+     - name: "Delete an AWS cloud discovery provider"
+       infoblox.universal_ddi.cloud_discovery_providers:
+         name: "{{ cloud_discovery_provider_aws_name }}"
+         provider_type: "Amazon Web Services"
+         account_preference: "single"
+         credential_preference:
+           access_identifier_type: "role_arn"
+           credential_type: "dynamic"
+         source_configs:
+           - credential_config:
+               access_identifier: "{{ config_access_id }}"
+         state: absent

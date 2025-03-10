@@ -7,6 +7,7 @@ action_groups:
           - dns
           - keys
           - infra
+          - cloud_discovery
   dns:
     - dns_view
     - dns_view_info
@@ -58,3 +59,7 @@ action_groups:
     - infra_host_info
     - infra_service
     - infra_service_info
+
+  cloud_discovery:
+    - cloud_discovery_providers
+    - cloud_discovery_providers_info
