@@ -78,7 +78,7 @@
          provider_type: "Google Cloud Platform"
          account_preference: "single"
          credential_preference:
-           access_identifier_type: "role_arn"
+           access_identifier_type: "project_id"
            credential_type: "dynamic"
          source_configs:
            - credential_config:
