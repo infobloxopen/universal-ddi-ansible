@@ -9,12 +9,12 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: ipam_subnet
-short_description: Manage Subnet
+module: dhcp_server
+short_description: Manages a DHCP Server.
 description:
-    - Manage Subnet
-    - The Subnet object represents a set of addresses from which addresses are assigned to network equipment interfaces.
-version_added: 2.0.0
+    - Manages a DHCP Server.
+    - A DHCP Server is a named configuration profile that can be shared for specified list of hosts.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -31,62 +31,14 @@ options:
             - present
             - absent
         default: present
-    address:
+    client_principal:
         description:
-            - "The address of the subnet in the form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
+            - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+            - "Defaults to empty."
         type: str
-    asm_config:
-        description:
-            - "The Automated Scope Management configuration for the subnet."
-        type: dict
-        suboptions:
-            asm_threshold:
-                description:
-                    - "ASM shows the number of addresses forecast to be used I(forecast_period) days in the future, if it is greater than I(asm_threshold) percent * I(dhcp_total) (see I(dhcp_utilization)) then the subnet is flagged."
-                type: int
-            enable:
-                description:
-                    - "Indicates if Automated Scope Management is enabled."
-                type: bool
-            enable_notification:
-                description:
-                    - "Indicates if ASM should send notifications to the user."
-                type: bool
-            forecast_period:
-                description:
-                    - "The forecast period in days."
-                type: int
-            growth_factor:
-                description:
-                    - "Indicates the growth in the number or percentage of IP addresses."
-                type: int
-            growth_type:
-                description:
-                    - "The type of factor to use: I(percent) or I(count)."
-                type: str
-            history:
-                description:
-                    - "The minimum amount of history needed before ASM can run on this subnet."
-                type: int
-            min_total:
-                description:
-                    - "The minimum size of range needed for ASM to run on this subnet."
-                type: int
-            min_unused:
-                description:
-                    - "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change.."
-                type: int
-            reenable_date:
-                description: 
-                    - "The date at which notifications will be re-enabled automatically."
-                type: str
-    cidr:
-        description:
-            - "The CIDR of the subnet. This is required if I(address) does not include CIDR."
-        type: int
     comment:
         description:
-            - "The description for the subnet. May contain 0 to 1024 characters. Can include UTF-8."
+            - "The description for the DHCP Config Profile. May contain 0 to 1024 characters. Can include UTF-8."
         type: str
     ddns_client_update:
         description:
@@ -97,8 +49,13 @@ options:
             - "* I(ignore): DHCP server always updates DNS, even if the client says not to."
             - "* I(over_client_update): Same as I(server). DHCP server always updates DNS, overriding an update request from the client, unless the client requests no updates."
             - "* I(over_no_update): DHCP server updates DNS even if the client requests that no updates be done. If the client requests to do the update, DHCP server allows it."
-            - "Defaults to I(client)."
         type: str
+        choices:
+            - client
+            - server
+            - ignore
+            - over_client_update
+            - over_no_update
     ddns_conflict_resolution_mode:
         description:
             - "The mode used for resolving conflicts while performing DDNS updates."
@@ -109,14 +66,25 @@ options:
             - "* I(no_check_without_dhcid): This ignores conflict detection and will not add a DHCID record when creating/updating a DDNS entry."
             - "Defaults to I(check_with_dhcid)."
         type: str
+        choices:
+            - "check_with_dhcid"
+            - "no_check_with_dhcid"
+            - "check_exists_with_dhcid"
     ddns_domain:
         description:
             - "The domain suffix for DDNS updates. FQDN, may be empty."
+            - "Required if I(ddns_enabled) is true."
             - "Defaults to empty."
         type: str
+    ddns_enabled:
+        description:
+            - "Indicates if DDNS updates should be performed for leases. All other I(ddns)*_ configuration is ignored when this flag is unset."
+            - "At a minimum, I(ddns_domain) and I(ddns_zones) must be configured to enable DDNS."
+            - "Defaults to I(false)."
+        type: bool
     ddns_generate_name:
         description:
-            - "Indicates if DDNS needs to generate a hostname when not supplied by the client."
+            - "Indicates if DDNS should generate a hostname when not supplied by the client."
             - "Defaults to I(false)."
         type: bool
     ddns_generated_prefix:
@@ -127,7 +95,7 @@ options:
         type: str
     ddns_send_updates:
         description:
-            - "Determines if DDNS updates are enabled at the subnet level. Defaults to I(true)."
+            - "Determines if DDNS updates are enabled at the server level. Defaults to I(true)."
         type: bool
     ddns_ttl_percent:
         description:
@@ -144,11 +112,129 @@ options:
             - "When false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients."
             - "Defaults to I(true)."
         type: bool
+    ddns_zones:
+        description:
+            - "The DNS zones that DDNS updates can be sent to. There is no resolver fallback. The target zone must be explicitly configured for the update to be performed."
+            - "Updates are sent to the closest enclosing zone."
+            - "Error if I(ddns_enabled) is I(true) and the I(ddns_domain) does not have a corresponding entry in I(ddns_zones)."
+            - "Error if there are items with duplicate zone in the list."
+            - "Defaults to empty list."
+        type: list
+        elements: dict
+        suboptions:
+            fqdn:
+                description:
+                    - "Zone FQDN."
+                    - "If I(zone) is defined, the I(fqdn) field must be empty."
+                type: str
+            gss_tsig_enabled:
+                description:
+                    - "I(gss_tsig_enabled) enables/disables GSS-TSIG signed dynamic updates."
+                    - "Defaults to I(false)."
+                type: bool
+            nameservers:
+                description:
+                    - "The Nameservers in the zone."
+                    - "Each nameserver IP should be unique across the list of nameservers."
+                type: list
+                elements: dict
+                suboptions:
+                    client_principal:
+                        description:
+                            - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                            - "Defaults to empty."
+                        type: str
+                    gss_tsig_fallback:
+                        description:
+                            - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                            - "Defaults to I(false)."
+                        type: bool
+                    kerberos_rekey_interval:
+                        description:
+                            - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+                            - "Defaults to 120 seconds."
+                        type: int
+                    kerberos_retry_interval:
+                        description:
+                            - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                            - "Defaults to 30 seconds."
+                        type: int
+                    kerberos_tkey_lifetime:
+                        description:
+                            - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                            - "Defaults to 160 seconds."
+                        type: int
+                    kerberos_tkey_protocol:
+                        description:
+                            - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                            - "Defaults to I(tcp)."
+                        type: str
+                    nameserver:
+                        description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
+                        type: str
+                    server_principal:
+                        description:
+                            - "The Kerberos principal name of this DNS server that will receive updates."
+                            - "Defaults to empty."
+                        type: str
+            tsig_enabled:
+                description:
+                    - "Indicates if TSIG key should be used for the update."
+                    - "Defaults to I(false)."
+                type: bool
+            tsig_key:
+                description:
+                    - "The TSIG key. Required if I(tsig_enabled) is I(true)."
+                    - "Defaults to empty."
+                type: dict
+                suboptions:
+                    algorithm:
+                        description:
+                            - "TSIG key algorithm."
+                            - "Valid values are:"
+                            - "* I(hmac_sha256)"
+                            - "* I(hmac_sha1)"
+                            - "* I(hmac_sha224)"
+                            - "* I(hmac_sha384)"
+                            - "* I(hmac_sha512)"
+                        type: str
+                    comment:
+                        description:
+                            - "The description for the TSIG key. May contain 0 to 1024 characters. Can include UTF-8."
+                        type: str
+                    key:
+                        description:
+                            - "The resource identifier."
+                        type: str
+                    name:
+                        description:
+                            - "The TSIG key name, FQDN."
+                        type: str
+                    secret:
+                        description:
+                            - "The TSIG key secret, base64 string."
+                        type: str
+            view:
+                description:
+                    - "The resource identifier."
+                type: str
+            zone:
+                description:
+                    - "The resource identifier."
+                type: str
     dhcp_config:
         description:
-            - "The DHCP configuration of the subnet that controls how leases are issued."
+            - "The DHCP configuration for the profile. This controls how leases are issued."
         type: dict
         suboptions:
+            abandoned_reclaim_time:
+                description:
+                    - "The abandoned reclaim time in seconds for IPV4 clients."
+                type: int
+            abandoned_reclaim_time_v6:
+                description:
+                    - "The abandoned reclaim time in seconds for IPV6 clients."
+                type: int
             allow_unknown:
                 description:
                     - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -157,7 +243,16 @@ options:
                 description:
                     - "Disable to allow leases only for known IPV6 clients, those for which a fixed address is configured."
                 type: bool
+            echo_client_id:
+                description:
+                    - "Enable/disable to include/exclude the client id when responding to discover or request."
+                type: bool
             filters:
+                description:
+                    - "The resource identifier."
+                type: list
+                elements: str
+            filters_large_selection:
                 description:
                     - "The resource identifier."
                 type: list
@@ -196,13 +291,11 @@ options:
                 description:
                     - "The lease duration in seconds for IPV6 clients."
                 type: int
-    dhcp_host:
-        description:
-            - "The resource identifier."
-        type: str
     dhcp_options:
         description:
-            - "The DHCP options of the subnet. This can either be a specific option or a group of options."
+            - "The list of DHCP options or group of options for IPv4. An option list is ordered and may include both option groups and specific options. Multiple occurences of the same option or group is not an error. The last occurence of an option in the list will be used."
+            - "Error if the graph of referenced groups contains cycles."
+            - "Defaults to empty list."
         type: list
         elements: dict
         suboptions:
@@ -225,16 +318,41 @@ options:
                     - "* I(group)"
                     - "* I(option)"
                 type: str
-    disable_dhcp:
+    dhcp_options_v6:
         description:
-            - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
+            - "The list of DHCP options or group of options for IPv6. An option list is ordered and may include both option groups and specific options. Multiple occurences of the same option or group is not an error. The last occurence of an option in the list will be used."
+            - "Error if the graph of referenced groups contains cycles."
+            - "Defaults to empty list."
+        type: list
+        elements: dict
+        suboptions:
+            group:
+                description:
+                    - "The resource identifier."
+                type: str
+            option_code:
+                description:
+                    - "The resource identifier."
+                type: str
+            option_value:
+                description:
+                    - "The option value."
+                type: str
+            type:
+                description:
+                    - "The type of item."
+                    - "Valid values are:"
+                    - "* I(group)"
+                    - "* I(option)"
+                type: str
+                choices:
+                    - "group"
+                    - "option"
+    gss_tsig_fallback:
+        description:
+            - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
             - "Defaults to I(false)."
         type: bool
-    federated_realms:
-        description:
-            - "The IDs of the federated realms in which the subnet participates."
-        type: list
-        elements: str
     header_option_filename:
         description:
             - "The configuration for header option filename field."
@@ -264,114 +382,201 @@ options:
             - "Must begin with \"[\" and end with \"]\" and be a compilable POSIX regex."
             - "Defaults to \"[^a-zA-Z0-9_.]\"."
         type: str
-    inheritance_parent:
-        description:
-            - "The resource identifier."
-        type: str
     inheritance_sources:
         description:
-            - "The DHCP inheritance configuration for the subnet."
+            - "The inheritance configuration."
         type: dict
         suboptions:
-            asm_config:
+            ddns_block:
                 description:
-                    - "The inheritance configuration for I(asm_config) field."
+                    - "The inheritance configuration for I(ddns_enabled), I(ddns_send_updates), I(ddns_domain), I(ddns_zones) fields from I(Server) object."
                 type: dict
                 suboptions:
-                    asm_enable_block:
+                    action:
                         description:
-                            - "The block of ASM fields: I(enable), I(enable_notification), I(reenable_date)."
+                            - "The inheritance setting."
+                            - "Valid values are:"
+                            - "* I(inherit): Use the inherited value."
+                            - "* I(override): Use the value set in the object."
+                            - "Defaults to I(inherit)."
+                        type: str
+                    value:
+                        description:
+                            - "The inherited value."
                         type: dict
                         suboptions:
-                            action:
+                            client_principal:
                                 description:
-                                    - "The inheritance setting."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
+                                    - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                                    - "Defaults to empty."
                                 type: str
-                    asm_growth_block:
-                        description:
-                            - "The block of ASM fields: I(growth_factor), I(growth_type)."
-                        type: dict
-                        suboptions:
-                            action:
+                            ddns_domain:
                                 description:
-                                    - "The inheritance setting."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
+                                    - "The domain name for DDNS."
                                 type: str
-                    asm_threshold:
-                        description:
-                            - "ASM shows the number of addresses forecast to be used I(forecast_period) days in the future, if it is greater than I(asm_threshold_percent) * I(dhcp_total) (see I(dhcp_utilization)) then the subnet is flagged."
-                        type: dict
-                        suboptions:
-                            action:
+                            ddns_enabled:
                                 description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
+                                    - "Indicates if DDNS is enabled."
+                                type: bool
+                            ddns_send_updates:
+                                description:
+                                    - "Determines if DDNS updates are enabled at this level."
+                                type: bool
+                            ddns_zones:
+                                description:
+                                    - "The list of DDNS zones."
+                                type: list
+                                elements: dict
+                                suboptions:
+                                    fqdn:
+                                        description:
+                                            - "Zone FQDN."
+                                            - "If I(zone) is defined, the I(fqdn) field must be empty."
+                                        type: str
+                                    gss_tsig_enabled:
+                                        description:
+                                            - "I(gss_tsig_enabled) enables/disables GSS-TSIG signed dynamic updates."
+                                            - "Defaults to I(false)."
+                                        type: bool
+                                    nameservers:
+                                        description:
+                                            - "The Nameservers in the zone."
+                                            - "Each nameserver IP should be unique across the list of nameservers."
+                                        type: list
+                                        elements: dict
+                                        suboptions:
+                                            client_principal:
+                                                description:
+                                                    - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                                                    - "Defaults to empty."
+                                                type: str
+                                            gss_tsig_fallback:
+                                                description:
+                                                    - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                                                    - "Defaults to I(false)."
+                                                type: bool
+                                            kerberos_rekey_interval:
+                                                description:
+                                                    - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+                                                    - "Defaults to 120 seconds."
+                                                type: int
+                                            kerberos_retry_interval:
+                                                description:
+                                                    - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                                                    - "Defaults to 30 seconds."
+                                                type: int
+                                            kerberos_tkey_lifetime:
+                                                description:
+                                                    - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                                                    - "Defaults to 160 seconds."
+                                                type: int
+                                            kerberos_tkey_protocol:
+                                                description:
+                                                    - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                                                    - "Defaults to I(tcp)."
+                                                type: str
+                                            nameserver:
+                                                description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
+                                                type: str
+                                            server_principal:
+                                                description:
+                                                    - "The Kerberos principal name of this DNS server that will receive updates."
+                                                    - "Defaults to empty."
+                                                type: str
+                                    tsig_enabled:
+                                        description:
+                                            - "Indicates if TSIG key should be used for the update."
+                                            - "Defaults to I(false)."
+                                        type: bool
+                                    tsig_key:
+                                        description:
+                                            - "The TSIG key. Required if I(tsig_enabled) is I(true)."
+                                            - "Defaults to empty."
+                                        type: dict
+                                        suboptions:
+                                            algorithm:
+                                                description:
+                                                    - "TSIG key algorithm."
+                                                    - "Valid values are:"
+                                                    - "* I(hmac_sha256)"
+                                                    - "* I(hmac_sha1)"
+                                                    - "* I(hmac_sha224)"
+                                                    - "* I(hmac_sha384)"
+                                                    - "* I(hmac_sha512)"
+                                                type: str
+                                            comment:
+                                                description:
+                                                    - "The description for the TSIG key. May contain 0 to 1024 characters. Can include UTF-8."
+                                                type: str
+                                            key:
+                                                description:
+                                                    - "The resource identifier."
+                                                type: str
+                                            name:
+                                                description:
+                                                    - "The TSIG key name, FQDN."
+                                                type: str
+                                            secret:
+                                                description:
+                                                    - "The TSIG key secret, base64 string."
+                                                type: str
+                                    view:
+                                        description:
+                                            - "The resource identifier."
+                                        type: str
+                                    zone:
+                                        description:
+                                            - "The resource identifier."
+                                        type: str
+                            gss_tsig_fallback:
+                                description:
+                                    - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                                    - "Defaults to I(false)."
+                                type: bool
+                            kerberos_kdc:
+                                description:
+                                    - "Address of Kerberos Key Distribution Center."
+                                    - "Defaults to empty."
                                 type: str
-                    forecast_period:
-                        description:
-                            - "The forecast period in days."
-                        type: dict
-                        suboptions:
-                            action:
+                            kerberos_keys:
                                 description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
+                                    - "I(kerberos_keys) contains a list of keys for GSS-TSIG signed dynamic updates."
+                                    - "Defaults to empty."
+                                type: list
+                                elements: dict
+                                suboptions:
+                                    key:
+                                        description:
+                                            - "The resource identifier."
+                                        type: str
+                            kerberos_rekey_interval:
+                                description:
+                                    - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the rekey_interval value."
+                                    - "Defaults to 120 seconds."
+                                type: int
+                            kerberos_retry_interval:
+                                description:
+                                    - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                                    - "Defaults to 30 seconds."
+                                type: int
+                            kerberos_tkey_lifetime:
+                                description:
+                                    - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                                    - "Defaults to 160 seconds."
+                                type: int
+                            kerberos_tkey_protocol:
+                                description:
+                                    - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                                    - "Defaults to I(tcp)."
                                 type: str
-                    history:
-                        description:
-                            - "The minimum amount of history needed before ASM can run on this subnet."
-                        type: dict
-                        suboptions:
-                            action:
+                            server_principal:
                                 description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
-                                type: str
-                    min_total:
-                        description:
-                            - "The minimum size of range needed for ASM to run on this subnet."
-                        type: dict
-                        suboptions:
-                            action:
-                                description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
-                                type: str
-                    min_unused:
-                        description:
-                            - "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change."
-                        type: dict
-                        suboptions:
-                            action:
-                                description:
-                                    - "The inheritance setting for a field."
-                                    - "Valid values are:"
-                                    - "* I(inherit): Use the inherited value."
-                                    - "* I(override): Use the value set in the object."
-                                    - "Defaults to I(inherit)."
+                                    - "The Kerberos principal name of the external DNS server that will receive updates."
+                                    - "Defaults to empty."
                                 type: str
             ddns_client_update:
                 description:
-                    - "The inheritance configuration for I(ddns_client_update) field."
+                    - "The inheritance configuration for I(ddns_client_update) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -384,20 +589,7 @@ options:
                         type: str
             ddns_conflict_resolution_mode:
                 description:
-                    - "The inheritance configuration for I(ddns_conflict_resolution_mode) field."
-                type: dict
-                suboptions:
-                    action:
-                        description:
-                            - "The inheritance setting for a field."
-                            - "Valid values are:"
-                            - "* I(inherit): Use the inherited value."
-                            - "* I(override): Use the value set in the object."
-                            - "Defaults to I(inherit)."
-                        type: str
-            ddns_enabled:
-                description:
-                    - "The inheritance configuration for I(ddns_enabled) field. Only action allowed is 'inherit'."
+                    - "The inheritance configuration for I(ddns_conflict_resolution_mode) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -410,7 +602,7 @@ options:
                         type: str
             ddns_hostname_block:
                 description:
-                    - "The inheritance configuration for I(ddns_generate_name) and I(ddns_generated_prefix) fields."
+                    - "The inheritance configuration for I(ddns_generate_name) and I(ddns_generated_prefix) fields from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -423,7 +615,7 @@ options:
                         type: str
             ddns_ttl_percent:
                 description:
-                    - "The inheritance configuration for I(ddns_ttl_percent) field."
+                    - "The inheritance configuration for I(ddns_ttl_percent) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -434,22 +626,9 @@ options:
                             - "* I(override): Use the value set in the object."
                             - "Defaults to I(inherit)."
                         type: str
-            ddns_update_block:
-                description:
-                    - "The inheritance configuration for I(ddns_send_updates) and I(ddns_domain) fields."
-                type: dict
-                suboptions:
-                    action:
-                        description:
-                            - "The inheritance setting."
-                            - "Valid values are:"
-                            - "* I(inherit): Use the inherited value."
-                            - "* I(override): Use the value set in the object."
-                            - "Defaults to I(inherit)."
-                        type: str
             ddns_update_on_renew:
                 description:
-                    - "The inheritance configuration for I(ddns_update_on_renew) field."
+                    - "The inheritance configuration for I(ddns_update_on_renew) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -462,7 +641,7 @@ options:
                         type: str
             ddns_use_conflict_resolution:
                 description:
-                    - "The inheritance configuration for I(ddns_use_conflict_resolution) field."
+                    - "The inheritance configuration for I(ddns_use_conflict_resolution) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -475,7 +654,7 @@ options:
                         type: str
             dhcp_config:
                 description:
-                    - "The inheritance configuration for I(dhcp_config) field."
+                    - "The inheritance configuration for I(dhcp_config) field from I(Server) object."
                 type: dict
                 suboptions:
                     abandoned_reclaim_time:
@@ -633,7 +812,34 @@ options:
                                 type: str
             dhcp_options:
                 description:
-                    - "The inheritance configuration for I(dhcp_options) field."
+                    - "The inheritance configuration for I(dhcp_options) field from I(Server) object."
+                type: dict
+                suboptions:
+                    action:
+                        description:
+                            - "The inheritance setting."
+                            - "Valid values are:"
+                            - "* I(inherit): Use the inherited value."
+                            - "* I(block): Don't use the inherited value."
+                            - "Defaults to I(inherit)."
+                        type: str
+                    value:
+                        description:
+                            - "The inherited DHCP option values."
+                        type: list
+                        elements: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting."
+                                    - "Valid values are:"
+                                    - "* I(inherit): Use the inherited value."
+                                    - "* I(block): Don't use the inherited value."
+                                    - "Defaults to I(inherit)."
+                                type: str
+            dhcp_options_v6:
+                description:
+                    - "The inheritance configuration for I(dhcp_options_v6) field from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -699,7 +905,7 @@ options:
                         type: str
             hostname_rewrite_block:
                 description:
-                    - "The inheritance configuration for I(hostname_rewrite_enabled), I(hostname_rewrite_regex), and I(hostname_rewrite_char) fields."
+                    - "The inheritance configuration for I(hostname_rewrite_enabled), I(hostname_rewrite_regex), I(hostname_rewrite_char) fields from I(Server) object."
                 type: dict
                 suboptions:
                     action:
@@ -710,50 +916,86 @@ options:
                             - "* I(override): Use the value set in the object."
                             - "Defaults to I(inherit)."
                         type: str
+            vendor_specific_option_option_space:
+                description:
+                    - "The inheritance configuration for I(vendor_specific_option_option_space) field from I(Server) object."
+                type: dict
+                suboptions:
+                    action:
+                        description:
+                            - "The inheritance setting for a field."
+                            - "Valid values are:"
+                            - "* I(inherit): Use the inherited value."
+                            - "* I(override): Use the value set in the object."
+                            - "Defaults to I(inherit)."
+                        type: str
+                    value:
+                        description:
+                            - "The resource identifier."
+                        type: str
+    kerberos_kdc:
+        description:
+            - "Address of Kerberos Key Distribution Center."
+            - "Defaults to empty."
+        type: str
+    kerberos_keys:
+        description:
+            - "I(kerberos_keys) contains a list of keys for GSS-TSIG signed dynamic updates."
+            - "Defaults to empty."
+        type: list
+        elements: dict
+        suboptions:
+            key:
+                description:
+                    - "The resource identifier."
+                type: str
+    kerberos_rekey_interval:
+        description:
+            - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+            - "Defaults to 120 seconds."
+        type: int
+    kerberos_retry_interval:
+        description:
+            - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+            - "Defaults to 30 seconds."
+        type: int
+    kerberos_tkey_lifetime:
+        description:
+            - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+            - "Defaults to 160 seconds."
+        type: int
+    kerberos_tkey_protocol:
+        description:
+            - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+            - "Defaults to I(tcp)."
+        type: str
     name:
         description:
-            - "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8."
+            - "The name of the DHCP Config Profile. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
-    parent:
+    profile_type:
         description:
-            - "The resource identifier."
+            - "The type of server object."
+            - "Defaults to I(server)."
+            - "Valid values are:"
+            - "* I(server): The server profile type."
+            - "* I(subnet): The subnet profile type."
         type: str
-    rebind_time:
+        choices:
+            - server
+            - subnet
+    server_principal:
         description:
-            - "The lease rebind time (T2) in seconds."
-        type: int
-    renew_time:
-        description:
-            - "The lease renew time (T1) in seconds."
-        type: int
-    space:
-        description:
-            - "The resource identifier."
+            - "The Kerberos principal name of the external DNS server that will receive updates."
+            - "Defaults to empty."
         type: str
     tags:
         description:
-            - "The tags for the subnet in JSON format."
+            - "The tags for the DHCP Config Profile in JSON format."
         type: dict
-    threshold:
+    vendor_specific_option_option_space:
         description:
-            - "The IP address utilization threshold settings for the subnet."
-        type: dict
-        suboptions:
-            enabled:
-                description:
-                    - "Indicates whether the utilization threshold for IP addresses is enabled or not."
-                type: bool
-            high:
-                description:
-                    - "The high threshold value for the percentage of used IP addresses relative to the total IP addresses available in the scope of the object. Thresholds are inclusive in the comparison test."
-                type: int
-            low:
-                description:
-                    - "The low threshold value for the percentage of used IP addresses relative to the total IP addresses available in the scope of the object. Thresholds are inclusive in the comparison test."
-                type: int
-    next_available_id:
-        description:
-            - "The resource identifier for the address block where the next available subnet should be generated."
+            - "The resource identifier."
         type: str
 
 extends_documentation_fragment:
@@ -761,162 +1003,48 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: "Create an IP Space (required as parent)"
-      infoblox.universal_ddi.ipam_ip_space:
-        name: "example-ipspace"
-        state: "present"
-      register: ip_space
+    - name: Create a DHCP server
+      infoblox.universal_ddi.dhcp_server:
+        name: "example-dhcp-server"
+        state: present
 
-    - name: "Create an Address Block (required as parent)"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.0.0/16"
-        space: "{{ ip_space.id }}"
-        state: "present"
-      register: address_block
+    - name: Create a DHCP server with additional fields
+      infoblox.universal_ddi.dhcp_server:
+        name: "test-dhcp-server"
+        comment: "example-comment"
+        profile_type: "server"
+        ddns_ttl_percent: 50
+        tags: 
+          location: "site-1"
+        state: present
 
-    - name: "Create a subnet"
-      infoblox.universal_ddi.ipam_subnet:
-        address: "10.0.0.0/24"
-        space: "{{ ip_space.id }}"
-        state: "present"
-
-    - name: "Create a subnet with Additional Fields"
-      infoblox.universal_ddi.ipam_subnet:
-        address: "10.0.0.0/24"
-        space: "{{ ip_space_id }}"
-        tags: [location: "site1" ]
-        state: "present"
-        dhcp_config:
-            abandoned_reclaim_time: 3600
-        inheritance_sources:
-            dhcp_config:
-                lease_time:
-                    action: override
-
-                # The API currently requires all fields inside the inheritance config to be explicitly provided,
-                # or it fails with error 'The value of an inheritance action field is not valid'.
-                abandoned_reclaim_time:
-                    action: inherit
-                abandoned_reclaim_time_v6:
-                    action: inherit
-                allow_unknown:
-                      action: inherit
-                allow_unknown_v6:
-                    action: inherit
-                echo_client_id:
-                    action: inherit
-                filters:
-                    action: inherit
-                filters_v6:
-                    action: inherit
-                ignore_client_uid:
-                    action: inherit
-                ignore_list:
-                    action: inherit
-                lease_time_v6:
-                    action: inherit
-
-    - name: "Create a Next available Subnet"
-      infoblox.universal_ddi.ipam_subnet:
-        cidr: 24
-        next_available_id: "{{ address_block.id }}"
-        space: "{{ ip_space.id }}"
-        state: "present"
-
-    - name: "Delete a subnet"
-      infoblox.universal_ddi.ipam_subnet:
-        address: "10.0.0.0"
-        cidr: "24"
-        space: "{{ ip_space.id }}"
-        state: "absent"
-"""
+    - name: Delete a DHCP server
+      infoblox.universal_ddi.dhcp_server:
+        name: "example-dhcp-server"
+        state: absent        
+"""  # noqa: E501
 
 RETURN = r"""
 id:
     description:
-        - ID of the Subnet object
+        - ID of the Server object
     type: str
     returned: Always
 item:
     description:
-        - Subnet object
+        - Server object
     type: complex
     returned: Always
     contains:
-        address:
+        client_principal:
             description:
-                - "The address of the subnet in the form \"a.b.c.d/n\" where the \"/n\" may be omitted. In this case, the CIDR value must be defined in the I(cidr) field. When reading, the I(address) field is always in the form \"a.b.c.d\"."
+                - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                - "Defaults to empty."
             type: str
-            returned: Always
-        asm_config:
-            description:
-                - "The Automated Scope Management configuration for the subnet."
-            type: dict
-            returned: Always
-            contains:
-                asm_threshold:
-                    description:
-                        - "ASM shows the number of addresses forecast to be used I(forecast_period) days in the future, if it is greater than I(asm_threshold) percent * I(dhcp_total) (see I(dhcp_utilization)) then the subnet is flagged."
-                    type: int
-                    returned: Always
-                enable:
-                    description:
-                        - "Indicates if Automated Scope Management is enabled."
-                    type: bool
-                    returned: Always
-                enable_notification:
-                    description:
-                        - "Indicates if ASM should send notifications to the user."
-                    type: bool
-                    returned: Always
-                forecast_period:
-                    description:
-                        - "The forecast period in days."
-                    type: int
-                    returned: Always
-                growth_factor:
-                    description:
-                        - "Indicates the growth in the number or percentage of IP addresses."
-                    type: int
-                    returned: Always
-                growth_type:
-                    description:
-                        - "The type of factor to use: I(percent) or I(count)."
-                    type: str
-                    returned: Always
-                history:
-                    description:
-                        - "The minimum amount of history needed before ASM can run on this subnet."
-                    type: int
-                    returned: Always
-                min_total:
-                    description:
-                        - "The minimum size of range needed for ASM to run on this subnet."
-                    type: int
-                    returned: Always
-                min_unused:
-                    description:
-                        - "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change.."
-                    type: int
-                    returned: Always
-                reenable_date:
-                    description: 
-                        - "The date at which notifications will be re-enabled automatically."
-                    type: str
-                    returned: Always
-        asm_scope_flag:
-            description:
-                - "Set to 1 to indicate that the subnet may run out of addresses."
-            type: int
-            returned: Always
-        cidr:
-            description:
-                - "The CIDR of the subnet. This is required if I(address) does not include CIDR."
-            type: int
             returned: Always
         comment:
             description:
-                - "The description for the subnet. May contain 0 to 1024 characters. Can include UTF-8."
+                - "The description for the DHCP Config Profile. May contain 0 to 1024 characters. Can include UTF-8."
             type: str
             returned: Always
         created_at:
@@ -950,12 +1078,20 @@ item:
         ddns_domain:
             description:
                 - "The domain suffix for DDNS updates. FQDN, may be empty."
+                - "Required if I(ddns_enabled) is true."
                 - "Defaults to empty."
             type: str
             returned: Always
+        ddns_enabled:
+            description:
+                - "Indicates if DDNS updates should be performed for leases. All other I(ddns)*_ configuration is ignored when this flag is unset."
+                - "At a minimum, I(ddns_domain) and I(ddns_zones) must be configured to enable DDNS."
+                - "Defaults to I(false)."
+            type: bool
+            returned: Always
         ddns_generate_name:
             description:
-                - "Indicates if DDNS needs to generate a hostname when not supplied by the client."
+                - "Indicates if DDNS should generate a hostname when not supplied by the client."
                 - "Defaults to I(false)."
             type: bool
             returned: Always
@@ -968,7 +1104,7 @@ item:
             returned: Always
         ddns_send_updates:
             description:
-                - "Determines if DDNS updates are enabled at the subnet level. Defaults to I(true)."
+                - "Determines if DDNS updates are enabled at the server level. Defaults to I(true)."
             type: bool
             returned: Always
         ddns_ttl_percent:
@@ -989,12 +1125,163 @@ item:
                 - "Defaults to I(true)."
             type: bool
             returned: Always
+        ddns_zones:
+            description:
+                - "The DNS zones that DDNS updates can be sent to. There is no resolver fallback. The target zone must be explicitly configured for the update to be performed."
+                - "Updates are sent to the closest enclosing zone."
+                - "Error if I(ddns_enabled) is I(true) and the I(ddns_domain) does not have a corresponding entry in I(ddns_zones)."
+                - "Error if there are items with duplicate zone in the list."
+                - "Defaults to empty list."
+            type: list
+            returned: Always
+            elements: dict
+            contains:
+                fqdn:
+                    description:
+                        - "Zone FQDN."
+                        - "If I(zone) is defined, the I(fqdn) field must be empty."
+                    type: str
+                    returned: Always
+                gss_tsig_enabled:
+                    description:
+                        - "I(gss_tsig_enabled) enables/disables GSS-TSIG signed dynamic updates."
+                        - "Defaults to I(false)."
+                    type: bool
+                    returned: Always
+                nameservers:
+                    description:
+                        - "The Nameservers in the zone."
+                        - "Each nameserver IP should be unique across the list of nameservers."
+                    type: list
+                    returned: Always
+                    elements: dict
+                    contains:
+                        client_principal:
+                            description:
+                                - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                                - "Defaults to empty."
+                            type: str
+                            returned: Always
+                        gss_tsig_fallback:
+                            description:
+                                - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                                - "Defaults to I(false)."
+                            type: bool
+                            returned: Always
+                        kerberos_rekey_interval:
+                            description:
+                                - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+                                - "Defaults to 120 seconds."
+                            type: int
+                            returned: Always
+                        kerberos_retry_interval:
+                            description:
+                                - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                                - "Defaults to 30 seconds."
+                            type: int
+                            returned: Always
+                        kerberos_tkey_lifetime:
+                            description:
+                                - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                                - "Defaults to 160 seconds."
+                            type: int
+                            returned: Always
+                        kerberos_tkey_protocol:
+                            description:
+                                - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                                - "Defaults to I(tcp)."
+                            type: str
+                            returned: Always
+                        nameserver:
+                            description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
+                            type: str
+                            returned: Always
+                        server_principal:
+                            description:
+                                - "The Kerberos principal name of this DNS server that will receive updates."
+                                - "Defaults to empty."
+                            type: str
+                            returned: Always
+                tsig_enabled:
+                    description:
+                        - "Indicates if TSIG key should be used for the update."
+                        - "Defaults to I(false)."
+                    type: bool
+                    returned: Always
+                tsig_key:
+                    description:
+                        - "The TSIG key. Required if I(tsig_enabled) is I(true)."
+                        - "Defaults to empty."
+                    type: dict
+                    returned: Always
+                    contains:
+                        algorithm:
+                            description:
+                                - "TSIG key algorithm."
+                                - "Valid values are:"
+                                - "* I(hmac_sha256)"
+                                - "* I(hmac_sha1)"
+                                - "* I(hmac_sha224)"
+                                - "* I(hmac_sha384)"
+                                - "* I(hmac_sha512)"
+                            type: str
+                            returned: Always
+                        comment:
+                            description:
+                                - "The description for the TSIG key. May contain 0 to 1024 characters. Can include UTF-8."
+                            type: str
+                            returned: Always
+                        key:
+                            description:
+                                - "The resource identifier."
+                            type: str
+                            returned: Always
+                        name:
+                            description:
+                                - "The TSIG key name, FQDN."
+                            type: str
+                            returned: Always
+                        protocol_name:
+                            description:
+                                - "The TSIG key name in punycode."
+                            type: str
+                            returned: Always
+                        secret:
+                            description:
+                                - "The TSIG key secret, base64 string."
+                            type: str
+                            returned: Always
+                view:
+                    description:
+                        - "The resource identifier."
+                    type: str
+                    returned: Always
+                view_name:
+                    description:
+                        - "The name of the view."
+                    type: str
+                    returned: Always
+                zone:
+                    description:
+                        - "The resource identifier."
+                    type: str
+                    returned: Always
         dhcp_config:
             description:
-                - "The DHCP configuration of the subnet that controls how leases are issued."
+                - "The DHCP configuration for the profile. This controls how leases are issued."
             type: dict
             returned: Always
             contains:
+                abandoned_reclaim_time:
+                    description:
+                        - "The abandoned reclaim time in seconds for IPV4 clients."
+                    type: int
+                    returned: Always
+                abandoned_reclaim_time_v6:
+                    description:
+                        - "The abandoned reclaim time in seconds for IPV6 clients."
+                    type: int
+                    returned: Always
                 allow_unknown:
                     description:
                         - "Disable to allow leases only for known IPv4 clients, those for which a fixed address is configured."
@@ -1005,7 +1292,17 @@ item:
                         - "Disable to allow leases only for known IPV6 clients, those for which a fixed address is configured."
                     type: bool
                     returned: Always
+                echo_client_id:
+                    description:
+                        - "Enable/disable to include/exclude the client id when responding to discover or request."
+                    type: bool
+                    returned: Always
                 filters:
+                    description:
+                        - "The resource identifier."
+                    type: list
+                    returned: Always
+                filters_large_selection:
                     description:
                         - "The resource identifier."
                     type: list
@@ -1050,14 +1347,11 @@ item:
                         - "The lease duration in seconds for IPV6 clients."
                     type: int
                     returned: Always
-        dhcp_host:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
         dhcp_options:
             description:
-                - "The DHCP options of the subnet. This can either be a specific option or a group of options."
+                - "The list of DHCP options or group of options for IPv4. An option list is ordered and may include both option groups and specific options. Multiple occurences of the same option or group is not an error. The last occurence of an option in the list will be used."
+                - "Error if the graph of referenced groups contains cycles."
+                - "Defaults to empty list."
             type: list
             returned: Always
             elements: dict
@@ -1085,53 +1379,43 @@ item:
                         - "* I(option)"
                     type: str
                     returned: Always
-        dhcp_utilization:
+        dhcp_options_v6:
             description:
-                - "The utilization of IP addresses within the DHCP ranges of the subnet."
-            type: dict
+                - "The list of DHCP options or group of options for IPv6. An option list is ordered and may include both option groups and specific options. Multiple occurences of the same option or group is not an error. The last occurence of an option in the list will be used."
+                - "Error if the graph of referenced groups contains cycles."
+                - "Defaults to empty list."
+            type: list
             returned: Always
+            elements: dict
             contains:
-                dhcp_free:
+                group:
                     description:
-                        - "The total free IP addresses in the DHCP ranges in the scope of this object. It can be computed as I(dhcp_total) - I(dhcp_used)."
+                        - "The resource identifier."
                     type: str
                     returned: Always
-                dhcp_total:
+                option_code:
                     description:
-                        - "The total IP addresses available in the DHCP ranges in the scope of this object."
+                        - "The resource identifier."
                     type: str
                     returned: Always
-                dhcp_used:
+                option_value:
                     description:
-                        - "The total IP addresses marked as used in the DHCP ranges in the scope of this object."
+                        - "The option value."
                     type: str
                     returned: Always
-                dhcp_utilization:
+                type:
                     description:
-                        - "The percentage of used IP addresses relative to the total IP addresses available in the DHCP ranges in the scope of this object."
-                    type: int
+                        - "The type of item."
+                        - "Valid values are:"
+                        - "* I(group)"
+                        - "* I(option)"
+                    type: str
                     returned: Always
-        disable_dhcp:
+        gss_tsig_fallback:
             description:
-                - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
+                - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
                 - "Defaults to I(false)."
             type: bool
-            returned: Always
-        discovery_attrs:
-            description:
-                - "The discovery attributes for this subnet in JSON format."
-            type: dict
-            returned: Always
-        discovery_metadata:
-            description:
-                - "The discovery metadata for this subnet in JSON format."
-            type: dict
-            returned: Always
-        federated_realms:
-            description:
-                - "The IDs of the federated realms in which the subnet participates."
-            type: list
-            elements: str
             returned: Always
         header_option_filename:
             description:
@@ -1173,285 +1457,284 @@ item:
                 - "The resource identifier."
             type: str
             returned: Always
-        inheritance_assigned_hosts:
-            description:
-                - "The list of the inheritance assigned hosts of the object."
-            type: list
-            returned: Always
-            elements: dict
-            contains:
-                display_name:
-                    description:
-                        - "The human-readable display name for the host referred to by I(ophid)."
-                    type: str
-                    returned: Always
-                host:
-                    description:
-                        - "The resource identifier."
-                    type: str
-                    returned: Always
-                ophid:
-                    description:
-                        - "The on-prem host ID."
-                    type: str
-                    returned: Always
-        inheritance_parent:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
         inheritance_sources:
             description:
-                - "The DHCP inheritance configuration for the subnet."
+                - "The inheritance configuration."
             type: dict
             returned: Always
             contains:
-                asm_config:
+                ddns_block:
                     description:
-                        - "The inheritance configuration for I(asm_config) field."
+                        - "The inheritance configuration for I(ddns_enabled), I(ddns_send_updates), I(ddns_domain), I(ddns_zones) fields from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
-                        asm_enable_block:
+                        action:
                             description:
-                                - "The block of ASM fields: I(enable), I(enable_notification), I(reenable_date)."
+                                - "The inheritance setting."
+                                - "Valid values are:"
+                                - "* I(inherit): Use the inherited value."
+                                - "* I(override): Use the value set in the object."
+                                - "Defaults to I(inherit)."
+                            type: str
+                            returned: Always
+                        display_name:
+                            description:
+                                - "The human-readable display name for the object referred to by I(source)."
+                            type: str
+                            returned: Always
+                        source:
+                            description:
+                                - "The resource identifier."
+                            type: str
+                            returned: Always
+                        value:
+                            description:
+                                - "The inherited value."
                             type: dict
                             returned: Always
                             contains:
-                                action:
+                                client_principal:
                                     description:
-                                        - "The inheritance setting."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
+                                        - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                                        - "Defaults to empty."
                                     type: str
                                     returned: Always
-                                display_name:
+                                ddns_domain:
                                     description:
-                                        - "The human-readable display name for the object referred to by I(source)."
+                                        - "The domain name for DDNS."
                                     type: str
                                     returned: Always
-                                source:
+                                ddns_enabled:
                                     description:
-                                        - "The resource identifier."
-                                    type: str
+                                        - "Indicates if DDNS is enabled."
+                                    type: bool
                                     returned: Always
-                                value:
+                                ddns_send_updates:
                                     description:
-                                        - "The inherited value."
-                                    type: dict
+                                        - "Determines if DDNS updates are enabled at this level."
+                                    type: bool
                                     returned: Always
+                                ddns_zones:
+                                    description:
+                                        - "The list of DDNS zones."
+                                    type: list
+                                    returned: Always
+                                    elements: dict
                                     contains:
-                                        enable:
+                                        fqdn:
                                             description:
-                                                - "Indicates whether Automated Scope Management is enabled or not."
-                                            type: bool
-                                            returned: Always
-                                        enable_notification:
-                                            description:
-                                                - "Indicates whether sending notifications to the users is enabled or not."
-                                            type: bool
-                                            returned: Always
-                                        reenable_date:
-                                            description:
-                                                - "The date at which notifications will be re-enabled automatically."
+                                                - "Zone FQDN."
+                                                - "If I(zone) is defined, the I(fqdn) field must be empty."
                                             type: str
                                             returned: Always
-                        asm_growth_block:
-                            description:
-                                - "The block of ASM fields: I(growth_factor), I(growth_type)."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
-                                    description:
-                                        - "The inheritance setting."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
-                                    type: dict
-                                    returned: Always
-                                    contains:
-                                        growth_factor:
+                                        gss_tsig_enabled:
                                             description:
-                                                - "Either the number or percentage of addresses to grow by."
+                                                - "I(gss_tsig_enabled) enables/disables GSS-TSIG signed dynamic updates."
+                                                - "Defaults to I(false)."
+                                            type: bool
+                                            returned: Always
+                                        nameservers:
+                                            description:
+                                                - "The Nameservers in the zone."
+                                                - "Each nameserver IP should be unique across the list of nameservers."
+                                            type: list
+                                            returned: Always
+                                            elements: dict
+                                            contains:
+                                                client_principal:
+                                                    description:
+                                                        - "The Kerberos principal name. It uses the typical Kerberos notation: <SERVICE-NAME>/<server-domain-name>@<REALM>."
+                                                        - "Defaults to empty."
+                                                    type: str
+                                                    returned: Always
+                                                gss_tsig_fallback:
+                                                    description:
+                                                        - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                                                        - "Defaults to I(false)."
+                                                    type: bool
+                                                    returned: Always
+                                                kerberos_rekey_interval:
+                                                    description:
+                                                        - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+                                                        - "Defaults to 120 seconds."
+                                                    type: int
+                                                    returned: Always
+                                                kerberos_retry_interval:
+                                                    description:
+                                                        - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                                                        - "Defaults to 30 seconds."
+                                                    type: int
+                                                    returned: Always
+                                                kerberos_tkey_lifetime:
+                                                    description:
+                                                        - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                                                        - "Defaults to 160 seconds."
+                                                    type: int
+                                                    returned: Always
+                                                kerberos_tkey_protocol:
+                                                    description:
+                                                        - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                                                        - "Defaults to I(tcp)."
+                                                    type: str
+                                                    returned: Always
+                                                nameserver:
+                                                    description: "The Nameservers in the zone.Each nameserver IP should be unique across the list of nameservers."
+                                                    type: str
+                                                    returned: Always
+                                                server_principal:
+                                                    description:
+                                                        - "The Kerberos principal name of this DNS server that will receive updates."
+                                                        - "Defaults to empty."
+                                                    type: str
+                                                    returned: Always
+                                        tsig_enabled:
+                                            description:
+                                                - "Indicates if TSIG key should be used for the update."
+                                                - "Defaults to I(false)."
+                                            type: bool
+                                            returned: Always
+                                        tsig_key:
+                                            description:
+                                                - "The TSIG key. Required if I(tsig_enabled) is I(true)."
+                                                - "Defaults to empty."
+                                            type: dict
+                                            returned: Always
+                                            contains:
+                                                algorithm:
+                                                    description:
+                                                        - "TSIG key algorithm."
+                                                        - "Valid values are:"
+                                                        - "* I(hmac_sha256)"
+                                                        - "* I(hmac_sha1)"
+                                                        - "* I(hmac_sha224)"
+                                                        - "* I(hmac_sha384)"
+                                                        - "* I(hmac_sha512)"
+                                                    type: str
+                                                    returned: Always
+                                                comment:
+                                                    description:
+                                                        - "The description for the TSIG key. May contain 0 to 1024 characters. Can include UTF-8."
+                                                    type: str
+                                                    returned: Always
+                                                key:
+                                                    description:
+                                                        - "The resource identifier."
+                                                    type: str
+                                                    returned: Always
+                                                name:
+                                                    description:
+                                                        - "The TSIG key name, FQDN."
+                                                    type: str
+                                                    returned: Always
+                                                protocol_name:
+                                                    description:
+                                                        - "The TSIG key name in punycode."
+                                                    type: str
+                                                    returned: Always
+                                                secret:
+                                                    description:
+                                                        - "The TSIG key secret, base64 string."
+                                                    type: str
+                                                    returned: Always
+                                        view:
+                                            description:
+                                                - "The resource identifier."
+                                            type: str
+                                            returned: Always
+                                        view_name:
+                                            description:
+                                                - "The name of the view."
+                                            type: str
+                                            returned: Always
+                                        zone:
+                                            description:
+                                                - "The resource identifier."
+                                            type: str
+                                            returned: Always
+                                gss_tsig_fallback:
+                                    description:
+                                        - "The behavior when GSS-TSIG should be used (a matching external DNS server is configured) but no GSS-TSIG key is available. If configured to I(false) (the default) this DNS server is skipped, if configured to I(true) the DNS server is ignored and the DNS update is sent with the configured DHCP-DDNS protection e.g. TSIG key or without any protection when none was configured."
+                                        - "Defaults to I(false)."
+                                    type: bool
+                                    returned: Always
+                                kerberos_kdc:
+                                    description:
+                                        - "Address of Kerberos Key Distribution Center."
+                                        - "Defaults to empty."
+                                    type: str
+                                    returned: Always
+                                kerberos_keys:
+                                    description:
+                                        - "I(kerberos_keys) contains a list of keys for GSS-TSIG signed dynamic updates."
+                                        - "Defaults to empty."
+                                    type: list
+                                    returned: Always
+                                    elements: dict
+                                    contains:
+                                        algorithm:
+                                            description:
+                                                - "Encryption algorithm of the key in accordance with RFC 3961."
+                                            type: str
+                                            returned: Always
+                                        domain:
+                                            description:
+                                                - "Kerberos realm of the principal."
+                                            type: str
+                                            returned: Always
+                                        key:
+                                            description:
+                                                - "The resource identifier."
+                                            type: str
+                                            returned: Always
+                                        principal:
+                                            description:
+                                                - "Kerberos principal associated with key."
+                                            type: str
+                                            returned: Always
+                                        uploaded_at:
+                                            description:
+                                                - "Upload time for the key."
+                                            type: str
+                                            returned: Always
+                                        version:
+                                            description:
+                                                - "The version number (KVNO) of the key."
                                             type: int
                                             returned: Always
-                                        growth_type:
-                                            description:
-                                                - "The type of factor to use: I(percent) or I(count)."
-                                            type: str
-                                            returned: Always
-                        asm_threshold:
-                            description:
-                                - "ASM shows the number of addresses forecast to be used I(forecast_period) days in the future, if it is greater than I(asm_threshold_percent) * I(dhcp_total) (see I(dhcp_utilization)) then the subnet is flagged."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
+                                kerberos_rekey_interval:
                                     description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
+                                        - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the rekey_interval value."
+                                        - "Defaults to 120 seconds."
                                     type: int
                                     returned: Always
-                        forecast_period:
-                            description:
-                                - "The forecast period in days."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
+                                kerberos_retry_interval:
                                     description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
+                                        - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                                        - "Defaults to 30 seconds."
                                     type: int
                                     returned: Always
-                        history:
-                            description:
-                                - "The minimum amount of history needed before ASM can run on this subnet."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
+                                kerberos_tkey_lifetime:
                                     description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
+                                        - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                                        - "Defaults to 160 seconds."
                                     type: int
                                     returned: Always
-                        min_total:
-                            description:
-                                - "The minimum size of range needed for ASM to run on this subnet."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
+                                kerberos_tkey_protocol:
                                     description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
+                                        - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                                        - "Defaults to I(tcp)."
                                     type: str
                                     returned: Always
-                                display_name:
+                                server_principal:
                                     description:
-                                        - "The human-readable display name for the object referred to by I(source)."
+                                        - "The Kerberos principal name of the external DNS server that will receive updates."
+                                        - "Defaults to empty."
                                     type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
-                                    type: int
-                                    returned: Always
-                        min_unused:
-                            description:
-                                - "The minimum percentage of addresses that must be available outside of the DHCP ranges and fixed addresses when making a suggested change."
-                            type: dict
-                            returned: Always
-                            contains:
-                                action:
-                                    description:
-                                        - "The inheritance setting for a field."
-                                        - "Valid values are:"
-                                        - "* I(inherit): Use the inherited value."
-                                        - "* I(override): Use the value set in the object."
-                                        - "Defaults to I(inherit)."
-                                    type: str
-                                    returned: Always
-                                display_name:
-                                    description:
-                                        - "The human-readable display name for the object referred to by I(source)."
-                                    type: str
-                                    returned: Always
-                                source:
-                                    description:
-                                        - "The resource identifier."
-                                    type: str
-                                    returned: Always
-                                value:
-                                    description:
-                                        - "The inherited value."
-                                    type: int
                                     returned: Always
                 ddns_client_update:
                     description:
-                        - "The inheritance configuration for I(ddns_client_update) field."
+                        - "The inheritance configuration for I(ddns_client_update) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1481,7 +1764,7 @@ item:
                             returned: Always
                 ddns_conflict_resolution_mode:
                     description:
-                        - "The inheritance configuration for I(ddns_conflict_resolution_mode) field."
+                        - "The inheritance configuration for I(ddns_conflict_resolution_mode) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1508,40 +1791,10 @@ item:
                             description:
                                 - "The inherited value."
                             type: str
-                            returned: Always
-                ddns_enabled:
-                    description:
-                        - "The inheritance configuration for I(ddns_enabled) field. Only action allowed is 'inherit'."
-                    type: dict
-                    returned: Always
-                    contains:
-                        action:
-                            description:
-                                - "The inheritance setting for a field."
-                                - "Valid values are:"
-                                - "* I(inherit): Use the inherited value."
-                                - "* I(override): Use the value set in the object."
-                                - "Defaults to I(inherit)."
-                            type: str
-                            returned: Always
-                        display_name:
-                            description:
-                                - "The human-readable display name for the object referred to by I(source)."
-                            type: str
-                            returned: Always
-                        source:
-                            description:
-                                - "The resource identifier."
-                            type: str
-                            returned: Always
-                        value:
-                            description:
-                                - "The inherited value."
-                            type: bool
                             returned: Always
                 ddns_hostname_block:
                     description:
-                        - "The inheritance configuration for I(ddns_generate_name) and I(ddns_generated_prefix) fields."
+                        - "The inheritance configuration for I(ddns_generate_name) and I(ddns_generated_prefix) fields from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1582,7 +1835,7 @@ item:
                                     returned: Always
                 ddns_ttl_percent:
                     description:
-                        - "The inheritance configuration for I(ddns_ttl_percent) field."
+                        - "The inheritance configuration for I(ddns_ttl_percent) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1610,50 +1863,9 @@ item:
                                 - "The inherited value."
                             type: float
                             returned: Always
-                ddns_update_block:
-                    description:
-                        - "The inheritance configuration for I(ddns_send_updates) and I(ddns_domain) fields."
-                    type: dict
-                    returned: Always
-                    contains:
-                        action:
-                            description:
-                                - "The inheritance setting."
-                                - "Valid values are:"
-                                - "* I(inherit): Use the inherited value."
-                                - "* I(override): Use the value set in the object."
-                                - "Defaults to I(inherit)."
-                            type: str
-                            returned: Always
-                        display_name:
-                            description:
-                                - "The human-readable display name for the object referred to by I(source)."
-                            type: str
-                            returned: Always
-                        source:
-                            description:
-                                - "The resource identifier."
-                            type: str
-                            returned: Always
-                        value:
-                            description:
-                                - "The inherited value."
-                            type: dict
-                            returned: Always
-                            contains:
-                                ddns_domain:
-                                    description:
-                                        - "The domain name for DDNS."
-                                    type: str
-                                    returned: Always
-                                ddns_send_updates:
-                                    description:
-                                        - "Determines if DDNS updates are enabled at this level."
-                                    type: bool
-                                    returned: Always
                 ddns_update_on_renew:
                     description:
-                        - "The inheritance configuration for I(ddns_update_on_renew) field."
+                        - "The inheritance configuration for I(ddns_update_on_renew) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1683,7 +1895,7 @@ item:
                             returned: Always
                 ddns_use_conflict_resolution:
                     description:
-                        - "The inheritance configuration for I(ddns_use_conflict_resolution) field."
+                        - "The inheritance configuration for I(ddns_use_conflict_resolution) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -1713,7 +1925,7 @@ item:
                             returned: Always
                 dhcp_config:
                     description:
-                        - "The inheritance configuration for I(dhcp_config) field."
+                        - "The inheritance configuration for I(dhcp_config) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -2064,7 +2276,88 @@ item:
                                     returned: Always
                 dhcp_options:
                     description:
-                        - "The inheritance configuration for I(dhcp_options) field."
+                        - "The inheritance configuration for I(dhcp_options) field from I(Server) object."
+                    type: dict
+                    returned: Always
+                    contains:
+                        action:
+                            description:
+                                - "The inheritance setting."
+                                - "Valid values are:"
+                                - "* I(inherit): Use the inherited value."
+                                - "* I(block): Don't use the inherited value."
+                                - "Defaults to I(inherit)."
+                            type: str
+                            returned: Always
+                        value:
+                            description:
+                                - "The inherited DHCP option values."
+                            type: list
+                            returned: Always
+                            elements: dict
+                            contains:
+                                action:
+                                    description:
+                                        - "The inheritance setting."
+                                        - "Valid values are:"
+                                        - "* I(inherit): Use the inherited value."
+                                        - "* I(block): Don't use the inherited value."
+                                        - "Defaults to I(inherit)."
+                                    type: str
+                                    returned: Always
+                                display_name:
+                                    description:
+                                        - "The human-readable display name for the object referred to by I(source)."
+                                    type: str
+                                    returned: Always
+                                source:
+                                    description:
+                                        - "The resource identifier."
+                                    type: str
+                                    returned: Always
+                                value:
+                                    description:
+                                        - "The inherited value for the DHCP option."
+                                    type: dict
+                                    returned: Always
+                                    contains:
+                                        option:
+                                            description:
+                                                - "Option inherited from the ancestor."
+                                            type: dict
+                                            returned: Always
+                                            contains:
+                                                group:
+                                                    description:
+                                                        - "The resource identifier."
+                                                    type: str
+                                                    returned: Always
+                                                option_code:
+                                                    description:
+                                                        - "The resource identifier."
+                                                    type: str
+                                                    returned: Always
+                                                option_value:
+                                                    description:
+                                                        - "The option value."
+                                                    type: str
+                                                    returned: Always
+                                                type:
+                                                    description:
+                                                        - "The type of item."
+                                                        - "Valid values are:"
+                                                        - "* I(group)"
+                                                        - "* I(option)"
+                                                    type: str
+                                                    returned: Always
+                                        overriding_group:
+                                            description:
+                                                - "The resource identifier."
+                                            type: str
+                                            returned: Always
+                dhcp_options_v6:
+                    description:
+                        - "The inheritance configuration for I(dhcp_options_v6) field from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -2235,7 +2528,7 @@ item:
                             returned: Always
                 hostname_rewrite_block:
                     description:
-                        - "The inheritance configuration for I(hostname_rewrite_enabled), I(hostname_rewrite_regex), and I(hostname_rewrite_char) fields."
+                        - "The inheritance configuration for I(hostname_rewrite_enabled), I(hostname_rewrite_regex), I(hostname_rewrite_char) fields from I(Server) object."
                     type: dict
                     returned: Always
                     contains:
@@ -2279,183 +2572,157 @@ item:
                                         - "The inheritance configuration for I(hostname_rewrite_regex) field."
                                     type: str
                                     returned: Always
+                vendor_specific_option_option_space:
+                    description:
+                        - "The inheritance configuration for I(vendor_specific_option_option_space) field from I(Server) object."
+                    type: dict
+                    returned: Always
+                    contains:
+                        action:
+                            description:
+                                - "The inheritance setting for a field."
+                                - "Valid values are:"
+                                - "* I(inherit): Use the inherited value."
+                                - "* I(override): Use the value set in the object."
+                                - "Defaults to I(inherit)."
+                            type: str
+                            returned: Always
+                        display_name:
+                            description:
+                                - "The human-readable display name for the object referred to by I(source)."
+                            type: str
+                            returned: Always
+                        source:
+                            description:
+                                - "The resource identifier."
+                            type: str
+                            returned: Always
+                        value:
+                            description:
+                                - "The resource identifier."
+                            type: str
+                            returned: Always
+        kerberos_kdc:
+            description:
+                - "Address of Kerberos Key Distribution Center."
+                - "Defaults to empty."
+            type: str
+            returned: Always
+        kerberos_keys:
+            description:
+                - "I(kerberos_keys) contains a list of keys for GSS-TSIG signed dynamic updates."
+                - "Defaults to empty."
+            type: list
+            returned: Always
+            elements: dict
+            contains:
+                algorithm:
+                    description:
+                        - "Encryption algorithm of the key in accordance with RFC 3961."
+                    type: str
+                    returned: Always
+                domain:
+                    description:
+                        - "Kerberos realm of the principal."
+                    type: str
+                    returned: Always
+                key:
+                    description:
+                        - "The resource identifier."
+                    type: str
+                    returned: Always
+                principal:
+                    description:
+                        - "Kerberos principal associated with key."
+                    type: str
+                    returned: Always
+                uploaded_at:
+                    description:
+                        - "Upload time for the key."
+                    type: str
+                    returned: Always
+                version:
+                    description:
+                        - "The version number (KVNO) of the key."
+                    type: int
+                    returned: Always
+        kerberos_rekey_interval:
+            description:
+                - "Time interval (in seconds) the keys for each configured external DNS server are checked for rekeying, i.e. a new key is created to replace the current usable one when its age is greater than the I(kerberos_rekey_interval) value."
+                - "Defaults to 120 seconds."
+            type: int
+            returned: Always
+        kerberos_retry_interval:
+            description:
+                - "Time interval (in seconds) to retry to create a key if any error occurred previously for any configured external DNS server."
+                - "Defaults to 30 seconds."
+            type: int
+            returned: Always
+        kerberos_tkey_lifetime:
+            description:
+                - "Lifetime (in seconds) of GSS-TSIG keys in the TKEY protocol."
+                - "Defaults to 160 seconds."
+            type: int
+            returned: Always
+        kerberos_tkey_protocol:
+            description:
+                - "Determines which protocol is used to establish the security context with the external DNS servers, TCP or UDP."
+                - "Defaults to I(tcp)."
+            type: str
+            returned: Always
         name:
             description:
-                - "The name of the subnet. May contain 1 to 256 characters. Can include UTF-8."
+                - "The name of the DHCP Config Profile. Must contain 1 to 256 characters. Can include UTF-8."
             type: str
             returned: Always
-        parent:
+        profile_type:
             description:
-                - "The resource identifier."
+                - "The type of server object."
+                - "Defaults to I(server)."
+                - "Valid values are:"
+                - "* I(server): The server profile type."
+                - "* I(subnet): The subnet profile type."
             type: str
             returned: Always
-        protocol:
+        server_principal:
             description:
-                - "The type of protocol of the subnet (I(ip4) or I(ip6))."
-            type: str
-            returned: Always
-        rebind_time:
-            description:
-                - "The lease rebind time (T2) in seconds."
-            type: int
-            returned: Always
-        renew_time:
-            description:
-                - "The lease renew time (T1) in seconds."
-            type: int
-            returned: Always
-        space:
-            description:
-                - "The resource identifier."
+                - "The Kerberos principal name of the external DNS server that will receive updates."
+                - "Defaults to empty."
             type: str
             returned: Always
         tags:
             description:
-                - "The tags for the subnet in JSON format."
+                - "The tags for the DHCP Config Profile in JSON format."
             type: dict
             returned: Always
-        threshold:
-            description:
-                - "The IP address utilization threshold settings for the subnet."
-            type: dict
-            returned: Always
-            contains:
-                enabled:
-                    description:
-                        - "Indicates whether the utilization threshold for IP addresses is enabled or not."
-                    type: bool
-                    returned: Always
-                high:
-                    description:
-                        - "The high threshold value for the percentage of used IP addresses relative to the total IP addresses available in the scope of the object. Thresholds are inclusive in the comparison test."
-                    type: int
-                    returned: Always
-                low:
-                    description:
-                        - "The low threshold value for the percentage of used IP addresses relative to the total IP addresses available in the scope of the object. Thresholds are inclusive in the comparison test."
-                    type: int
-                    returned: Always
         updated_at:
             description:
                 - "Time when the object has been updated. Equals to I(created_at) if not updated after creation."
             type: str
             returned: Always
-        usage:
+        vendor_specific_option_option_space:
             description:
-                - "The usage is a combination of indicators, each tracking a specific associated use. Listed below are usage indicators with their meaning:"
-                - "* I(IPAM): Subnet is managed in BloxOne DDI."
-                - "* I(DHCP): Subnet is served by a DHCP Host."
-                - "* I(DISCOVERED): Subnet is discovered by some network discovery probe like Network Insight or NetMRI in NIOS."
-            type: list
+                - "The resource identifier."
+            type: str
             returned: Always
-        utilization:
-            description:
-                - "The IPV4 address utilization statistics of the subnet."
-            type: dict
-            returned: Always
-            contains:
-                abandon_utilization:
-                    description:
-                        - "The percentage of abandoned IP addresses relative to the total IP addresses available in the scope of the object."
-                    type: int
-                    returned: Always
-                abandoned:
-                    description:
-                        - "The number of IP addresses in the scope of the object which are in the abandoned state (issued by a DHCP server and then declined by the client)."
-                    type: str
-                    returned: Always
-                dynamic:
-                    description:
-                        - "The number of IP addresses handed out by DHCP in the scope of the object. This includes all leased addresses, fixed addresses that are defined but not currently leased and abandoned leases."
-                    type: str
-                    returned: Always
-                free:
-                    description:
-                        - "The number of IP addresses available in the scope of the object."
-                    type: str
-                    returned: Always
-                static:
-                    description:
-                        - "The number of defined IP addresses such as reservations or DNS records. It can be computed as I(static) = I(used) - I(dynamic)."
-                    type: str
-                    returned: Always
-                total:
-                    description:
-                        - "The total number of IP addresses available in the scope of the object."
-                    type: str
-                    returned: Always
-                used:
-                    description:
-                        - "The number of IP addresses used in the scope of the object."
-                    type: str
-                    returned: Always
-                utilization:
-                    description:
-                        - "The percentage of used IP addresses relative to the total IP addresses available in the scope of the object."
-                    type: int
-                    returned: Always
-        utilization_v6:
-            description:
-                - "The utilization of IPV6 addresses in the subnet."
-            type: dict
-            returned: Always
-            contains:
-                abandoned:
-                    description: 
-                        - "The number of IP addresses in the scope of the object which are in the abandoned state (issued by a DHCP server and then declined by the client)."
-                    type: str
-                    returned: Always
-                dynamic:
-                    description: 
-                        - "The number of IP addresses handed out by DHCP in the scope of the object. This includes all leased addresses, fixed addresses that are defined but not currently leased and abandoned leases."
-                    type: str
-                    returned: Always
-                static:
-                    description: 
-                        - "The number of defined IP addresses such as reservations or DNS records. It can be computed as _static_ = _used_ - _dynamic_."
-                    type: str
-                    returned: Always
-                total:
-                    description: 
-                        - "The total number of IP addresses available in the scope of the object."
-                    type: str
-                    returned: Always
-                used:
-                    description: 
-                        - "The number of IP addresses used in the scope of the object."
-                    type: str
-                    returned: Always
 """  # noqa: E501
 
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from ipam import Subnet, SubnetApi
+    from ipam import Server, ServerApi
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
 
-class SubnetModule(UniversalDDIAnsibleModule):
+class DHCPServerModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(SubnetModule, self).__init__(*args, **kwargs)
+        super(DHCPServerModule, self).__init__(*args, **kwargs)
 
-        self.next_available_id = self.params.get("next_available_id")
-        if self.params["address"] is not None:
-            if "/" in self.params["address"]:
-                self.params["address"], netmask = self.params["address"].split("/")
-                self.params["cidr"] = int(netmask)
-
-        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id", "next_available_id"]
+        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
-        self._payload = Subnet.from_dict(self._payload_params)
-
-        # Unset unsupported DHCP configuration attributes
-        if self._payload.dhcp_config:
-            self._payload.dhcp_config.abandoned_reclaim_time = None
-            self._payload.dhcp_config.abandoned_reclaim_time_v6 = None
-            self._payload.dhcp_config.echo_client_id = None
-
+        self._payload = Server.from_dict(self._payload_params)
         self._existing = None
 
     @property
@@ -2484,22 +2751,24 @@ class SubnetModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = SubnetApi(self.client).read(self.params["id"], inherit="full")
+                resp = ServerApi(self.client).read(self.params["id"], inherit="full")
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
                     return None
                 raise e
         else:
-            if self.params["address"] is None:
-                return None
+            filter = f"name=='{self.params['name']}'"
+            resp = ServerApi(self.client).list(filter=filter, inherit="full")
 
-            filter = f"address=='{self.params['address']}' and space=='{self.params['space']}' and cidr=={self.params['cidr']}"
-            resp = SubnetApi(self.client).list(filter=filter, inherit="full")
+            # If no results, set results to empty list
+            if not resp.results:
+                resp.results = []
+
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple Subnet: {resp.results}")
+                self.fail_json(msg=f"Found multiple Server: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
@@ -2507,27 +2776,21 @@ class SubnetModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-        if self.next_available_id is not None:
-            naId = f"{self.next_available_id}/nextavailablesubnet"
-            self._payload.address = naId
-        resp = SubnetApi(self.client).create(body=self.payload, inherit="full")
+        resp = ServerApi(self.client).create(body=self.payload, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
 
-        update_body = self.payload
-        update_body = self.validate_readonly_on_update(self.existing, update_body, ["address", "space", "cidr"])
-
-        resp = SubnetApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+        resp = ServerApi(self.client).update(id=self.existing.id, body=self.payload, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
         if self.check_mode:
             return
 
-        SubnetApi(self.client).delete(self.existing.id)
+        ServerApi(self.client).delete(self.existing.id)
 
     def run_command(self):
         result = dict(changed=False, object={}, id=None)
@@ -2540,16 +2803,16 @@ class SubnetModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "Subnet created"
+                result["msg"] = "Server created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "Subnet updated"
+                    result["msg"] = "Server updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "Subnet deleted"
+                result["msg"] = "Server deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -2573,40 +2836,68 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        address=dict(type="str"),
-        next_available_id=dict(type="str", required=False),
-        asm_config=dict(
-            type="dict",
-            options=dict(
-                asm_threshold=dict(type="int"),
-                enable=dict(type="bool"),
-                enable_notification=dict(type="bool"),
-                forecast_period=dict(type="int"),
-                growth_factor=dict(type="int"),
-                growth_type=dict(type="str"),
-                history=dict(type="int"),
-                min_total=dict(type="int"),
-                min_unused=dict(type="int"),
-                reenable_date=dict(type="str"),
-            ),
-        ),
-        cidr=dict(type="int"),
+        client_principal=dict(type="str"),
         comment=dict(type="str"),
-        ddns_client_update=dict(type="str"),
-        ddns_conflict_resolution_mode=dict(type="str"),
+        ddns_client_update=dict(
+            type="str", choices=["client", "server", "ignore", "over_client_update", "over_no_update"]
+        ),
+        ddns_conflict_resolution_mode=dict(
+            type="str", choices=["check_with_dhcid", "no_check_with_dhcid", "check_exists_with_dhcid"]
+        ),
         ddns_domain=dict(type="str"),
+        ddns_enabled=dict(type="bool"),
         ddns_generate_name=dict(type="bool"),
         ddns_generated_prefix=dict(type="str"),
         ddns_send_updates=dict(type="bool"),
         ddns_ttl_percent=dict(type="float"),
         ddns_update_on_renew=dict(type="bool"),
         ddns_use_conflict_resolution=dict(type="bool"),
+        ddns_zones=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                fqdn=dict(type="str"),
+                gss_tsig_enabled=dict(type="bool"),
+                nameservers=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        client_principal=dict(type="str"),
+                        gss_tsig_fallback=dict(type="bool"),
+                        kerberos_rekey_interval=dict(type="int", no_log=True),
+                        kerberos_retry_interval=dict(type="int"),
+                        kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                        kerberos_tkey_protocol=dict(type="str", no_log=True),
+                        nameserver=dict(type="str"),
+                        server_principal=dict(type="str"),
+                    ),
+                ),
+                tsig_enabled=dict(type="bool"),
+                tsig_key=dict(
+                    type="dict",
+                    options=dict(
+                        algorithm=dict(type="str"),
+                        comment=dict(type="str"),
+                        key=dict(type="str", no_log=True),
+                        name=dict(type="str"),
+                        secret=dict(type="str", no_log=True),
+                    ),
+                    no_log=True,
+                ),
+                view=dict(type="str"),
+                zone=dict(type="str"),
+            ),
+        ),
         dhcp_config=dict(
             type="dict",
             options=dict(
+                abandoned_reclaim_time=dict(type="int"),
+                abandoned_reclaim_time_v6=dict(type="int"),
                 allow_unknown=dict(type="bool"),
                 allow_unknown_v6=dict(type="bool"),
+                echo_client_id=dict(type="bool"),
                 filters=dict(type="list", elements="str"),
+                filters_large_selection=dict(type="list", elements="str"),
                 filters_v6=dict(type="list", elements="str"),
                 ignore_client_uid=dict(type="bool"),
                 ignore_list=dict(
@@ -2621,7 +2912,6 @@ def main():
                 lease_time_v6=dict(type="int"),
             ),
         ),
-        dhcp_host=dict(type="str"),
         dhcp_options=dict(
             type="list",
             elements="dict",
@@ -2632,61 +2922,88 @@ def main():
                 type=dict(type="str"),
             ),
         ),
-        disable_dhcp=dict(type="bool"),
-        federated_realms=dict(type="list", elements="str"),
+        dhcp_options_v6=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                group=dict(type="str"),
+                option_code=dict(type="str"),
+                option_value=dict(type="str"),
+                type=dict(type="str", choices=["group", "option"]),
+            ),
+        ),
+        gss_tsig_fallback=dict(type="bool"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
         header_option_server_name=dict(type="str"),
         hostname_rewrite_char=dict(type="str"),
         hostname_rewrite_enabled=dict(type="bool"),
         hostname_rewrite_regex=dict(type="str"),
-        inheritance_parent=dict(type="str"),
         inheritance_sources=dict(
             type="dict",
             options=dict(
-                asm_config=dict(
+                ddns_block=dict(
                     type="dict",
                     options=dict(
-                        asm_enable_block=dict(
+                        action=dict(type="str"),
+                        value=dict(
                             type="dict",
                             options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        asm_growth_block=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        asm_threshold=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        forecast_period=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        history=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        min_total=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
-                            ),
-                        ),
-                        min_unused=dict(
-                            type="dict",
-                            options=dict(
-                                action=dict(type="str"),
+                                client_principal=dict(type="str"),
+                                ddns_domain=dict(type="str"),
+                                ddns_enabled=dict(type="bool"),
+                                ddns_send_updates=dict(type="bool"),
+                                ddns_zones=dict(
+                                    type="list",
+                                    elements="dict",
+                                    options=dict(
+                                        fqdn=dict(type="str"),
+                                        gss_tsig_enabled=dict(type="bool"),
+                                        nameservers=dict(
+                                            type="list",
+                                            elements="dict",
+                                            options=dict(
+                                                client_principal=dict(type="str"),
+                                                gss_tsig_fallback=dict(type="bool"),
+                                                kerberos_rekey_interval=dict(type="int", no_log=True),
+                                                kerberos_retry_interval=dict(type="int"),
+                                                kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                                                kerberos_tkey_protocol=dict(type="str", no_log=True),
+                                                nameserver=dict(type="str"),
+                                                server_principal=dict(type="str"),
+                                            ),
+                                        ),
+                                        tsig_enabled=dict(type="bool"),
+                                        tsig_key=dict(
+                                            type="dict",
+                                            options=dict(
+                                                algorithm=dict(type="str"),
+                                                comment=dict(type="str"),
+                                                key=dict(type="str", no_log=True),
+                                                name=dict(type="str"),
+                                                secret=dict(type="str", no_log=True),
+                                            ),
+                                            no_log=True,
+                                        ),
+                                        view=dict(type="str"),
+                                        zone=dict(type="str"),
+                                    ),
+                                ),
+                                gss_tsig_fallback=dict(type="bool"),
+                                kerberos_kdc=dict(type="str"),
+                                kerberos_keys=dict(
+                                    type="list",
+                                    elements="dict",
+                                    options=dict(
+                                        key=dict(type="str", no_log=True),
+                                    ),
+                                    no_log=True,
+                                ),
+                                kerberos_rekey_interval=dict(type="int", no_log=True),
+                                kerberos_retry_interval=dict(type="int"),
+                                kerberos_tkey_lifetime=dict(type="int", no_log=True),
+                                kerberos_tkey_protocol=dict(type="str", no_log=True),
+                                server_principal=dict(type="str"),
                             ),
                         ),
                     ),
@@ -2703,12 +3020,6 @@ def main():
                         action=dict(type="str"),
                     ),
                 ),
-                ddns_enabled=dict(
-                    type="dict",
-                    options=dict(
-                        action=dict(type="str"),
-                    ),
-                ),
                 ddns_hostname_block=dict(
                     type="dict",
                     options=dict(
@@ -2716,12 +3027,6 @@ def main():
                     ),
                 ),
                 ddns_ttl_percent=dict(
-                    type="dict",
-                    options=dict(
-                        action=dict(type="str"),
-                    ),
-                ),
-                ddns_update_block=dict(
                     type="dict",
                     options=dict(
                         action=dict(type="str"),
@@ -2825,6 +3130,19 @@ def main():
                         ),
                     ),
                 ),
+                dhcp_options_v6=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(
+                            type="list",
+                            elements="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                    ),
+                ),
                 header_option_filename=dict(
                     type="dict",
                     options=dict(
@@ -2849,31 +3167,39 @@ def main():
                         action=dict(type="str"),
                     ),
                 ),
+                vendor_specific_option_option_space=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str"),
+                        value=dict(type="str"),
+                    ),
+                ),
             ),
         ),
-        name=dict(type="str"),
-        parent=dict(type="str"),
-        rebind_time=dict(type="int"),
-        renew_time=dict(type="int"),
-        space=dict(type="str"),
-        tags=dict(type="dict"),
-        threshold=dict(
-            type="dict",
+        kerberos_kdc=dict(type="str"),
+        kerberos_keys=dict(
+            type="list",
+            elements="dict",
             options=dict(
-                enabled=dict(type="bool"),
-                high=dict(type="int"),
-                low=dict(type="int"),
+                key=dict(type="str", no_log=True),
             ),
+            no_log=True,
         ),
+        kerberos_rekey_interval=dict(type="int", no_log=True),
+        kerberos_retry_interval=dict(type="int"),
+        kerberos_tkey_lifetime=dict(type="int", no_log=True),
+        kerberos_tkey_protocol=dict(type="str", no_log=True),
+        name=dict(type="str"),
+        profile_type=dict(type="str", choices=["server", "subnet"]),
+        server_principal=dict(type="str"),
+        tags=dict(type="dict"),
+        vendor_specific_option_option_space=dict(type="str"),
     )
 
-    module = SubnetModule(
+    module = DHCPServerModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        mutually_exclusive=[["address", "next_available_id"]],
-        required_if=[("state", "present", ["space"])],
-        required_one_of=[["address", "next_available_id"]],
-        required_by={"next_available_id": "cidr"},
+        required_if=[("state", "present", ["name"])],
     )
 
     module.run_command()

@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_ip_space
-short_description: Manage IP Space.
+short_description: Manages an IP Space.
 description:
-    - Manage IP Space.
-    - The IP Space object represents an entire address space
+    - Manages an IP Space.
+    - The IP Space object represents an entire address space.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -159,6 +159,11 @@ options:
             - "Defaults to I(true)."
         type: bool
         default: true
+    default_realms:
+        description: 
+            - "The IDs of the default realms in which the IP Space participates."
+        type: list
+        elements: str
     dhcp_config:
         description:
             - "The shared DHCP configuration for the IP space that controls how leases are issued."
@@ -1009,6 +1014,12 @@ item:
                 - "When false, DHCP server will simply attempt to update the DNS entries per the request, regardless of whether or not they conflict with existing entries owned by other DHCP4 clients."
                 - "Defaults to I(true)."
             type: bool
+            returned: Always
+        default_realms:
+            description: 
+                - "The IDs of the default realms in which the IP Space participates."
+            type: list
+            elements: str
             returned: Always
         dhcp_config:
             description:
@@ -2652,6 +2663,7 @@ def main():
         ddns_ttl_percent=dict(type="float"),
         ddns_update_on_renew=dict(type="bool", default=False),
         ddns_use_conflict_resolution=dict(type="bool", default=True),
+        default_realms=dict(type="list", elements="str"),
         dhcp_config=dict(
             type="dict",
             options=dict(

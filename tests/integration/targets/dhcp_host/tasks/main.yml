@@ -1,0 +1,134 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        host_display_name: "TF_TEST_HOST_01"
+        host_display_name_secondary: "TF_TEST_HOST_02"
+
+    - name: Get Host 1 Information
+      infoblox.universal_ddi.infra_host_info:
+        filters:
+          display_name: "{{ host_display_name }}"
+      register: infra_host_info_1
+
+    - name: Get Host 2 Information
+      infoblox.universal_ddi.infra_host_info:
+        filters:
+          display_name: "{{ host_display_name_secondary }}"
+      register: infra_host_info_2
+
+    - name: Update DHCP Host (check mode)
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        server: "{{ _dhcp_server.id }}"
+        state: present
+      check_mode: true
+      register: dhcp_host
+    - name: Get DHCP Host Information
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ infra_host_info_1.objects[0].display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host is changed
+          - dhcp_host.failed == false
+          # DHCP Host returns an object because the object already exists
+          - dhcp_host_info.objects | length == 1
+
+    - name: Update DHCP Host
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        server: "{{ _dhcp_server.id }}"
+        state: present
+      register: dhcp_host
+    - name: Get DHCP Host Information
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ infra_host_info_1.objects[0].display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host is changed
+          - dhcp_host_info is not failed
+          - dhcp_host_info.objects | length == 1
+
+    - name: Update DHCP Host (idempotent)
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        server: "{{ _dhcp_server.id }}"
+        state: present
+      register: dhcp_host
+    - assert:
+        that:
+          - dhcp_host is not changed
+          - dhcp_host is not failed
+
+    - name: Dissociate DHCP host from the server (Check Mode)
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        state: absent
+      check_mode: true
+      register: dhcp_host
+    - name: Get DHCP Host Information
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ infra_host_info_1.objects[0].display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host is changed
+          - dhcp_host_info is not failed
+
+    - name: Dissociate DHCP host from the server
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        state: absent
+      register: dhcp_host
+    - name: Get DHCP Host Information
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ infra_host_info_1.objects[0].display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host is changed
+          - dhcp_host_info is not failed
+
+    - name: Update server for DHCP Host
+      infoblox.universal_ddi.dhcp_host:
+       id: "{{ infra_host_info_2.objects[0].legacy_id }}"
+       server: "{{ _dhcp_server_2.id }}"
+       state: present
+      register: dhcp_host
+    - name: Get DHCP Host Information
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{ infra_host_info_2.objects[0].display_name }}"
+      register: dhcp_host_info
+    - assert:
+        that:
+          - dhcp_host is changed
+          - dhcp_host_info is not failed
+          - dhcp_host_info.objects | length == 1
+
+  always:
+    - name: "Dissociate DHCP Host"
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_1.objects[0].legacy_id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Dissociate DHCP Host 2"
+      infoblox.universal_ddi.dhcp_host:
+        id: "{{ infra_host_info_2.objects[0].legacy_id }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Clean up DHCP Servers"
+      ansible.builtin.include_role:
+        name: "setup_dhcp_server"
+        tasks_from: cleanup.yml
