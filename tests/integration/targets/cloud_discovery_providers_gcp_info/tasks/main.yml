@@ -72,7 +72,7 @@
           - gcp_provider_info_by_tag.objects[0].name == cloud_discovery_provider_gcp_name
 
   always:
-     - name: "Delete an GCP cloud discovery provider"
+     - name: "Delete a GCP cloud discovery provider"
        infoblox.universal_ddi.cloud_discovery_providers:
          name: "{{ cloud_discovery_provider_gcp_name }}"
          provider_type: "Google Cloud Platform"
