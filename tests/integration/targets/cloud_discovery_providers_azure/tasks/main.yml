@@ -1,0 +1,511 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a cloud discovery with a random name to avoid conflicts
+    - ansible.builtin.set_fact:
+        cloud_discovery_provider_azure_name: "test_azure_{{ 999999 | random | string }}"
+        cloud_discovery_provider_azure_name_auto: "test_azure_auto{{ 999999 | random | string }}"
+        config_access_id: "1{{ 999999999999 | random | string }}"
+        config_access_id_auto: "1{{ 999999999999 | random | string }}"
+        restricted_to_accounts: "2{{ 999999999999 | random | string }}"
+
+    - name: Create an Azure cloud discovery provider (check mode)
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: present
+      check_mode: yes
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 0
+
+    - name: Create an Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+
+    - name: Create an Azure cloud discovery provider(idempotent)
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: present
+      register: azure_provider
+    - assert:
+        that:
+          - azure_provider is not changed
+          - azure_provider is not failed
+
+    - name: Delete an Azure cloud discovery provider (check mode)
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: absent
+      check_mode: yes
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+
+    - name: Delete an Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: absent
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 0
+
+    - name: Delete an Azure cloud discovery provider(idempotent)
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        state: absent
+      register: azure_provider
+    - assert:
+        that:
+          - azure_provider is not changed
+          - azure_provider is not failed
+
+    - name: Create an Azure cloud discovery provider with additional config.
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        additional_config:
+          excluded_accounts:
+            - "123456789012"
+          forward_zone_enabled: true
+          internal_ranges_enabled: true
+          object_type:
+            discover_new: true
+            version: 1
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].additional_config.excluded_accounts == ["123456789012"]
+          - azure_provider_info.objects[0].additional_config.forward_zone_enabled == true
+          - azure_provider_info.objects[0].additional_config.internal_ranges_enabled == true
+          - azure_provider_info.objects[0].additional_config.object_type.discover_new == true
+          - azure_provider_info.objects[0].additional_config.object_type.version == 1
+
+    - name: Create an Azure cloud discovery provider with description
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        description: "This is a test description"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].description == "This is a test description"
+
+    - name: Create an Azure cloud discovery provider with destinations
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        destination_types_enabled:
+          - "DNS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_name: "{{ _view.id }}"
+            destination_type: "DNS"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].destination_types_enabled == ["DNS"]
+          - azure_provider_info.objects[0].destinations | length == 2
+
+    - name: Create an Azure cloud discovery provider with sync interval 15 min
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        sync_interval: "15"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].sync_interval == "15"
+
+    - name: Create an Azure cloud discovery provider with sync interval 1440 min
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        sync_interval: "1440"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].sync_interval == "1440"
+
+    - name: Create an Azure cloud discovery provider with sync interval auto
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        sync_interval: "Auto"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].sync_interval == "Auto"
+
+    - name: Create an Azure cloud discovery provider with tags
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        tags:
+          location: "site-1"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].tags.location == "site-1"
+
+    - name: Create an Azure cloud discovery provider with desired_state
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        desired_state: "disabled"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "single"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+          - azure_provider_info.objects[0].desired_state == "disabled"
+
+    - name: Create an Azure cloud discovery provider with auto discover multiple
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name_auto }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "auto_discover_multiple"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id_auto }}"
+        desired_state: "disabled"
+        state: present
+      register: azure_provider
+    - name: Get Infoblox Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name_auto}}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name_auto
+          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
+          - azure_provider_info.objects[0].account_preference == "auto_discover_multiple"
+          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
+          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
+
+  always:
+     - name: "Delete an Azure cloud discovery provider with auto discover multiple"
+       infoblox.universal_ddi.cloud_discovery_providers:
+         name: "{{ cloud_discovery_provider_azure_name_auto}}"
+         provider_type: "Microsoft Azure"
+         account_preference: "auto_discover_multiple"
+         credential_preference:
+           access_identifier_type: "tenant_id"
+           credential_type: "dynamic"
+         source_configs:
+           - credential_config:
+               access_identifier: "{{ config_access_id_auto }}"
+         state: absent
+
+     - name: "Delete an Azure cloud discovery provider "
+       infoblox.universal_ddi.cloud_discovery_providers:
+         name: "{{ cloud_discovery_provider_azure_name }}"
+         provider_type: "Microsoft Azure"
+         account_preference: "single"
+         credential_preference:
+           access_identifier_type: "tenant_id"
+           credential_type: "dynamic"
+         source_configs:
+           - credential_config:
+               access_identifier: "{{ config_access_id }}"
+         state: absent
+
+     - name: "Clean up DNS View"
+       ansible.builtin.include_role:
+         name: "setup_view"
+         tasks_from: cleanup.yml
