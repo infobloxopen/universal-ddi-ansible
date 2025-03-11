@@ -49,7 +49,7 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Get AWS cloud discovery provider by ID
       infoblox.universal_ddi.cloud_discovery_providers_info:
-        id: "{{ aws_provider_id }}"
+        id: "{{ aws_provider.id }}"
 
     - name: Get AWS cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
