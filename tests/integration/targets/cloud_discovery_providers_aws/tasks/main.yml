@@ -27,7 +27,7 @@
           - credential_config:
                 access_identifier: "{{ config_access_id }}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: aws_provider
     - name: Get Infoblox AWS cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
