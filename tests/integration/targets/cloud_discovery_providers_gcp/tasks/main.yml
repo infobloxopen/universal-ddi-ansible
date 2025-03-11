@@ -12,7 +12,7 @@
         config_access_id: "1{{ 999999999999 | random | string }}"
         config_access_id_auto: "1{{ 999999999999 | random | string }}"
 
-    - name: Create an GCP cloud discovery provider (check mode)
+    - name: Create a GCP cloud discovery provider (check mode)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
