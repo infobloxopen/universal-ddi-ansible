@@ -29,7 +29,7 @@
         state: present
       register: azure_provider
 
-    - name: Get Infoblox Azure cloud discovery provider by name
+    - name: Get Infoblox Azure cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"

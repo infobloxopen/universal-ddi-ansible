@@ -54,9 +54,9 @@ EXAMPLES = r"""
     - name: Get AWS cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
-          name: "{{ aws_provider_name }}"
+          name: "aws_provider_name"
 
-    - name: Get AWS cloud discovery provider by raw filter query
+    - name: Get AWS cloud discovery provider by filter query
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filter_query: "provider_type=='Amazon Web Services' and name=='aws_provider_name'"
 
@@ -72,9 +72,9 @@ EXAMPLES = r"""
     - name: Get GCP cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
-          name: "{{ gcp_provider_name }}"
+          name: "gcp_provider_name"
 
-    - name: Get GCP cloud discovery provider by raw filter query
+    - name: Get GCP cloud discovery provider by filter query
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filter_query: "provider_type=='Google Cloud Platform' and name=='gcp_provider_name'"
 
@@ -90,9 +90,9 @@ EXAMPLES = r"""
     - name: Get Azure cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
-          name: "{{ azure_provider_name }}"
+          name: "azure_provider_name"
 
-    - name: Get Azure cloud discovery provider by raw query
+    - name: Get Azure cloud discovery provider by filter query
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filter_query: "provider_type=='Microsoft Azure' and name=='azure_provider_name'"
 

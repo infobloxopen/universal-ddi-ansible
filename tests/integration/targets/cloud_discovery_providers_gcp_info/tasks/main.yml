@@ -28,7 +28,7 @@
         state: present
       register: gcp_provider
 
-    - name: Get Infoblox GCP cloud discovery provider by name
+    - name: Get Infoblox GCP cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"

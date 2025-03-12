@@ -26,7 +26,7 @@
         state: present
       register: aws_provider
 
-    - name: Get Infoblox AWS cloud discovery provider by name
+    - name: Get Infoblox AWS cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_aws_name }}"

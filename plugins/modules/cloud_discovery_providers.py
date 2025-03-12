@@ -34,6 +34,7 @@ options:
         description:
             - "Account preference. For ex.: single, multiple, auto-discover-multiple."
         type: str
+        required: true
     additional_config:
         description:
             - "Additional configuration. Ex.: '{ \"excluded_object_types\": [], \"exclusion_account_list\": [], \"zone_forwarding\": \"true\" or \"false\" }'."
@@ -156,10 +157,16 @@ options:
         description:
             - "Name of the discovery config."
         type: str
+        required: true
     provider_type:
         description:
             - "Provider type. Ex.: Amazon Web Services, Google Cloud Platform, Microsoft Azure."
         type: str
+        choices:
+            - "Amazon Web Services"
+            - "Google Cloud Platform"
+            - "Microsoft Azure"
+        required: true
     source_configs:
         description:
             - "Source configs."
@@ -215,6 +222,19 @@ options:
     sync_interval:
         description: "Sync interval for the discovery process."
         type: str
+        choices:
+            - "Auto"
+            - "15"
+            - "30"
+            - "60"
+            - "120"
+            - "180"
+            - "240"
+            - "360"
+            - "480"
+            - "720"
+            - "1440"
+        default: "Auto"
     tags:
         description:
             - "Tagging specifics."
@@ -225,7 +245,7 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create an AWS cloud discovery provider with minimal parameters
+    - name: Create an AWS cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "aws_provider_minimal"
         provider_type: "Amazon Web Services"
@@ -261,7 +281,7 @@ EXAMPLES = r"""
         account_preference: "single"
         state: absent
         
-    - name: Create a GCP cloud discovery provider with minimal parameters
+    - name: Create a GCP cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "gcp_provider_minimal"
         provider_type: "Google Cloud Platform"
@@ -297,7 +317,7 @@ EXAMPLES = r"""
         account_preference: "single"
         state: absent
 
-    - name: Create an Azure cloud discovery provider with minimal parameters
+    - name: Create an Azure cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "azure_provider_minimal"
         provider_type: "Microsoft Azure"
@@ -873,7 +893,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        account_preference=dict(type="str"),
+        account_preference=dict(type="str", required=True),
         additional_config=dict(
             type="dict",
             options=dict(
@@ -948,8 +968,10 @@ def main():
                 destination_type=dict(type="str"),
             ),
         ),
-        name=dict(type="str"),
-        provider_type=dict(type="str"),
+        name=dict(type="str", required=True),
+        provider_type=dict(
+            type="str", choices=["Amazon Web Services", "Google Cloud Platform", "Microsoft Azure"], required=True
+        ),
         source_configs=dict(
             type="list",
             elements="dict",
@@ -977,7 +999,11 @@ def main():
                 restricted_to_accounts=dict(type="list", elements="str"),
             ),
         ),
-        sync_interval=dict(type="str"),
+        sync_interval=dict(
+            type="str",
+            choices=["Auto", "15", "30", "60", "120", "180", "240", "360", "480", "720", "1440"],
+            default="Auto",
+        ),
         tags=dict(type="dict"),
     )
 

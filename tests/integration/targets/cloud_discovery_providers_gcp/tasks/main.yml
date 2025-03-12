@@ -70,7 +70,7 @@
           - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
 
-    - name: Create an GCP cloud discovery provider(idempotent)
+    - name: Create an GCP cloud discovery provider (idempotent)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -259,7 +259,7 @@
           - config:
               dns:
                 sync_type: "read_only"
-                view_name: "{{ _view.id }}"
+                view_id: "{{ _view.id }}"
             destination_type: "DNS"
         state: present
       register: gcp_provider
