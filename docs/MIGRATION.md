@@ -5,11 +5,11 @@
 - [Introduction](#introduction)
 - [Overview of Changes](#overview-of-changes)
 - [Renaming and Module Reorganization](#renaming-and-module-reorganization)
-- [New Modules](#new-modules)
+- [Modules Added to the Collection](#modules-added-to-the-collection)
 - [Enhancement and New Features](#enhancement-and-new-features)
     - [Added Return Section in Documentation](#added-return-section-in-documentation)
     - [Simplified Configuration with Module Defaults](#simplified-configuration-with-module-defaults)
-    - [Module States](#module-states)
+    - [Module State Configurations](#module-state-configurations)
     - [Check Mode Support](#check-mode-support)
     - [Difference in Authorization](#difference-in-authorization)
     - [Comprehensive Testing](#comprehensive-testing)
@@ -118,8 +118,7 @@ In addition to the Documentation , **Return** section has been added for all mod
 
 ### Simplified Configuration with Module Defaults
 
-In Bloxone Ansible, every example required explicit declaration of api_key and host under the task parameters to establish connectivity and authentication details for operations. Here's how parameters were defined
-
+In Bloxone Ansible, every example required explicit declaration of api_key and host under the task parameters to establish connectivity and authentication details for operations. Here's how parameters were defined :
 ```
 vars:   
   - host: "{{ Host server to connect to }}"
@@ -157,7 +156,7 @@ In Universal DDI Ansible, configuration has been simplified with module_defaults
     register: ip_space
 ```
 
-###  Module States
+###  Module State Configurations
 
 In the update from Bloxone Ansible to Universal DDI Ansible , there's been a simplification of the options available for the state parameter, which is used to define the desired state of the resource being managed by the playbook.
 
