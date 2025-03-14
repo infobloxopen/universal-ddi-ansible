@@ -77,5 +77,9 @@ action_groups:
     - dhcp_option_code_info
     - dhcp_option_space
     - dhcp_option_space_info
+    - dhcp_ha_group
+    - dhcp_ha_group_info
+    - dhcp_ha_group
+    - dhcp_ha_group_info
     - dhcp_host
     - dhcp_host_info
