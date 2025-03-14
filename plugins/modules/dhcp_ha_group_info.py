@@ -64,7 +64,7 @@ EXAMPLES = r"""
           
     - name: Get DHCP HA Group Information by filter query
       infoblox.universal_ddi.dhcp_ha_group_info:
-        filter_query: "name=='example_ha_hroup'"
+        filter_query: "name=='example_ha_group'"
         
     - name: Get DHCP HA Group Information by tag filters
       infoblox.universal_ddi.dhcp_ha_group_info:
