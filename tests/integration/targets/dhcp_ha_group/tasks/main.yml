@@ -1,0 +1,276 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        ha_group_name: "test-ha-group-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Get DHCP Host 1 information by filters
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "ZTP_jt_yg_1402855201519044181"
+      register: host_info_1
+
+    - name: Get DHCP Host 2 information by filters
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "ZTP_jt_yg_6002105851565412243"
+      register: host_info_2
+
+    - name: Get DHCP Host 3 information by filters
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "yg_5_209"
+      register: host_info_3
+
+    - name: Create DHCP HA Group (check mode)
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      check_mode: true
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group.failed == false
+          - dhcp_ha_group_info.objects | length == 0
+
+    - name: Create DHCP HA Group
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects | length == 1
+
+    - name: Update DHCP HA Group
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        comment: "update comment"
+        state: present
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+            filters:
+              name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects | length == 1
+
+    - name: Update DHCP HA Group (idempotent)
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+
+    - name: delete DHCP HA Group (check mode)
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+        state: absent
+      check_mode: true
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+
+    - name: delete DHCP HA Group
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+        state: absent
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects | length == 0
+
+    - name: delete DHCP HA Group (idempotent)
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+        state: absent
+      register: dhcp_ha_group
+
+    - name: Create a DHCP HA Group with comment
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        comment: "test comment"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects[0].comment == "test comment"
+
+    - name: update a DHCP HA Group host
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        comment: "test comment"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_3.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects[0].hosts | length == 2
+          - dhcp_ha_group_info.objects[0].mode == "active-active"
+          - dhcp_ha_group_info.objects[0].hosts[0].host == host_info_1.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[1].host == host_info_3.objects[0].id
+
+
+    - name: update a DHCP HA Group host with mode as active-passive
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-passive"
+        comment: "test comment"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_3.objects[0].id }}"
+            role: "passive"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects[0].hosts | length == 2
+          - dhcp_ha_group_info.objects[0].mode == "active-passive"
+          - dhcp_ha_group_info.objects[0].hosts[0].host == host_info_1.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[1].host == host_info_3.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[0].role == "active"
+          - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
+
+    - name: update a DHCP HA Group host with mode as active-passive
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-passive"
+        comment: "test comment"
+        tags:
+          location: "{{ tag_value }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_3.objects[0].id }}"
+            role: "passive"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects[0].hosts | length == 2
+          - dhcp_ha_group_info.objects[0].mode == "active-passive"
+          - dhcp_ha_group_info.objects[0].hosts[0].host == host_info_1.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[1].host == host_info_3.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[0].role == "active"
+          - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
+          - dhcp_ha_group_info.objects[0].tags.location ==  tag_value
+
+  always:
+    # Cleanup if the test fails
+      - name: "Delete DHCP HA Group"
+        infoblox.universal_ddi.dhcp_ha_group:
+          name: "{{ ha_group_name }}"
+          hosts:
+            - host: "{{ host_info_1.objects[0].id }}"
+              role: "active"
+            - host: "{{ host_info_2.objects[0].id }}"
+              role: "active"
+          state: absent
+        ignore_errors: yes
