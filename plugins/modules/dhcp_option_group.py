@@ -86,7 +86,7 @@ EXAMPLES = r"""
     - name: Create a DHCP Option Group with additional parameters
       infoblox.universal_ddi.dhcp_option_group:
         name: "option_group_name"
-        comment: "This is a test DHCP Option Group"
+        comment: "This is a  DHCP Option Group"
         dhcp_options:
             - type: "option"
               option_code: 234
@@ -315,11 +315,11 @@ def main():
                 group=dict(type="str"),
                 option_code=dict(type="str"),
                 option_value=dict(type="str"),
-                type=dict(type="str"),
+                type=dict(type="str",choices=["group", "option"]),
             ),
         ),
         name=dict(type="str", required=True),
-        protocol=dict(type="str"),
+        protocol=dict(type="str", choices=["ip4", "ip6"]),
         tags=dict(type="dict"),
     )
 

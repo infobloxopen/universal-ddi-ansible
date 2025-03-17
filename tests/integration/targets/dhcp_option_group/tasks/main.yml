@@ -133,7 +133,7 @@
           - option_group_info is not failed
           - option_group_info.objects | length == 1
           - option_group_info.objects[0].id == option_group.id
-          - option_group_info.objects[0].name == option_group_name
+          - option_group_info.objects[0].name == "{{ option_group_name }}_ip6"
           - option_group_info.objects[0].protocol == "ip6"
 
     - name: Create a DHCP option Group with tags
@@ -175,9 +175,9 @@
           - option_group_info_2 is not failed
           - option_group_info_2.objects | length == 1
           - option_group_info_2.objects[0].id == option_group_2.id
-          - option_group_info_2.objects[0].name == option_group_name_2
+          - option_group_info_2.objects[0].name == "{{ option_group_name }}_2"
 
-    - name: Create a DHCP Option for the DHCP Option Group
+    - name: Create a DHCP Option for the DHCP Option types
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}"
           dhcp_options:
@@ -211,7 +211,7 @@
           state: "absent"
       ignore_errors: true
 
-    - name: Delete the DHCP Option Group
+    - name: Delete the ip6in DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}_ip6"
           protocol: "ip6"

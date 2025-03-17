@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group_info
-short_description: Manage Option Group
+short_description: Retrieves Option Groups
 description:
-    - Manage Option Group
+    - Retrieves information about existing Option Groups.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
