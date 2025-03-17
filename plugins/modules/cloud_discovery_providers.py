@@ -960,10 +960,7 @@ def main():
                             options=dict(
                                 consolidated_zone_data_enabled=dict(type="bool"),
                                 split_view_enabled=dict(type="bool"),
-                                sync_type=dict(
-                                    type="str",
-                                    choices=["read_only", "read_write"]
-                                ),
+                                sync_type=dict(type="str", choices=["read_only", "read_write"]),
                                 view_id=dict(type="str"),
                                 view_name=dict(type="str"),
                             ),
@@ -978,16 +975,12 @@ def main():
                         ),
                     ),
                 ),
-                destination_type=dict(
-                    type="str",
-                    choices=["DNS", "IPAM", "ACCOUNT"])
+                destination_type=dict(type="str", choices=["DNS", "IPAM", "ACCOUNT"]),
             ),
         ),
         name=dict(type="str", required=True),
         provider_type=dict(
-            type="str",
-            choices=["Amazon Web Services", "Google Cloud Platform", "Microsoft Azure"],
-            required=True
+            type="str", choices=["Amazon Web Services", "Google Cloud Platform", "Microsoft Azure"], required=True
         ),
         source_configs=dict(
             type="list",
