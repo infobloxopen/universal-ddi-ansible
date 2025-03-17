@@ -156,6 +156,10 @@ options:
                 description:
                     - "Destination type: DNS / IPAM / ACCOUNT."
                 type: str
+                choices:
+                    - "DNS"
+                    - "IPAM"
+                    - "ACCOUNT"
     name:
         description:
             - "Name of the discovery config."
@@ -552,10 +556,6 @@ item:
                         - "Destination type: DNS / IPAM / ACCOUNT."
                     type: str
                     returned: Always
-                    choices:
-                        - "DNS"
-                        - "IPAM"
-                        - "ACCOUNT"
                 id:
                     description:
                         - "Auto-generated unique destination ID. Format BloxID."
