@@ -27,9 +27,9 @@
             restricted_to_accounts:
               - "{{restricted_to_accounts}}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -55,7 +55,7 @@
               - "{{restricted_to_accounts}}"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -105,9 +105,9 @@
             restricted_to_accounts:
               - "{{restricted_to_accounts}}"
         state: absent
-      check_mode: yes
+      check_mode: true
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -133,7 +133,7 @@
               - "{{restricted_to_accounts}}"
         state: absent
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -187,7 +187,7 @@
             version: 1
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -224,7 +224,7 @@
         description: "This is a test description"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -264,7 +264,7 @@
             destination_type: "DNS"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -298,7 +298,7 @@
         sync_interval: "15"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -331,7 +331,7 @@
         sync_interval: "1440"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -364,7 +364,7 @@
         sync_interval: "Auto"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -398,7 +398,7 @@
           location: "site-1"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -431,7 +431,7 @@
         desired_state: "disabled"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -462,7 +462,7 @@
         desired_state: "disabled"
         state: present
       register: azure_provider
-    - name: Get Infoblox Azure cloud discovery provider
+    - name: Get Azure cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name_auto}}"
@@ -491,6 +491,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id_auto }}"
          state: absent
+         ignore_errors: true
 
      - name: "Delete an Azure cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
@@ -504,6 +505,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
+         ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:

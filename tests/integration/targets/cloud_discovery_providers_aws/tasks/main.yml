@@ -99,7 +99,7 @@
           - credential_config:
                 access_identifier: "{{ config_access_id }}"
         state: absent
-      check_mode: yes
+      check_mode: true
       register: aws_provider
     - name: Get AWS cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
@@ -136,7 +136,7 @@
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 0
 
-    - name: Delete an AWS cloud discovery provider(idempotent)
+    - name: Delete an AWS cloud discovery provider (idempotent)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_aws_name }}"
         provider_type: "Amazon Web Services"
@@ -465,6 +465,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
+         ignore_errors: true
 
      - name: "Delete an AWS cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
@@ -478,6 +479,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
+         ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:

@@ -29,7 +29,7 @@
         state: present
       register: azure_provider
 
-    - name: Get Infoblox Azure cloud discovery provider by filter
+    - name: Get Azure cloud discovery provider by filter
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_azure_name }}"
@@ -44,7 +44,7 @@
           - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].tags.location == "site-1"
 
-    - name: Get Infoblox Azure cloud discovery provider by ID
+    - name: Get Azure cloud discovery provider by ID
       infoblox.universal_ddi.cloud_discovery_providers_info:
           id: "{{ azure_provider.id }}"
       register: azure_provider_info_by_id
@@ -53,7 +53,7 @@
           - azure_provider_info_by_id.objects | length == 1
           - azure_provider_info_by_id.objects[0].id == azure_provider.id
 
-    - name: Get Infoblox Azure cloud discovery provider by filter query
+    - name: Get Azure cloud discovery provider by filter query
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filter_query: "name=='{{ cloud_discovery_provider_azure_name }}'"
       register: azure_provider_info_by_query
@@ -62,7 +62,7 @@
           - azure_provider_info_by_query.objects | length == 1
           - azure_provider_info_by_query.objects[0].name == cloud_discovery_provider_azure_name
 
-    - name: Get Infoblox Azure cloud discovery provider by tag filters
+    - name: Get Azure cloud discovery provider by tag filters
       infoblox.universal_ddi.cloud_discovery_providers_info:
         tag_filters:
           location: "site-1"
@@ -85,3 +85,4 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
+         ignore_errors: true

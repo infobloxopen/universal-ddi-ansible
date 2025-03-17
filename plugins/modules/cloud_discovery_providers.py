@@ -13,7 +13,7 @@ module: cloud_discovery_providers
 short_description: Manage Cloud Providers
 description:
     - Manage Cloud Providers
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -129,6 +129,9 @@ options:
                             sync_type:
                                 description: "Type of sync operation, e.g., 'read_only' or 'read_write'."
                                 type: str
+                                choices:
+                                    - "read_only"
+                                    - "read_write"
                             view_id:
                                 description: "ID of the view."
                                 type: str
@@ -257,6 +260,7 @@ EXAMPLES = r"""
           - credential_config:
                 access_identifier: "aws_account_id"
         state: present
+        register: aws_provider
 
     - name: Create an AWS cloud discovery provider with additional attributes
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -293,6 +297,7 @@ EXAMPLES = r"""
           - credential_config:
                 access_identifier: "gcp_project_id"
         state: present
+        register: gcp_provider
 
     - name: Create a GCP cloud discovery provider with additional attributes
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -329,6 +334,7 @@ EXAMPLES = r"""
           - credential_config:
                 access_identifier: "azure_subscription_id"
         state: present
+        register: azure_provider
   
     - name: Create an Azure cloud discovery provider with additional attributes
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -546,6 +552,10 @@ item:
                         - "Destination type: DNS / IPAM / ACCOUNT."
                     type: str
                     returned: Always
+                    choices:
+                        - "DNS"
+                        - "IPAM"
+                        - "ACCOUNT"
                 id:
                     description:
                         - "Auto-generated unique destination ID. Format BloxID."
@@ -950,7 +960,10 @@ def main():
                             options=dict(
                                 consolidated_zone_data_enabled=dict(type="bool"),
                                 split_view_enabled=dict(type="bool"),
-                                sync_type=dict(type="str"),
+                                sync_type=dict(
+                                    type="str",
+                                    choices=["read_only", "read_write"]
+                                ),
                                 view_id=dict(type="str"),
                                 view_name=dict(type="str"),
                             ),
@@ -965,12 +978,16 @@ def main():
                         ),
                     ),
                 ),
-                destination_type=dict(type="str"),
+                destination_type=dict(
+                    type="str",
+                    choices=["DNS", "IPAM", "ACCOUNT"])
             ),
         ),
         name=dict(type="str", required=True),
         provider_type=dict(
-            type="str", choices=["Amazon Web Services", "Google Cloud Platform", "Microsoft Azure"], required=True
+            type="str",
+            choices=["Amazon Web Services", "Google Cloud Platform", "Microsoft Azure"],
+            required=True
         ),
         source_configs=dict(
             type="list",

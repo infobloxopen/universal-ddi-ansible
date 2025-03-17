@@ -26,9 +26,9 @@
             restricted_to_accounts:
               - "{{ config_access_id }}"
         state: present
-      check_mode: yes
+      check_mode: true
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -39,7 +39,7 @@
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 0
 
-    - name: Create an GCP cloud discovery provider
+    - name: Create a GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -54,7 +54,7 @@
               - "{{ config_access_id }}"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -70,7 +70,7 @@
           - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
 
-    - name: Create an GCP cloud discovery provider (idempotent)
+    - name: Create a GCP cloud discovery provider (idempotent)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -90,7 +90,7 @@
           - gcp_provider is not changed
           - gcp_provider is not failed
 
-    - name: Delete an GCP cloud discovery provider (check mode)
+    - name: Delete a GCP cloud discovery provider (check mode)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -104,9 +104,9 @@
             restricted_to_accounts:
               - "{{ config_access_id }}"
         state: absent
-      check_mode: yes
+      check_mode: true
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -117,7 +117,7 @@
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
 
-    - name: Delete an GCP cloud discovery provider
+    - name: Delete a GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -132,7 +132,7 @@
               - "{{ config_access_id }}"
         state: absent
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -143,7 +143,7 @@
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 0
 
-    - name: Delete an GCP cloud discovery provider(idempotent)
+    - name: Delete a GCP cloud discovery provider(idempotent)
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -163,7 +163,7 @@
           - gcp_provider is not changed
           - gcp_provider is not failed
 
-    - name: Create an GCP cloud discovery provider with additional config.
+    - name: Create a GCP cloud discovery provider with additional config.
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -186,7 +186,7 @@
             version: 1
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -207,7 +207,7 @@
           - gcp_provider_info.objects[0].additional_config.object_type.discover_new == true
           - gcp_provider_info.objects[0].additional_config.object_type.version == 1
 
-    - name: Create an GCP cloud discovery provider with description
+    - name: Create a GCP cloud discovery provider with description
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -223,7 +223,7 @@
         description: "This is a test description"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -240,7 +240,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].description == "This is a test description"
 
-    - name: Create an GCP cloud discovery provider with destinations
+    - name: Create a GCP cloud discovery provider with destinations
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -263,7 +263,7 @@
             destination_type: "DNS"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -281,7 +281,7 @@
           - gcp_provider_info.objects[0].destination_types_enabled == ["DNS"]
           - gcp_provider_info.objects[0].destinations | length == 2
 
-    - name: Create an GCP cloud discovery provider with sync interval 15 min
+    - name: Create a GCP cloud discovery provider with sync interval 15 min
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -297,7 +297,7 @@
         sync_interval: "15"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -314,7 +314,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "15"
 
-    - name: Create an GCP cloud discovery provider with sync interval 1440 min
+    - name: Create a GCP cloud discovery provider with sync interval 1440 min
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -330,7 +330,7 @@
         sync_interval: "1440"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -347,7 +347,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "1440"
 
-    - name: Create an GCP cloud discovery provider with sync interval auto
+    - name: Create a GCP cloud discovery provider with sync interval auto
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -363,7 +363,7 @@
         sync_interval: "Auto"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -380,7 +380,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "Auto"
 
-    - name: Create an GCP cloud discovery provider with tags
+    - name: Create a GCP cloud discovery provider with tags
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -397,7 +397,7 @@
           location: "site-1"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -414,7 +414,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].tags.location == "site-1"
 
-    - name: Create an GCP cloud discovery provider with desired_state
+    - name: Create a GCP cloud discovery provider with desired_state
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"
         provider_type: "Google Cloud Platform"
@@ -430,7 +430,7 @@
         desired_state: "disabled"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name }}"
@@ -447,7 +447,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].desired_state == "disabled"
 
-    - name: Create an GCP cloud discovery provider with auto discover multiple
+    - name: Create a GCP cloud discovery provider with auto discover multiple
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name_auto }}"
         provider_type: "Google Cloud Platform"
@@ -461,7 +461,7 @@
         desired_state: "disabled"
         state: present
       register: gcp_provider
-    - name: Get Infoblox GCP cloud discovery provider
+    - name: Get GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers_info:
         filters:
           name: "{{ cloud_discovery_provider_gcp_name_auto}}"
@@ -478,7 +478,7 @@
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
 
   always:
-     - name: "Delete an GCP cloud discovery provider with auto discover multiple"
+     - name: "Delete a GCP cloud discovery provider with auto discover multiple"
        infoblox.universal_ddi.cloud_discovery_providers:
          name: "{{ cloud_discovery_provider_gcp_name_auto}}"
          provider_type: "Google Cloud Platform"
@@ -490,8 +490,9 @@
            - credential_config:
                access_identifier: "{{ config_access_id_auto }}"
          state: absent
+         ignore_errors: true
 
-     - name: "Delete an GCP cloud discovery provider "
+     - name: "Delete a GCP cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
          name: "{{ cloud_discovery_provider_gcp_name }}"
          provider_type: "Google Cloud Platform"
@@ -503,6 +504,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
+         ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:
