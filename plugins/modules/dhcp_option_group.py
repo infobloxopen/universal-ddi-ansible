@@ -315,7 +315,7 @@ def main():
                 group=dict(type="str"),
                 option_code=dict(type="str"),
                 option_value=dict(type="str"),
-                type=dict(type="str",choices=["group", "option"]),
+                type=dict(type="str", choices=["group", "option"]),
             ),
         ),
         name=dict(type="str", required=True),
