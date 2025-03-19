@@ -59,6 +59,9 @@ options:
                     - "* I(group)"
                     - "* I(option)"
                 type: str
+                choices:
+                    - group
+                    - option
     name:
         description:
             - "The name of the option group. Must contain 1 to 256 characters. Can include UTF-8."
@@ -68,6 +71,9 @@ options:
         description:
             - "The type of protocol (I(ip4) or I(ip6))."
         type: str
+        choices:
+            - ip4
+            - ip6
     tags:
         description:
             - "The tags for the option group in JSON format."
