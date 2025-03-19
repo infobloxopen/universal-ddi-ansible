@@ -99,7 +99,7 @@ options:
         description:
             - "The name of the HA group. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
-        required: true
+        required: true 
     status:
         description:
             - "Status of the HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
