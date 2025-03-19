@@ -92,6 +92,7 @@
           - dhcp_ha_group is changed
           - dhcp_ha_group_info is not failed
           - dhcp_ha_group_info.objects | length == 1
+          - dhcp_ha_group_info.objects[0].comment == "update comment"
 
     - name: Update DHCP HA Group (idempotent)
       infoblox.universal_ddi.dhcp_ha_group:
@@ -146,7 +147,7 @@
           - dhcp_ha_group_info is not failed
           - dhcp_ha_group_info.objects | length == 0
 
-    - name: delete DHCP HA Group (idempotent)
+    - name: Delete DHCP HA Group (idempotent)
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         hosts:
@@ -273,4 +274,4 @@
             - host: "{{ host_info_2.objects[0].id }}"
               role: "active"
           state: absent
-        ignore_errors: yes
+        ignore_errors: true

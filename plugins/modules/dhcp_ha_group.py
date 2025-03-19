@@ -43,6 +43,7 @@ options:
             - "The list of hosts."
         type: list
         elements: dict
+        required: true
         suboptions:
             address:
                 description:
@@ -98,6 +99,7 @@ options:
         description:
             - "The name of the HA group. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
+        required: true
     status:
         description:
             - "Status of the HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
@@ -116,6 +118,18 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+    - name: Get DHCP Host 1 information by filters (required as parent)
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "Host1"
+      register: host_1
+
+    - name: Get DHCP Host 2 information by filters (required as parent)
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "Host2"
+      register: host_2
+      
     - name: Create DHCP HA Group
       infoblox.universal_ddi.dhcp_ha_group:
         name: "example_ha_group"
@@ -129,7 +143,7 @@ EXAMPLES = r"""
       
     - name: "Delete DHCP HA Group"
       infoblox.universal_ddi.dhcp_ha_group:
-        name: "{{ ha_group_name }}"
+        name: "example_ha_group"
         hosts:
           - host: "{{ host_1.id }}"
             role: "active"
@@ -319,7 +333,7 @@ class HaGroupModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = HaGroupApi(self.client).read(self.params["id"], inherit="full")
+                resp = HaGroupApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -409,6 +423,7 @@ def main():
         hosts=dict(
             type="list",
             elements="dict",
+            required=True,
             options=dict(
                 address=dict(type="str"),
                 heartbeats=dict(
@@ -428,7 +443,7 @@ def main():
         ),
         ip_space=dict(type="str"),
         mode=dict(type="str"),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         status=dict(type="str"),
         status_v6=dict(type="str"),
         tags=dict(type="dict"),

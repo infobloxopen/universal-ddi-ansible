@@ -31,16 +31,6 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    inherit:
-        description:
-            - Return inheritance information
-        type: str
-        required: false
-        choices:
-            - full
-            - partial
-            - none
-        default: full
     tag_filters:
         description:
             - Filter dict to filter objects by tags
@@ -57,7 +47,7 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get DHCP HA Group Information
+    - name: Get DHCP HA Group Information by filters
       infoblox.universal_ddi.dhcp_ha_group_info:
         filters:
           name: "example_ha_group"
@@ -227,7 +217,7 @@ class HaGroupInfoModule(UniversalDDIAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = HaGroupApi(self.client).read(self.params["id"], inherit="full")
+            resp = HaGroupApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return None
@@ -294,7 +284,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        inherit=dict(type="str", required=False, choices=["full", "partial", "none"], default="full"),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )
