@@ -105,7 +105,7 @@
             role: "active"
       register: dhcp_ha_group
 
-    - name: delete DHCP HA Group (check mode)
+    - name: Delete DHCP HA Group (check mode)
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         hosts:
@@ -126,7 +126,7 @@
           - dhcp_ha_group is changed
           - dhcp_ha_group_info is not failed
 
-    - name: delete DHCP HA Group
+    - name: Delete DHCP HA Group
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         hosts:
@@ -180,7 +180,7 @@
           - dhcp_ha_group_info is not failed
           - dhcp_ha_group_info.objects[0].comment == "test comment"
 
-    - name: update a DHCP HA Group host
+    - name: Update a DHCP HA Group host
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         mode: "active-active"
@@ -205,8 +205,7 @@
           - dhcp_ha_group_info.objects[0].hosts[0].host == host_info_1.objects[0].id
           - dhcp_ha_group_info.objects[0].hosts[1].host == host_info_3.objects[0].id
 
-
-    - name: update a DHCP HA Group host with mode as active-passive
+    - name: Update a DHCP HA Group host with mode as active-passive
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         mode: "active-passive"
@@ -233,7 +232,7 @@
           - dhcp_ha_group_info.objects[0].hosts[0].role == "active"
           - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
 
-    - name: update a DHCP HA Group host with mode as active-passive
+    - name: Update a DHCP HA Group host with mode as active-passive
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         mode: "active-passive"
