@@ -55,9 +55,6 @@ options:
             type:
                 description:
                     - "The type of item."
-                    - "Valid values are:"
-                    - "* I(group)"
-                    - "* I(option)"
                 type: str
                 choices:
                     - group

@@ -211,7 +211,7 @@
           state: "absent"
       ignore_errors: true
 
-    - name: Delete the ip6in DHCP Option Group
+    - name: Delete the ip6 in DHCP Option Group
       infoblox.universal_ddi.dhcp_option_group:
           name: "{{ option_group_name }}_ip6"
           protocol: "ip6"
