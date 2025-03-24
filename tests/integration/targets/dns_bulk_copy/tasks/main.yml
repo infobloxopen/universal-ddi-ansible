@@ -1,0 +1,121 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - name: Create a DNS Bulk Copy Job (check mode)
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+      check_mode: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is not changed
+          - bulk_copy is not failed
+
+    - name: Create a DNS Bulk Copy Job
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with recursive flag
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        recursive: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with skip on error
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        skip_on_error: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with auth zone config
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          external_primaries:
+            - type: "primary"
+              fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with forward zone config
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        forward_zone_config:
+          external_forwarders:
+            - fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with secondary zone config
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        secondary_zone_config:
+          external_secondaries:
+            - fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+  always:
+    - name: Delete a record
+      ansible.builtin.include_role:
+        name: setup_dns_a_record
+        tasks_from: cleanup.yml
+
+    - name: Delete the auth zone
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml
