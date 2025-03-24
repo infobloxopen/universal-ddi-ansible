@@ -26,6 +26,7 @@ options:
         description:
             - "The name of the anycast configuration."
         type: str
+        required: false
     service:
         description:
             - Filter by service type (e.g., DNS, DHCP, DFP).

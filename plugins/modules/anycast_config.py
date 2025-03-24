@@ -49,6 +49,7 @@ options:
         description: 
             - "The name of the anycast configuration."
         type: str
+        required: true
     onprem_hosts:
         description: 
             - "The list of on-prem hosts associated with the anycast configuration."
@@ -74,6 +75,7 @@ options:
         description: 
             - "The type of the Service used in anycast configuration, supports (dns, dhcp, dfp)."
         type: str
+        required: true
     tags:
         description: 
             - "The tags for the anycast configuration object."
@@ -375,7 +377,7 @@ def main():
         anycast_ip_address=dict(type="str"),
         anycast_ipv6_address=dict(type="str"),
         description=dict(type="str"),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         onprem_hosts=dict(
             type="list",
             elements="dict",
@@ -385,14 +387,16 @@ def main():
                 name=dict(type="str"),
             ),
         ),
-        service=dict(type="str"),
+        service=dict(type="str", required=True),
         tags=dict(type="dict"),
     )
 
     module = OnPremAnycastManagerModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["name", "anycast_ip_address", "service"])],
+        required_if=[("state", "present", ["name", "service"])],
+        mutually_exclusive=[["anycast_ip_address", "anycast_ipv6_address"]],
+        required_one_of=[["anycast_ip_address", "anycast_ipv6_address"]],
     )
 
     module.run_command()
