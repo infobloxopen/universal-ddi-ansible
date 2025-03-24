@@ -9,6 +9,7 @@ action_groups:
           - keys
           - infra
           - dhcp
+          - on_prem_anycast_manager
 
   dns:
     - dns_view
@@ -79,3 +80,7 @@ action_groups:
     - dhcp_option_space_info
     - dhcp_host
     - dhcp_host_info
+
+  on_prem_anycast_manager:
+    - anycast_config
+    - anycast_config_info
