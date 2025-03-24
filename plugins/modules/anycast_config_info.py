@@ -229,7 +229,7 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
             tag_filter_str = self.params["tag_filter_query"]
 
         service = self.params.get("service")
-        name = self.params.get("name")  # Name will always be provided
+        name = self.params.get("name")
         all_results = []
 
         try:
