@@ -975,7 +975,7 @@ def main():
                         ),
                     ),
                 ),
-                destination_type=dict(type="str", choices=["DNS", "IPAM", "ACCOUNT"]),
+                destination_type=dict(type="str", choices=["DNS", "IPAM", "ACCOUNTS"]),
             ),
         ),
         name=dict(type="str", required=True),
