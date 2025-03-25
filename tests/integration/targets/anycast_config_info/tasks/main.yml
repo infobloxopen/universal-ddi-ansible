@@ -11,7 +11,7 @@
     - name: Create Anycast Configuration
       infoblox.universal_ddi.anycast_config:
         name: "{{ ac_config_name }}"
-        anycast_ip_address: "27.0.0.0"
+        anycast_ip_address: "10.0.0.0"
         service: "DNS"
         tags:
           location: "{{ tag_value }}"
@@ -20,7 +20,7 @@
 
     - name: Get Information about the Anycast Configuration by ID
       infoblox.universal_ddi.anycast_config_info:
-        id: "{{ ac_config.id | int }}"  # Explicitly casting ID to integer
+        id: "{{ ac_config.id }}"
       register: ac_config_info
     - assert:
         that:
@@ -64,7 +64,7 @@
     - name: Delete Anycast Configuration
       infoblox.universal_ddi.anycast_config:
         name: "{{ ac_config_name }}"
-        anycast_ip_address: "27.0.0.0"
+        anycast_ip_address: "10.0.0.0"
         service: "DNS"
         state: absent
       ignore_errors: true

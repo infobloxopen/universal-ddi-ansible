@@ -20,7 +20,7 @@ options:
     id:
         description:
             - ID of the object
-        type: str
+        type: int
         required: false
     state:
         description:
@@ -115,7 +115,7 @@ RETURN = r"""
 id:
     description:
         - ID of the Anycast Config object
-    type: str
+    type: int
     returned: Always
 objects:
     description:
@@ -372,7 +372,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
 
 def main():
     module_args = dict(
-        id=dict(type="str", required=False),
+        id=dict(type="int", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         anycast_ip_address=dict(type="str"),
         anycast_ipv6_address=dict(type="str"),

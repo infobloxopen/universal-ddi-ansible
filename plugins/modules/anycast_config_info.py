@@ -72,7 +72,7 @@ RETURN = r"""
 id:
     description:
         - ID of the Anycast Config object
-    type: str
+    type: int
     returned: Always
 objects:
     description:
