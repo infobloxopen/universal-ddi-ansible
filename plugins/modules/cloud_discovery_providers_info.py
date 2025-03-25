@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: cloud_discovery_providers_info
 short_description: Manage Cloud Providers
 description:
-    - Manage Cloud Providers
+    - Retrieves information about existing Cloud Discovery Providers.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
