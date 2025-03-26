@@ -775,6 +775,10 @@ EXAMPLES = r"""
         state: "present"
         dhcp_config:
           lease_time: 3600
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ option_code.id }}"
+            option_value: "False"
         inheritance_sources:
           dhcp_config:
             lease_time:

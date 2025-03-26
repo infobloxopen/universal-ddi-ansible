@@ -662,6 +662,33 @@
           - subnet_info.objects[0].federated_realms | length == 1
           - subnet_info.objects[0].federated_realms == [ _federated_realm1.id ]
 
+    - name: "Create a Subnet with a DHCP option code"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "72.72.1.0"
+        space: "{{ _ip_space.id }}"
+        cidr: 24
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ _option_code.id }}"
+            option_value: "False"
+        state: "present"
+      register: subnet
+    - name: Get information about the Subnet
+      infoblox.universal_ddi.ipam_subnet_info:
+        filters:
+          address: "72.72.1.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 24
+      register: subnet_info
+    - assert:
+        that:
+          - subnet is not failed
+          - subnet_info.objects | length == 1
+          - subnet_info.objects[0].federated_realms | length == 1
+          - subnet_info.objects[0].dhcp_options | length == 1
+          - subnet_info.objects[0].dhcp_options[0].option_code == _option_code.id
+          - subnet_info.objects[0].dhcp_options[0].option_value == "False"
+
   always:
     # Cleanup if the test fails
     - name: "Delete the Subnet"

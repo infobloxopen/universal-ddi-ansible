@@ -278,6 +278,31 @@
           - range_info.objects | length == 1
           - range_info.objects[0].inheritance_sources.dhcp_options.action == "block"
 
+    - name: Create a Range with DHCP option"
+      infoblox.universal_ddi.ipam_range:
+        start: "{{ range_start }}"
+        end: "{{ range_end }}"
+        space: "{{ _ip_space.id }}"
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ _option_code.id }}"
+            option_value: "False"
+        state: "present"
+      register: range
+    - name: Get information about the Range
+      infoblox.universal_ddi.ipam_range_info:
+        filters:
+          start: "{{ range_start }}"
+          end: "{{ range_end }}"
+          space: "{{ _ip_space.id }}"
+      register: range_info
+    - assert:
+        that:
+        - range is not failed
+        - range_info.objects | length == 1
+        - range_info.objects[0].dhcp_options[0].type == "option"
+        - range_info.objects[0].dhcp_options[0].option_code == _option_code.id
+        - range_info.objects[0].dhcp_options[0].option_value == "False"
 
   always:
     - name: "Delete a Range"
