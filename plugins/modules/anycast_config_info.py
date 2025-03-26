@@ -51,7 +51,7 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Get Information about the Anycast Configuration by ID
       infoblox.universal_ddi.anycast_config_info:
-        id: "{{ ac_config.id | int }}"
+        id: "{{ ac_config.id }}"
 
     - name: Get Information about the Anycast Configuration by service (and name in memory)
       infoblox.universal_ddi.anycast_config_info:
@@ -65,7 +65,7 @@ EXAMPLES = r"""
 
     - name: Get Anycast Configuration information by tag filter query
       infoblox.universal_ddi.anycast_config_info:
-        tag_filter_query: "location=='{{ tag_value }}'"
+        tag_filter_query: "location=='site-1'"
 """
 
 RETURN = r"""
@@ -268,7 +268,7 @@ def main():
     module_args = dict(
         id=dict(type="int", required=False),
         name=dict(type="str", required=False),
-        service=dict(type="str", required=False),
+        service=dict(type="str", required=False, choices=["DNS", "DHCP", "DFP"]),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

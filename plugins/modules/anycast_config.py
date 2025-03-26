@@ -92,6 +92,7 @@ EXAMPLES = r"""
           anycast_ip_address: "40.0.0.0"
           service: "DNS"
           state: "present"
+      register: ac_config
 
     - name: Create Anycast Configuration with Additional Fields
       infoblox.universal_ddi.anycast_config:
@@ -387,7 +388,7 @@ def main():
                 name=dict(type="str"),
             ),
         ),
-        service=dict(type="str", required=True),
+        service=dict(type="str", required=True, choices=["DNS", "DHCP", "DFP"]),
         tags=dict(type="dict"),
     )
 

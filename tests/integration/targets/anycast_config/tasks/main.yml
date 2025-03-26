@@ -45,7 +45,7 @@
               - ac_config is changed
               - ac_config_info is not failed
               - ac_config_info.objects | length == 1
-              - ac_config_info.objects[0].name == ac_config.object.name
+              - ac_config_info.objects[0].name == ac_config_name
               - ac_config_info.objects[0].anycast_ip_address == "10.0.0.0"
               - ac_config_info.objects[0].service == "DNS"
 
@@ -188,6 +188,7 @@
               - ac_config is changed
               - ac_config_info is not failed
               - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].name == ac_config_name_1
               - ac_config_info.objects[0].service == "DHCP"
 
   always:
