@@ -73,7 +73,11 @@ options:
         elements: dict
     service:
         description: 
-            - "The type of the Service used in anycast configuration, supports (dns, dhcp, dfp)."
+            - "The type of the Service used in anycast configuration, supports (DNS, DHCP, DFP)."
+        choices:
+            - "DNS"
+            - "DHCP"
+            - "DFP"
         type: str
         required: true
     tags:
@@ -226,7 +230,11 @@ objects:
             returned: Always
         service:
             description: 
-                - "The type of the Service used in anycast configuration, supports (dns, dhcp, dfp)."
+                - "The type of the Service used in anycast configuration, supports (DNS, DHCP, DFP)."
+            choices:
+                - "DNS"
+                - "DHCP"
+                - "DFP"
             type: str
             returned: Always
         tags:

@@ -31,6 +31,10 @@ options:
         description:
             - Filter by service type (e.g., DNS, DHCP, DFP).
         type: str
+        choices:
+            - DNS
+            - DHCP
+            - DFP
         required: false
     tag_filters:
         description:
