@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_ha_group_info
-short_description: Manage HaGroup
+short_description: Retrieves Ha Group.
 description:
-    - Manage HaGroup
+    - Retrieves information about existing HA Groups.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:

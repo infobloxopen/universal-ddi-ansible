@@ -12,7 +12,8 @@ DOCUMENTATION = r"""
 module: dhcp_ha_group
 short_description: Manage HaGroup
 description:
-    - Manage HaGroup
+    -  Manages an HA Group.
+    -  The HA Group object represents on-prem hosts that can serve the same leases for HA.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
