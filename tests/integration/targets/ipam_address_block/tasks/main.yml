@@ -562,7 +562,7 @@
               option_code: "{{ _option_code.id }}"
               option_value: "False"
           state: "present"
-      register: "address_block"
+      register: address_block
     - name: Get information about the Address Block
       infoblox.universal_ddi.ipam_address_block_info:
         filters:

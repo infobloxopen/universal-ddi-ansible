@@ -278,7 +278,7 @@
           - range_info.objects | length == 1
           - range_info.objects[0].inheritance_sources.dhcp_options.action == "block"
 
-    - name: Create a Range with DHCP option"
+    - name: Create a Range with DHCP option
       infoblox.universal_ddi.ipam_range:
         start: "{{ range_start }}"
         end: "{{ range_end }}"
