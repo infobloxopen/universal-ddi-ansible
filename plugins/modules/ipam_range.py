@@ -216,6 +216,10 @@ EXAMPLES = r"""
         start: "10.0.0.1"
         end: "10.0.0.100"
         space: "{{ ip_space.id }}"
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ option_code.id }}"
+            option_value: "False"
         disable_dhcp: "true"
         tags:
           location: "site-1"
