@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_ha_group
-short_description: Manage HaGroup
+short_description: Manages an HA Group.
 description:
     -  Manages an HA Group.
     -  The HA Group object represents on-prem hosts that can serve the same leases for HA.

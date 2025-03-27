@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_ha_group_info
-short_description: Retrieves Ha Group.
+short_description: Retrieves information about existing HA Groups.
 description:
-    - Retrieves information about existing HA Groups.
+    - Retrieves details of existing High Availability (HA) Groups, including their configuration and status.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
