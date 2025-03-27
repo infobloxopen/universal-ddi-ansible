@@ -185,11 +185,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].additional_config.excluded_accounts == ["123456789012"]
           - aws_provider_info.objects[0].additional_config.forward_zone_enabled == true
           - aws_provider_info.objects[0].additional_config.internal_ranges_enabled == true
@@ -220,11 +215,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].description == "This is a test description"
 
     - name: Create an AWS cloud discovery provider with destinations
@@ -258,12 +248,44 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].destination_types_enabled == ["DNS"]
+          - aws_provider_info.objects[0].destinations | length == 2
+
+    - name: Create an AWS cloud discovery provider with destinations account
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_aws_name }}"
+        provider_type: "Amazon Web Services"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+        destination_types_enabled:
+          - "DNS"
+          - "ACCOUNTS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+              ipam:
+                disable_ipam_projection: true
+            destination_type: "DNS"
+        state: present
+      register: aws_provider
+    - name: Get AWS cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_aws_name }}"
+      register: aws_provider_info
+    - assert:
+        that:
+          - aws_provider is changed
+          - aws_provider_info is not failed
+          - aws_provider_info.objects | length == 1
+          - aws_provider_info.objects[0].destination_types_enabled == ["DNS", "ACCOUNTS"]
           - aws_provider_info.objects[0].destinations | length == 2
 
     - name: Create an AWS cloud discovery provider with sync interval 15 min
@@ -290,11 +312,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].sync_interval == "15"
 
     - name: Create an AWS cloud discovery provider with sync interval 1440 min
@@ -321,11 +338,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].sync_interval == "1440"
 
     - name: Create an AWS cloud discovery provider with sync interval auto
@@ -352,11 +364,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].sync_interval == "Auto"
 
     - name: Create an AWS cloud discovery provider with tags
@@ -384,11 +391,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].tags.location == "site-1"
 
     - name: Create an AWS cloud discovery provider with desired_state
@@ -415,11 +417,6 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
-          - aws_provider_info.objects[0].account_preference == "single"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - aws_provider_info.objects[0].desired_state == "disabled"
 
     - name: Create an AWS cloud discovery provider with auto discover multiple
@@ -446,11 +443,7 @@
           - aws_provider is changed
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
-          - aws_provider_info.objects[0].name == cloud_discovery_provider_aws_name_1
-          - aws_provider_info.objects[0].provider_type == "Amazon Web Services"
           - aws_provider_info.objects[0].account_preference == "auto_discover_multiple"
-          - aws_provider_info.objects[0].credential_preference.access_identifier_type == "role_arn"
-          - aws_provider_info.objects[0].credential_preference.credential_type == "dynamic"
 
   always:
      - name: "Delete an AWS cloud discovery provider with auto discover multiple"
@@ -465,7 +458,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Delete an AWS cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
@@ -479,7 +472,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:

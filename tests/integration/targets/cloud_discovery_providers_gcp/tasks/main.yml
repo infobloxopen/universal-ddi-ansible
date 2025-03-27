@@ -196,11 +196,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].additional_config.excluded_accounts == ["123456789012"]
           - gcp_provider_info.objects[0].additional_config.forward_zone_enabled == true
           - gcp_provider_info.objects[0].additional_config.internal_ranges_enabled == true
@@ -233,11 +228,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].description == "This is a test description"
 
     - name: Create a GCP cloud discovery provider with destinations
@@ -273,12 +263,46 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].destination_types_enabled == ["DNS"]
+          - gcp_provider_info.objects[0].destinations | length == 2
+
+    - name: Create a GCP cloud discovery provider with destinations accounts
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_gcp_name }}"
+        provider_type: "Google Cloud Platform"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "project_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{ config_access_id }}"
+        destination_types_enabled:
+          - "DNS"
+          - "ACCOUNTS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+              ipam:
+                disable_ipam_projection: true
+            destination_type: "DNS"
+        state: present
+      register: gcp_provider
+    - name: Get GCP cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_gcp_name }}"
+      register: gcp_provider_info
+    - assert:
+        that:
+          - gcp_provider is changed
+          - gcp_provider_info is not failed
+          - gcp_provider_info.objects | length == 1
+          - gcp_provider_info.objects[0].destination_types_enabled == ["DNS", "ACCOUNTS"]
           - gcp_provider_info.objects[0].destinations | length == 2
 
     - name: Create a GCP cloud discovery provider with sync interval 15 min
@@ -307,11 +331,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "15"
 
     - name: Create a GCP cloud discovery provider with sync interval 1440 min
@@ -340,11 +359,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "1440"
 
     - name: Create a GCP cloud discovery provider with sync interval auto
@@ -373,11 +387,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].sync_interval == "Auto"
 
     - name: Create a GCP cloud discovery provider with tags
@@ -407,11 +416,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].tags.location == "site-1"
 
     - name: Create a GCP cloud discovery provider with desired_state
@@ -440,11 +444,6 @@
           - gcp_provider is changed
           - gcp_provider_info is not failed
           - gcp_provider_info.objects | length == 1
-          - gcp_provider_info.objects[0].name == cloud_discovery_provider_gcp_name
-          - gcp_provider_info.objects[0].provider_type == "Google Cloud Platform"
-          - gcp_provider_info.objects[0].account_preference == "single"
-          - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
-          - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - gcp_provider_info.objects[0].desired_state == "disabled"
 
     - name: Create a GCP cloud discovery provider with auto discover multiple
@@ -490,7 +489,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id_auto }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Delete a GCP cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
@@ -504,7 +503,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:

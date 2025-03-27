@@ -35,6 +35,10 @@ options:
             - "Account preference. For ex.: single, multiple, auto-discover-multiple."
         type: str
         required: true
+        choices:
+            - "single"
+            - "multiple"
+            - "auto_discover_multiple"
     additional_config:
         description:
             - "Additional configuration. Ex.: '{ \"excluded_object_types\": [], \"exclusion_account_list\": [], \"zone_forwarding\": \"true\" or \"false\" }'."
@@ -88,6 +92,10 @@ options:
             access_identifier_type:
                 description: "Type of access identifier, e.g., 'role_arn', 'tenant_id', or 'project_id'."
                 type: str
+                choices:
+                    - "role_arn"
+                    - "tenant_id"
+                    - "project_id"
             credential_type:
                 description: "Type of credential, e.g., 'static' or 'delegated'."
                 type: str
@@ -112,7 +120,7 @@ options:
         suboptions:
             config:
                 description:
-                    - "Destination configuration. Ex.: '{ \"dns\": { \"view_name\": \"view 1\", \"view_id\": \"dns/view/v1\", \"consolidated_zone_data_enabled\": false, \"sync_type\": \"read_only/read_write\" \"split_view_enabled\": false }, \"ipam\": { \"ip_space\": \"\", }, \"account\": {}, }'."
+                    - Destination configuration includes DNS settings (view name, view ID, consolidated zone data, sync type, split view), IPAM settings (IP space), and account settings.
                 type: dict
                 suboptions:
                     dns:
@@ -159,7 +167,7 @@ options:
                 choices:
                     - "DNS"
                     - "IPAM"
-                    - "ACCOUNT"
+                    - "ACCOUNTS"
     name:
         description:
             - "Name of the discovery config."
@@ -252,6 +260,12 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+    - name: Create a View
+      infoblox.universal_ddi.dns_view:
+        name: "dnsView"
+        state: present
+      register: _view
+
     - name: Create an AWS cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "aws_provider_minimal"
@@ -262,7 +276,7 @@ EXAMPLES = r"""
           credential_type: "static"
         source_configs:
           - credential_config:
-                access_identifier: "aws_account_id"
+                access_identifier: "arn:aws:iam::123456789123:role/infoblox_discovery"
         state: present
         register: aws_provider
 
@@ -276,8 +290,24 @@ EXAMPLES = r"""
           credential_type: "static"
         source_configs:
           - credential_config:
-                access_identifier: "aws_account_id"
-        sync_interval: "Auto"
+                access_identifier: "arn:aws:iam::123456789123:role/infoblox_discovery"
+        additional_config:
+          excluded_accounts:
+            - "123456789012"
+          forward_zone_enabled: true
+          internal_ranges_enabled: true
+          object_type:
+            discover_new: true
+        destination_types_enabled:
+          - "DNS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+            destination_type: "DNS"
+        sync_interval: "15"
+        desired_state: "disabled"
         tags:
           environment: "production"
         state: present
@@ -299,32 +329,9 @@ EXAMPLES = r"""
           credential_type: "dynamic"
         source_configs:
           - credential_config:
-                access_identifier: "gcp_project_id"
+                access_identifier: "123456789012"
         state: present
         register: gcp_provider
-
-    - name: Create a GCP cloud discovery provider with additional attributes
-      infoblox.universal_ddi.cloud_discovery_providers:
-        name: "gcp_provider_additional"
-        provider_type: "Google Cloud Platform"
-        account_preference: "single"
-        credential_preference:
-          access_identifier_type: "project_id"
-          credential_type: "dynamic"
-        source_configs:
-          - credential_config:
-                access_identifier: "gcp_project_id"
-        sync_interval: "Auto"
-        tags:
-          location: "site-1"
-        state: present
-
-    - name: Delete a GCP cloud discovery provider
-      infoblox.universal_ddi.cloud_discovery_providers:
-        name: "gcp_provider_minimal"
-        provider_type: "Google Cloud Platform"
-        account_preference: "single"
-        state: absent
 
     - name: Create an Azure cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -336,32 +343,9 @@ EXAMPLES = r"""
           credential_type: "static"
         source_configs:
           - credential_config:
-                access_identifier: "azure_subscription_id"
+                access_identifier: "123456789012"
         state: present
         register: azure_provider
-  
-    - name: Create an Azure cloud discovery provider with additional attributes
-      infoblox.universal_ddi.cloud_discovery_providers:
-        name: "azure_provider_additional"
-        provider_type: "Microsoft Azure"
-        account_preference: "single"
-        credential_preference:
-          access_identifier_type: "subscription_id"
-          credential_type: "static"
-        source_configs:
-          - credential_config:
-                access_identifier: "azure_subscription_id"
-        sync_interval: "Auto"
-        tags:
-          department: "IT"
-        state: present
-
-    - name: Delete an Azure cloud discovery provider
-      infoblox.universal_ddi.cloud_discovery_providers:
-        name: "azure_provider_minimal"
-        provider_type: "Microsoft Azure"
-        account_preference: "single"
-        state: absent
 """  # noqa: E501
 
 RETURN = r"""
@@ -797,15 +781,6 @@ class ProvidersModule(UniversalDDIAnsibleModule):
     def payload(self):
         return self._payload
 
-    def get_destination_by_type(self, destination_type):
-        if not self.existing or not self.existing.destinations:
-            return None
-
-        for destination in self.existing.destinations:
-            if destination.destination_type == destination_type:
-                return destination
-        return None
-
     def payload_changed(self):
         if self.existing is None:
             # if existing is None, then it is a create operation
@@ -903,7 +878,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        account_preference=dict(type="str", required=True),
+        account_preference=dict(type="str", choices=["single", "multiple", "auto_discover_multiple"], required=True),
         additional_config=dict(
             type="dict",
             options=dict(
@@ -941,7 +916,7 @@ def main():
         credential_preference=dict(
             type="dict",
             options=dict(
-                access_identifier_type=dict(type="str"),
+                access_identifier_type=dict(type="str", choices=["role_arn", "tenant_id", "project_id"]),
                 credential_type=dict(type="str"),
             ),
         ),

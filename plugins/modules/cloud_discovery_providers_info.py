@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: cloud_discovery_providers_info
-short_description: Manage Cloud Providers
+short_description: Retrieves Cloud Discovery Providers.
 description:
     - Retrieves information about existing Cloud Discovery Providers.
 version_added: 1.0.0
@@ -47,59 +47,26 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get AWS cloud discovery provider by ID
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        id: "{{ aws_provider.id }}"
+# Note: The following examples demonstrate how to retrieve information for AWS cloud discovery providers.
+# Similar examples can be used for other providers like GCP and Azure by changing the provider-specific details.
 
-    - name: Get AWS cloud discovery provider by filter
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filters:
-          name: "aws_provider_name"
+- name: Get AWS cloud discovery provider by ID
+  infoblox.universal_ddi.cloud_discovery_providers_info:
+    id: "{{ aws_provider.id }}"
 
-    - name: Get AWS cloud discovery provider by filter query
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filter_query: "provider_type=='Amazon Web Services' and name=='aws_provider_name'"
+- name: Get AWS cloud discovery provider by filter
+  infoblox.universal_ddi.cloud_discovery_providers_info:
+    filters:
+      name: "aws_provider_name"
 
-    - name: Get AWS cloud discovery provider by tag filters
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        tag_filters:
-          environment: "production"
+- name: Get AWS cloud discovery provider by filter query
+  infoblox.universal_ddi.cloud_discovery_providers_info:
+    filter_query: "provider_type=='Amazon Web Services' and name=='aws_provider_name'"
 
-    - name: Get GCP cloud discovery provider by ID
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        id: "{{ gcp_provider_id }}"
-
-    - name: Get GCP cloud discovery provider by filter
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filters:
-          name: "gcp_provider_name"
-
-    - name: Get GCP cloud discovery provider by filter query
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filter_query: "provider_type=='Google Cloud Platform' and name=='gcp_provider_name'"
-
-    - name: Get GCP cloud discovery provider by tag filters
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        tag_filters:
-          location: "site-1"
-
-    - name: Get Azure cloud discovery provider by ID
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        id: "{{ azure_provider_id }}"
-
-    - name: Get Azure cloud discovery provider by filter
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filters:
-          name: "azure_provider_name"
-
-    - name: Get Azure cloud discovery provider by filter query
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        filter_query: "provider_type=='Microsoft Azure' and name=='azure_provider_name'"
-
-    - name: Get Azure cloud discovery provider by tag filters
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        tag_filters:
-          department: "IT"
+- name: Get AWS cloud discovery provider by tag filters
+  infoblox.universal_ddi.cloud_discovery_providers_info:
+    tag_filters:
+      environment: "production"
 """
 
 RETURN = r"""

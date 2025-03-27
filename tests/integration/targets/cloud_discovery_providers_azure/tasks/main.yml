@@ -197,11 +197,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].additional_config.excluded_accounts == ["123456789012"]
           - azure_provider_info.objects[0].additional_config.forward_zone_enabled == true
           - azure_provider_info.objects[0].additional_config.internal_ranges_enabled == true
@@ -234,11 +229,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].description == "This is a test description"
 
     - name: Create an Azure cloud discovery provider with destinations
@@ -274,12 +264,46 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].destination_types_enabled == ["DNS"]
+          - azure_provider_info.objects[0].destinations | length == 2
+
+    - name: Create an Azure cloud discovery provider with destinations accounts
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_azure_name }}"
+        provider_type: "Microsoft Azure"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "tenant_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{restricted_to_accounts}}"
+        destination_types_enabled:
+          - "DNS"
+          - "ACCOUNTS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+              ipam:
+                disable_ipam_projection: true
+            destination_type: "DNS"
+        state: present
+      register: azure_provider
+    - name: Get Azure cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_azure_name }}"
+      register: azure_provider_info
+    - assert:
+        that:
+          - azure_provider is changed
+          - azure_provider_info is not failed
+          - azure_provider_info.objects | length == 1
+          - azure_provider_info.objects[0].destination_types_enabled == ["DNS", "ACCOUNTS"]
           - azure_provider_info.objects[0].destinations | length == 2
 
     - name: Create an Azure cloud discovery provider with sync interval 15 min
@@ -308,11 +332,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].sync_interval == "15"
 
     - name: Create an Azure cloud discovery provider with sync interval 1440 min
@@ -341,11 +360,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].sync_interval == "1440"
 
     - name: Create an Azure cloud discovery provider with sync interval auto
@@ -374,11 +388,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].sync_interval == "Auto"
 
     - name: Create an Azure cloud discovery provider with tags
@@ -408,11 +417,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].tags.location == "site-1"
 
     - name: Create an Azure cloud discovery provider with desired_state
@@ -441,11 +445,6 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
-          - azure_provider_info.objects[0].account_preference == "single"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
-          - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
           - azure_provider_info.objects[0].desired_state == "disabled"
 
     - name: Create an Azure cloud discovery provider with auto discover multiple
@@ -472,10 +471,7 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           - azure_provider_info.objects | length == 1
-          - azure_provider_info.objects[0].name == cloud_discovery_provider_azure_name_auto
-          - azure_provider_info.objects[0].provider_type == "Microsoft Azure"
           - azure_provider_info.objects[0].account_preference == "auto_discover_multiple"
-          - azure_provider_info.objects[0].credential_preference.access_identifier_type == "tenant_id"
           - azure_provider_info.objects[0].credential_preference.credential_type == "dynamic"
 
   always:
@@ -491,7 +487,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id_auto }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Delete an Azure cloud discovery provider "
        infoblox.universal_ddi.cloud_discovery_providers:
@@ -505,7 +501,7 @@
            - credential_config:
                access_identifier: "{{ config_access_id }}"
          state: absent
-         ignore_errors: true
+       ignore_errors: true
 
      - name: "Clean up DNS View"
        ansible.builtin.include_role:
