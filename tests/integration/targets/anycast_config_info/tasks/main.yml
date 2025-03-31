@@ -28,7 +28,7 @@
          - ac_config_info.objects[0].name == ac_config_name
          - ac_config_info.objects[0].id == ac_config.id
 
-    - name: Get Information about the Anycast Configuration by service (and name in memory)
+    - name: Get Information about the Anycast Configuration by service and name
       infoblox.universal_ddi.anycast_config_info:
         service: "DNS"
         name: "{{ ac_config_name }}"

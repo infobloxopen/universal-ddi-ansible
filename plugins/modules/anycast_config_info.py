@@ -57,7 +57,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.anycast_config_info:
         id: "{{ ac_config.id }}"
 
-    - name: Get Information about the Anycast Configuration by service (and name in memory)
+    - name: Get Information about the Anycast Configuration by service and name
       infoblox.universal_ddi.anycast_config_info:
         service: "DNS"
         name: "ac_config_example"
