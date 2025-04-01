@@ -216,7 +216,7 @@
         name: "{{ ac_config_name }}"
         anycast_ip_address: "20.0.0.0"
         service: "DNS"
-        state: absent
+        state: "absent"
       ignore_errors: true
 
     - name: Delete Anycast Configuration enabled with DHCP service
@@ -224,7 +224,7 @@
         name: "{{ ac_config_name_1 }}"
         anycast_ip_address: "10.10.0.0"
         service: "DHCP"
-        state: absent
+        state: "absent"
       ignore_errors: true
 
     - name: Delete Anycast Configuration enabled with IPv6 address
@@ -232,5 +232,5 @@
         name: "{{ ac_config_name }}"
         anycast_ipv6_address: "2001:db8::1"
         service: "DNS"
-        state: absent
+        state: "absent"
       ignore_errors: true
