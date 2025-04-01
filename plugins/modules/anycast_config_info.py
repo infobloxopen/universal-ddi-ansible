@@ -112,17 +112,6 @@ objects:
                 - "Can include UTF-8."
             type: str
             returned: Always
-        fields:
-            description: 
-                - "Field mask represents a set of symbolic field paths"
-            type: dict
-            returned: Always
-            contains:
-                paths:
-                    description:
-                        - "The set of field mask paths."
-                    type: list
-                    returned: Always
         id:
             description: 
                 - "The resource identifier."
@@ -283,6 +272,8 @@ def main():
         supports_check_mode=True,
         mutually_exclusive=[
             ["id", "tag_filters", "tag_filter_query"],
+            ["id", "name"],
+            ["id", "service"],
         ],
     )
     module.run_command()
