@@ -1,0 +1,236 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+      - ansible.builtin.set_fact:
+          ac_config_name: "test_ac_config-{{ 99999 | random }}"
+          ac_config_name_1: "test_ac_config-1-{{ 99999 | random }}"
+
+      - name: Create Anycast Configuration (check mode)
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "present"
+        check_mode: true
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config.failed == false
+              - ac_config_info.objects | length == 0
+
+      - name: Create Anycast Configuration
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].name == ac_config_name
+              - ac_config_info.objects[0].anycast_ip_address == "10.0.0.0"
+              - ac_config_info.objects[0].service == "DNS"
+
+      - name: Create Anycast Configuration (idempotent)
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "present"
+        register: ac_config
+      - assert:
+          that:
+              - ac_config is not changed
+              - ac_config is not failed
+
+      - name: Delete Anycast Configuration (check mode)
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "absent"
+        check_mode: true
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+
+      - name: Delete Anycast Configuration
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "absent"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 0
+
+      - name: Delete Anycast Configuration (idempotent)
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          state: "absent"
+        register: ac_config
+      - assert:
+          that:
+              - ac_config is not changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 0
+
+      - name: Create Anycast Configuration with description
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          description: "Test description for Anycast configuration"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].description == "Test description for Anycast configuration"
+
+      - name: Create Anycast Configuration with Tags
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "10.0.0.0"
+          service: "DNS"
+          tags:
+            location: "site-1"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+            - ac_config is changed
+            - ac_config_info is not failed
+            - ac_config_info.objects | length == 1
+            - ac_config_info.objects[0].tags.location == "site-1"
+
+      - name: Create an Anycast Configuration with an updated Anycast IP Address
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ip_address: "20.0.0.0"
+          service: "DNS"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].anycast_ip_address == "20.0.0.0"
+
+      - name: Create a new Anycast Configuration with a different Service
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name_1 }}"
+          anycast_ip_address: "10.10.0.0"
+          service: "DHCP"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DHCP"
+          name: "{{ ac_config_name_1 }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].name == ac_config_name_1
+              - ac_config_info.objects[0].service == "DHCP"
+
+      - name: Creating an Anycast Configuration with IPv6 address
+        infoblox.universal_ddi.anycast_config:
+          name: "{{ ac_config_name }}"
+          anycast_ipv6_address: "2001:db8::1"
+          service: "DNS"
+          state: "present"
+        register: ac_config
+      - name: Get Anycast Configuration Information
+        infoblox.universal_ddi.anycast_config_info:
+          service: "DNS"
+          name: "{{ ac_config_name }}"
+        register: ac_config_info
+      - assert:
+          that:
+              - ac_config is changed
+              - ac_config_info is not failed
+              - ac_config_info.objects | length == 1
+              - ac_config_info.objects[0].anycast_ipv6_address == "2001:db8::1"
+
+  always:
+    - name: Delete Anycast Configuration enabled with DNS service
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ ac_config_name }}"
+        anycast_ip_address: "20.0.0.0"
+        service: "DNS"
+        state: "absent"
+      ignore_errors: true
+
+    - name: Delete Anycast Configuration enabled with DHCP service
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ ac_config_name_1 }}"
+        anycast_ip_address: "10.10.0.0"
+        service: "DHCP"
+        state: "absent"
+      ignore_errors: true
+
+    - name: Delete Anycast Configuration enabled with IPv6 address
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ ac_config_name }}"
+        anycast_ipv6_address: "2001:db8::1"
+        service: "DNS"
+        state: "absent"
+      ignore_errors: true
