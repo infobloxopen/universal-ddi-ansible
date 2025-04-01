@@ -302,9 +302,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
             if len(matching_configs) == 1:
                 return matching_configs[0]
             if len(matching_configs) > 1:
-                self.fail_json(
-                    msg=f"Found multiple Anycast Configurations: '{matching_configs}'"
-                )
+                self.fail_json(msg=f"Found multiple Anycast Configurations: '{matching_configs}'")
             if len(matching_configs) == 0:
                 return None
 
