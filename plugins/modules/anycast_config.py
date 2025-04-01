@@ -73,7 +73,7 @@ options:
         elements: dict
     service:
         description: 
-            - "The type of the Service used in anycast configuration, supports (DNS, DHCP, DFP)."
+            - "The type of the Service used in anycast configuration."
         choices:
             - "DNS"
             - "DHCP"
@@ -219,7 +219,7 @@ objects:
             returned: Always
         service:
             description: 
-                - "The type of the Service used in anycast configuration, supports (DNS, DHCP, DFP)."
+                - "The type of the Service used in anycast configuration."
             choices:
                 - "DNS"
                 - "DHCP"
@@ -301,10 +301,10 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
 
             if len(matching_configs) == 1:
                 return matching_configs[0]
-            if len(matching_configs) > 1:
-                self.fail_json(msg=f"Found multiple Anycast Configurations: '{matching_configs}'")
             if len(matching_configs) == 0:
                 return None
+            if len(matching_configs) > 1:
+                self.fail_json(msg=f"Found multiple Anycast Configurations: '{matching_configs}'")
 
     def create(self):
         if self.check_mode:

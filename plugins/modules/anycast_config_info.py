@@ -29,7 +29,7 @@ options:
         required: false
     service:
         description:
-            - Filter by service type (e.g., DNS, DHCP, DFP).
+            - Filter by service type.
         type: str
         choices:
             - DNS
