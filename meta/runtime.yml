@@ -9,6 +9,7 @@ action_groups:
           - keys
           - infra
           - dhcp
+          - anycast
 
   dns:
     - dns_view
@@ -81,3 +82,7 @@ action_groups:
     - dhcp_option_space_info
     - dhcp_host
     - dhcp_host_info
+
+  anycast:
+    - anycast_config
+    - anycast_config_info
