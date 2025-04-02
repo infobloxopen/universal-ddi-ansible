@@ -575,7 +575,9 @@
           - address_block is not failed
           - address_block_info.objects | length == 1
           - address_block_info.objects[0].dhcp_options | length == 1
-
+          - address_block_info.objects[0].dhcp_options[0].option_code == _option_code.id
+          - address_block_info.objects[0].dhcp_options[0].option_value == "False"
+          - address_block_info.objects[0].dhcp_options[0].type == "option"
 
   always:
     # Cleanup if the test fails

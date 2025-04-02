@@ -620,7 +620,7 @@
             _federated_realm5.id
             ] | sort)
 
-    - name: "Create an IP space with dhcp options"
+    - name: "Create an IP space with DHCP Options"
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
         dhcp_options:
