@@ -189,6 +189,7 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
                         if not remaining_count:
                             break
 
+            # Move the check for insufficient addresses outside of the loop
             if len(find_results) < self.params["count"]:
                 self.fail_json(msg="Not enough addresses block found with the given tags.")
 
