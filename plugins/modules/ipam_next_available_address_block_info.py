@@ -145,12 +145,14 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
             tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
 
         offset = 0
+        all_results = []  # Initialize a list to accumulate results from all pages
 
         while True:
             try:
                 resp = AddressBlockApi(self.client).list(
                     offset=offset, limit=self._limit, tfilter=tag_filter_str, inherit="full"
                 )
+                all_results.extend(resp.results)  # Accumulate results from each page
 
                 if len(resp.results) < self._limit:
                     break
@@ -159,7 +161,7 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
             except ApiException as e:
                 self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
-        return resp.results
+        return all_results
 
     def run_command(self):
         result = dict(objects=[])
