@@ -121,7 +121,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         self._limit = 1000
 
         # Validate count parameter if provided
-        if self.params.get("count") is not None and self.params.get("count") > 20:
+        if self.params["count"] is not None and self.params["count"] > 20:
             self.fail_json(msg="Parameter 'count' cannot exceed 20")
 
     def find_subnet(self, id=None, count=None):
@@ -183,15 +183,15 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             self.exit_json(**result)
 
-        if self.params.get("tag_filters"):
+        if self.params["tag_filters"]:
             address_blocks = self.find_address_blocks_by_tags()
             if not address_blocks:
                 self.fail_json(msg="No address block found with the given tags.")
 
             find_results = []
             for ab in address_blocks:
-                remaining_count = self.params.get("count", 1) - len(find_results)
-                while len(find_results) < self.params.get("count", 1):
+                remaining_count = self.params["count"] - len(find_results)
+                while len(find_results) < self.params["count"]:
                     find_result = self.find_subnet(id=ab.id, count=remaining_count)
                     if find_result:
                         find_results.extend(find_result)
@@ -201,7 +201,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
                         if not remaining_count:
                             break
 
-            if len(find_results) < self.params.get("count", 1):
+            if len(find_results) < self.params["count"]:
                 self.fail_json(msg="Not enough subnets found with the given tags.")
         else:
             find_results = self.find()
