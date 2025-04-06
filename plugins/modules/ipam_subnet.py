@@ -230,6 +230,11 @@ options:
             - "Optional. I(true) to disable object. A disabled object is effectively non-existent when generating configuration."
             - "Defaults to I(false)."
         type: bool
+    federated_realms:
+        description:
+            - "The IDs of the federated realms in which the subnet participates."
+        type: list
+        elements: str
     header_option_filename:
         description:
             - "The configuration for header option filename field."
@@ -1121,6 +1126,12 @@ item:
             description:
                 - "The discovery metadata for this subnet in JSON format."
             type: dict
+            returned: Always
+        federated_realms:
+            description:
+                - "The IDs of the federated realms in which the subnet participates."
+            type: list
+            elements: str
             returned: Always
         header_option_filename:
             description:
@@ -2622,6 +2633,7 @@ def main():
             ),
         ),
         disable_dhcp=dict(type="bool"),
+        federated_realms=dict(type="list", elements="str"),
         header_option_filename=dict(type="str"),
         header_option_server_address=dict(type="str"),
         header_option_server_name=dict(type="str"),
