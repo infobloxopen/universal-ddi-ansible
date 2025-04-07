@@ -1,0 +1,62 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random server name to avoid conflicts
+    - ansible.builtin.set_fact:
+        dhcp_server_name: "test-dhcp-server-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: dhcp_server
+
+    - name: Get DHCP Server information by ID
+      infoblox.universal_ddi.dhcp_server_info:
+        id: "{{ dhcp_server.id }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].id == dhcp_server.id
+
+    - name: Get DHCP Server information by filters
+      infoblox.universal_ddi.dhcp_server_info:
+        filters:
+          name: "{{ dhcp_server_name }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].id == dhcp_server.id
+          - dhcp_server_info.objects[0].name == dhcp_server_name
+
+    - name: Get DHCP Server information by tag_filters
+      infoblox.universal_ddi.dhcp_server_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: dhcp_server_info
+    - assert:
+        that:
+          - dhcp_server_info.objects | length == 1
+
+    - name: Get DHCP Server information by filter query
+      infoblox.universal_ddi.dns_acl_info:
+        filter_query: "name=='{{ dhcp_server_name }}'"
+    - assert:
+        that:
+          - dhcp_server_info.objects | length == 1
+          - dhcp_server_info.objects[0].id == dhcp_server.id
+
+  always:
+    - name: Delete a DHCP Server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: absent
+      ignore_errors: true

@@ -1,0 +1,65 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        option_space_name: "test-option-space-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Space
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: option_space
+
+    - name: Get Information about the DHCP Option Space by ID
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filters:
+          id: "{{ option_space.id }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].name == option_space.object.name
+          - option_space_info.objects[0].id == option_space.id
+
+    - name: Get DHCP Option Space information by filters (Name)
+      infoblox.universal_ddi.dhcp_option_space_info:
+         filters:
+           name: "{{ option_space_name }}"
+      register: option_space_info
+    - assert:
+        that:
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+
+    - name: Get DHCP Option Space information by filter query
+      infoblox.universal_ddi.dhcp_option_space_info:
+        filter_query: "name=='{{ option_space_name }}'"
+    - assert:
+        that:
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+
+    - name: Get DHCP Option Space information by tag filters
+      infoblox.universal_ddi.dhcp_option_space_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+    - assert:
+        that:
+          - option_space_info.objects | length == 1
+          - option_space_info.objects[0].id == option_space.id
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete DHCP Option Space"
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "{{ option_space_name }}"
+        protocol: "ip4"
+        state: absent

@@ -1,0 +1,20 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dhcp_server_name: "dhcp-server-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Server
+      infoblox.universal_ddi.dhcp_server:
+        name: "{{ dhcp_server_name }}"
+        state: present
+      register: _dhcp_server
+
+    - name: Create a DHCP Server 2
+      infoblox.universal_ddi.dhcp_server:
+          name: "{{ dhcp_server_name }}-2"
+          state: present
+      register: _dhcp_server_2
