@@ -65,12 +65,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the HaGroup object
+        - ID of the Ha Group object
     type: str
     returned: Always
 objects:
     description:
-        - HaGroup object
+        - Ha Group object
     type: list
     elements: dict
     returned: Always
