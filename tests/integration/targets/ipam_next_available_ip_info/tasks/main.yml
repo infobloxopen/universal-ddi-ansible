@@ -46,6 +46,226 @@
           - next_available_address_info is not failed
           - next_available_address_info.objects | length == 1
 
+    # Test cases for tag filters functionality
+    - name: Get Next Available IP in Address Blocks filtered by tags
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 10
+      register: next_available_address_info_tags
+    - assert:
+        that:
+          - next_available_address_info_tags is not failed
+          - next_available_address_info_tags.objects | length == 10
+    
+    # Test multiple tag filters with address block
+    - name: Get Next Available IP in Address Block with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter2"
+        resource_type: "address_block"
+        count: 3
+      register: multi_tag_address_block_result
+    - assert:
+        that:
+          - multi_tag_address_block_result is not failed
+          - multi_tag_address_block_result.objects | length == 3
+
+    # Test multiple tag filters with address block
+    - name: Get Continous Next Available IP in Address Block with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter1"
+        resource_type: "address_block"
+        count: 10
+        contiguous: true
+      register: multi_tag_address_block_result
+    - assert:
+        that:
+          - multi_tag_address_block_result is not failed
+          - multi_tag_address_block_result.objects | length == 10
+    
+    # Test multiple tag filters with address block
+    - name: Get Next Available IP from multiple Address Block with tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          location: "datacenter2"
+        resource_type: "address_block"
+        count: 16
+        contiguous: true
+      register: multi_tag_address_block_result
+    - assert:
+        that:
+          - multi_tag_address_block_result is not failed
+          - multi_tag_address_block_result.objects | length == 16
+    
+    # Verify that address block with non-matching tags is not returned
+    - name: Verify no results with non-matching tag combination
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter3"
+        resource_type: "address_block"
+        count: 1
+      register: non_matching_tags_result
+      ignore_errors: true
+    - assert:
+        that:
+          - non_matching_tags_result is failed
+          - "'No address_blocks found with the given tags.' in non_matching_tags_result.msg"
+    
+    # Count validation tests for address blocks
+    - name: Test count=0 with address block (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 0
+      register: zero_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - zero_count_result is failed
+          - "'count must be between 1 and 20' in zero_count_result.msg"
+    
+    - name: Test count=21 with address block (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 21
+      register: large_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - large_count_result is failed
+          - "'count must be between 1 and 20' in large_count_result.msg"
+
+    - name: Test without required resource_type
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        count: 1
+      register: missing_resource_type_result
+      ignore_errors: true
+    - assert:
+        that:
+          - missing_resource_type_result is failed
+
+    - name: Test with invalid resource_type
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "invalid_type"
+        count: 1
+      register: invalid_resource_type_result
+      ignore_errors: true
+    - assert:
+        that:
+          - invalid_resource_type_result is failed
+          - "'value of resource_type must be one of' in invalid_resource_type_result.msg"
+
+    # Test cases for tag filters functionality with subnet
+    - name: Get Next Available IP in Subnets filtered by tags
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 10
+      register: next_available_subnet_info_tags
+    - assert:
+        that:
+          - next_available_subnet_info_tags is not failed
+          - next_available_subnet_info_tags.objects | length == 10
+
+    # Test multiple tag filters with subnet
+    - name: Get Next Available IP in Subnet with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter2"
+        resource_type: "subnet"
+        count: 3
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 3
+
+    # Test multiple tag filters with subnet for contiguous IPs
+    - name: Get Continuous Next Available IP in Subnet with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter1"
+        resource_type: "subnet"
+        count: 10
+        contiguous: true
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 10
+
+    # Test single tag filter with subnet for contiguous IPs
+    - name: Get Next Available IP from multiple Subnets with tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          location: "datacenter2"
+        resource_type: "subnet"
+        count: 16
+        contiguous: true
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 16
+
+    # Verify that subnet with non-matching tags is not returned
+    - name: Verify no results with non-matching tag combination for subnet
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter3"
+        resource_type: "subnet"
+        count: 1
+      register: non_matching_tags_result
+      ignore_errors: true
+    - assert:
+        that:
+          - non_matching_tags_result is failed
+          - "'No subnets found with the given tags.' in non_matching_tags_result.msg"
+
+    # Count validation tests for subnets
+    - name: Test count=0 with subnet (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 0
+      register: zero_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - zero_count_result is failed
+          - "'count must be between 1 and 20' in zero_count_result.msg"
+
+    - name: Test count=21 with subnet (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 21
+      register: large_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - large_count_result is failed
+          - "'count must be between 1 and 20' in large_count_result.msg"
+
   always:
       # Cleanup if the test fails
     - name: Delete IP Space
