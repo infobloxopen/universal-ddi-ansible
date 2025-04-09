@@ -14,18 +14,27 @@
         filters:
           name: "TF_TEST_HOST_04"
       register: host_info_1
+    - assert:
+        that:
+          - host_info_1.objects[0].name == "TF_TEST_HOST_04"
 
     - name: Get DHCP Host 2 information by filters
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "TF_TEST_HOST_01"
       register: host_info_2
+    - assert:
+        that:
+          - host_info_2.objects[0].name == "TF_TEST_HOST_01"
 
     - name: Get DHCP Host 3 information by filters
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "TF_TEST_HOST_02"
       register: host_info_3
+    - assert:
+        that:
+          - host_info_3.objects[0].name == "TF_TEST_HOST_02"
 
     - name: Create DHCP HA Group (check mode)
       infoblox.universal_ddi.dhcp_ha_group:
@@ -105,6 +114,18 @@
           - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
       register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+          filters:
+             name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is not changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects | length == 1
+          - dhcp_ha_group_info.objects[0].comment == "update comment"
+
 
     - name: Delete DHCP HA Group (check mode)
       infoblox.universal_ddi.dhcp_ha_group:

@@ -8,20 +8,26 @@
     - ansible.builtin.set_fact:
         ha_group_name: "test-ha-group-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
-        host_display_name: "ZTP_jt_yg_1402855201519044181"
-        host_display_name_2: "ZTP_jt_yg_6002105851565412243"
+        host_display_name: "TF_TEST_HOST_04"
+        host_display_name_2: "TF_TEST_HOST_01"
 
     - name: Get DHCP Host 1 information by filters
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "{{host_display_name}}"
       register: host_info_1
+    - assert:
+        that:
+          - host_info_1.objects[0].name == host_display_name
 
     - name: Get DHCP Host 2 information by filters
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "{{host_display_name_2}}"
       register: host_info_2
+    - assert:
+        that:
+          - host_info_2.objects[0].name == host_display_name_2
 
     - name: Create DHCP HA Group
       infoblox.universal_ddi.dhcp_ha_group:

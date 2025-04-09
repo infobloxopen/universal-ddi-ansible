@@ -76,14 +76,6 @@ options:
                 description:
                     - "The role of this host in the HA relationship: I(active) or I(passive)."
                 type: str
-            state:
-                description:
-                    - "The state of DHCP on the host. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: str
-            state_v6:
-                description:
-                    - "The state of DHCPv6 on the host. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: str
     ip_space:
         description:
             - "The resource identifier."
@@ -436,8 +428,6 @@ def main():
                 ),
                 host=dict(type="str"),
                 role=dict(type="str"),
-                state=dict(type="str"),
-                state_v6=dict(type="str"),
             ),
         ),
         ip_space=dict(type="str"),
