@@ -17,7 +17,7 @@
     
     - name: Create Address Block with tags
       infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.1.0/28"
+        address: "10.0.1.0/27"
         space: "{{ _ip_space.id }}"
         tags:
           environment: "production"
@@ -27,7 +27,7 @@
     
     - name: Create another Address Block with different tags
       infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.2.0/28"
+        address: "10.0.2.0/27"
         space: "{{ _ip_space.id }}"
         tags:
           environment: "staging"
@@ -37,7 +37,7 @@
     
     - name: Create another Address Block with different tags
       infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.3.0/28"
+        address: "10.0.3.0/27"
         space: "{{ _ip_space.id }}"
         tags:
           environment: "production"
