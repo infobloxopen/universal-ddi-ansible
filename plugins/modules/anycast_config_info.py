@@ -230,10 +230,14 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
             # Fetch all configurations for the specified service
             resp = OnPremAnycastManagerApi(self.client).get_anycast_config_list(tfilter=tag_filter_str, service=service)
 
+            # If no results, set results to empty list
+            if not resp.results:
+                resp.results = []
+
             all_results = resp.results
 
             if name:
-                all_results = [config for config in resp.results if config.name == self.params["name"]]
+                all_results = [config for config in all_results if config.name == self.params["name"]]
 
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
