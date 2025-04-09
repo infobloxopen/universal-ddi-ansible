@@ -161,15 +161,15 @@ class NextAvailableIPInfoModule(UniversalDDIAnsibleModule):
 
     def find_next_available_ip(self, id=None, resource_type=None, count=None):
         try:
-            if resource_type == "address_block" or "ipam/address_block" in id:
+            if resource_type == "address_block" or ("ipam/address_block" in id):
                 resp = AddressBlockApi(self.client).list_next_available_ip(
                     id=id, contiguous=self.params["contiguous"], count=count
                 )
-            elif resource_type == "subnet" or "ipam/subnet" in id:
+            elif resource_type == "subnet" or ("ipam/subnet" in id):
                 resp = SubnetApi(self.client).list_next_available_ip(
                     id=id, contiguous=self.params["contiguous"], count=count
                 )
-            elif resource_type == "range" or "ipam/range" in id:
+            elif resource_type == "range" or ("ipam/range" in id):
                 resp = RangeApi(self.client).list_next_available_ip(
                     id=id, contiguous=self.params["contiguous"], count=count
                 )
