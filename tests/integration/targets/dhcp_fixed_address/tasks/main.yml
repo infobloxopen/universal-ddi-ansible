@@ -416,7 +416,7 @@
 #          - fixed_address_info.objects | length == 1
 #          - fixed_address_info.objects[0].id == fixed_address.id
 
-    - name: Create a Fixed Address with DHCP options
+    - name: Create a Fixed Address with DHCP Options
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
         name: "{{ name }}"

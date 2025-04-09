@@ -662,7 +662,7 @@
           - subnet_info.objects[0].federated_realms | length == 1
           - subnet_info.objects[0].federated_realms == [ _federated_realm1.id ]
 
-    - name: "Create a Subnet with a DHCP Options code"
+    - name: "Create a Subnet with DHCP Options"
       infoblox.universal_ddi.ipam_subnet:
         address: "72.72.1.0"
         space: "{{ _ip_space.id }}"
