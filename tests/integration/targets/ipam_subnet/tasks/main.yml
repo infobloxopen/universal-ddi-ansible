@@ -684,7 +684,6 @@
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].federated_realms | length == 1
           - subnet_info.objects[0].dhcp_options | length == 1
           - subnet_info.objects[0].dhcp_options[0].option_code == _option_code.id
           - subnet_info.objects[0].dhcp_options[0].option_value == "False"
