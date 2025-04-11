@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_ha_group
-short_description: Manage HaGroup
+short_description: Manages an HA Group.
 description:
     -  Manages an HA Group.
     -  The HA Group object represents on-prem hosts that can serve the same leases for HA.
@@ -76,14 +76,6 @@ options:
                 description:
                     - "The role of this host in the HA relationship: I(active) or I(passive)."
                 type: str
-            state:
-                description:
-                    - "The state of DHCP on the host. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: str
-            state_v6:
-                description:
-                    - "The state of DHCPv6 on the host. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: str
     ip_space:
         description:
             - "The resource identifier."
@@ -91,11 +83,13 @@ options:
     mode:
         description:
             - "The mode of the HA group."
-            - "Valid values are:"
-            - "* I(active-active): Both on-prem hosts remain active."
-            - "* I(active-passive): One on-prem host remains active and one remains passive. When the active on-prem host is down, the passive on-prem host takes over."
-            - "* I(advanced-active-passive): One on-prem host may be part of multiple HA groups. When the active on-prem host is down, the passive on-prem host takes over."
         type: str
+        choices:
+            - active-active
+            - active-passive
+            - advanced-active-passive
+            - anycast
+        default: active-active
     name:
         description:
             - "The name of the HA group. Must contain 1 to 256 characters. Can include UTF-8."
@@ -156,12 +150,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the HaGroup object
+        - ID of the Ha Group object
     type: str
     returned: Always
 item:
     description:
-        - HaGroup object
+        - Ha Group object
     type: complex
     returned: Always
     contains:
@@ -257,10 +251,6 @@ item:
         mode:
             description:
                 - "The mode of the HA group."
-                - "Valid values are:"
-                - "* I(active-active): Both on-prem hosts remain active."
-                - "* I(active-passive): One on-prem host remains active and one remains passive. When the active on-prem host is down, the passive on-prem host takes over."
-                - "* I(advanced-active-passive): One on-prem host may be part of multiple HA groups. When the active on-prem host is down, the passive on-prem host takes over."
             type: str
             returned: Always
         name:
@@ -386,16 +376,16 @@ class HaGroupModule(UniversalDDIAnsibleModule):
             if self.params["state"] == "present" and self.existing is None:
                 item = self.create()
                 result["changed"] = True
-                result["msg"] = "HaGroup created"
+                result["msg"] = "Ha Group created"
             elif self.params["state"] == "present" and self.existing is not None:
                 if self.payload_changed():
                     item = self.update()
                     result["changed"] = True
-                    result["msg"] = "HaGroup updated"
+                    result["msg"] = "Ha Group updated"
             elif self.params["state"] == "absent" and self.existing is not None:
                 self.delete()
                 result["changed"] = True
-                result["msg"] = "HaGroup deleted"
+                result["msg"] = "Ha Group deleted"
 
             if self.check_mode:
                 # if in check mode, do not update the result or the diff, just return the changed state
@@ -438,12 +428,14 @@ def main():
                 ),
                 host=dict(type="str"),
                 role=dict(type="str"),
-                state=dict(type="str"),
-                state_v6=dict(type="str"),
             ),
         ),
         ip_space=dict(type="str"),
-        mode=dict(type="str"),
+        mode=dict(
+            type="str",
+            choices=["active-active", "active-passive", "advanced-active-passive", "anycast"],
+            default="active-active",
+        ),
         name=dict(type="str", required=True),
         status=dict(type="str"),
         status_v6=dict(type="str"),
