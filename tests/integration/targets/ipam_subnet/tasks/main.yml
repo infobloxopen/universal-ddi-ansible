@@ -670,7 +670,9 @@
         dhcp_options:
           - type: "option"
             option_code: "{{ _option_code.id }}"
-            option_value: "False"
+            option_value: "false"
+          - type: "group"
+            group: "{{ _option_group.id }}"
         state: "present"
       register: subnet
     - name: Get information about the Subnet
@@ -684,9 +686,10 @@
         that:
           - subnet is not failed
           - subnet_info.objects | length == 1
-          - subnet_info.objects[0].dhcp_options | length == 1
+          - subnet_info.objects[0].dhcp_options | length == 2
           - subnet_info.objects[0].dhcp_options[0].option_code == _option_code.id
-          - subnet_info.objects[0].dhcp_options[0].option_value == "False"
+          - subnet_info.objects[0].dhcp_options[0].option_value == "false"
+          - subnet_info.objects[0].dhcp_options[1].group == _option_group.id
 
   always:
     # Cleanup if the test fails

@@ -75,7 +75,7 @@ options:
             role:
                 description:
                     - "The role of this host in the HA relationship: I(active) or I(passive)."
-                type: str 
+                type: str
     ip_space:
         description:
             - "The resource identifier."

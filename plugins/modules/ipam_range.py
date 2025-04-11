@@ -211,6 +211,15 @@ EXAMPLES = r"""
         space: "{{ ip_space.id }}"
         state: "present"
 
+    - name: Create a DHCP Option Code ( required as parent for DHCP Options)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "option_code_name"
+        option_space: "{{ option_space.id }}"
+        type: "boolean"
+        state: present
+      register: option_code
+
     - name: "Create a Range with additional Fields"
       infoblox.universal_ddi.ipam_range:
         start: "10.0.0.1"
@@ -219,7 +228,7 @@ EXAMPLES = r"""
         dhcp_options:
           - type: "option"
             option_code: "{{ option_code.id }}"
-            option_value: "False"
+            option_value: "false"
         disable_dhcp: "true"
         tags:
           location: "site-1"

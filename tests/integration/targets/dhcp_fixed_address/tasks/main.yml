@@ -426,7 +426,9 @@
         dhcp_options:
           - type: "option"
             option_code: "{{ _option_code.id }}"
-            option_value: "False"
+            option_value: "false"
+          - type: "group"
+            group: "{{ _option_group.id }}"
         state: "present"
       register: fixed_address
     - name: Get information about the Fixed Address
@@ -441,7 +443,9 @@
           - fixed_address_info.objects[0].id == fixed_address.id
           - fixed_address_info.objects[0].address == "10.0.0.1"
           - fixed_address_info.objects[0].dhcp_options[0].option_code == _option_code.id
-          - fixed_address_info.objects[0].dhcp_options[0].option_value == "False"
+          - fixed_address_info.objects[0].dhcp_options[0].option_value == "false"
+          - fixed_address_info.objects[0].dhcp_options[1].group == _option_group.id
+          - fixed_address_info.objects[0].dhcp_options[1].type == "group"
 
   always:
     - name: Delete IP Space

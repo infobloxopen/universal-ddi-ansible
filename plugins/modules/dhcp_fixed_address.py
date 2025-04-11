@@ -221,6 +221,15 @@ EXAMPLES = r"""
         ip_space: "{{ ip_space.id }}"
         state: "present"
         
+    - name: Create a DHCP Option Code ( required as parent for DHCP Options)
+      infoblox.universal_ddi.dhcp_option_code:
+        code: 234
+        name: "option_code_name"
+        option_space: "{{ option_space.id }}"
+        type: "boolean"
+        state: present
+      register: option_code
+        
     - name: Create a Fixed Address with additional fields
       infoblox.universal_ddi.dhcp_fixed_address:
         address: "10.0.0.1"
@@ -233,7 +242,7 @@ EXAMPLES = r"""
         dhcp_options:
           - type: "option"
             option_code: "{{ option_code.id }}"
-            option_value: "False"
+            option_value: "false"
         header_option_filename: "example-header-option-filename"
         header_option_server_address: "10.0.0.12"
         header_option_server_name: "example-header-option-server-name"
