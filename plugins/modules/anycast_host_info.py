@@ -341,7 +341,9 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             result = self.find_by_id()
-            return [result] if result else []  # Always return a list, even if empty
+            if isinstance(result, list):
+                return result
+            return [result] if result else []
 
         try:
             resp = OnPremAnycastManagerApi(self.client).get_onprem_host(self.params["id"])
