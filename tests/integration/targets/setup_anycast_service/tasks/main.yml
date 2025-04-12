@@ -1,0 +1,24 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random Service name to avoid conflicts
+    - ansible.builtin.set_fact:
+        service_name: "test-anycast-service-{{ 999999 | random | string }}"
+        host_display_name: "TF_TEST_HOST_01" #This is a real host and not a dummy one
+
+    - name: Get Information about the Host
+      infoblox.universal_ddi.infra_host_info:
+        filters:
+          display_name: "{{ host_display_name }}"
+      register: _infra_host_info
+
+    # Create a Service of type 'anycast'
+    - name: Create a Service
+      infoblox.universal_ddi.infra_service:
+        name: "{{ service_name }}"
+        pool_id: "{{ _infra_host_info.objects[0].pool_id }}"
+        service_type: "anycast"
+        state: "present"

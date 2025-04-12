@@ -124,8 +124,13 @@ def _is_changed(existing, payload):
                     changed = True
                 else:
                     for i in range(len(v)):
-                        if _is_changed(existing[k][i], v[i]):
-                            changed = True
+                        # Handle cases where elements of the list are strings or primitives
+                        if isinstance(v[i], (str, int, float)):
+                            if existing[k][i] != v[i]:  # Direct comparison for primitives
+                                changed = True
+                        else:
+                            if _is_changed(existing[k][i], v[i]):
+                                changed = True
             elif isinstance(v, dict):
                 changed = _is_changed(existing[k], v)
             elif existing[k] != v:

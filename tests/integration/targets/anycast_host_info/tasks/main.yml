@@ -1,0 +1,52 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+
+    #Initial PUT call to start the Anycast service on the Host
+    - name: Update call to enable Anycast Service on the Host
+      infoblox.universal_ddi.anycast_host:
+        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        name: "{{ _infra_host_info.objects[0].display_name }}"
+        state: "present"
+
+    - name: Update Anycast Host with Anycast Config Reference
+      infoblox.universal_ddi.anycast_host:
+        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        name: "{{ _infra_host_info.objects[0].display_name }}"
+        anycast_config_refs:
+          - anycast_config_name: "{{ ac_config_name }}"
+            routing_protocols: []
+        state: "present"
+      register: anycast_host
+
+    - name: Get Anycast Host Information by ID
+      infoblox.universal_ddi.anycast_host_info:
+        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+      register: anycast_host_info
+    - assert:
+        that:
+          - anycast_host is changed
+          - anycast_host_info is not failed
+          - anycast_host_info.objects | length == 1
+          - anycast_host_info.objects[0].name ==  host_display_name
+          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
+
+  always:
+    - name: "Dissociate Anycast Host"
+      infoblox.universal_ddi.anycast_host:
+        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        state: "absent"
+      ignore_errors: true
+
+    - name: "Clean up the Infra Service for Anycast"
+      ansible.builtin.include_role:
+        name: setup_anycast_service
+        tasks_from: cleanup.yml
+
+    - name: "Clean up the Anycast Config"
+      ansible.builtin.include_role:
+        name: setup_anycast_config
+        tasks_from: cleanup.yml

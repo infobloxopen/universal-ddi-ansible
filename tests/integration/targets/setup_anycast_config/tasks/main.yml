@@ -1,0 +1,18 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a random Anycast Configuration name to avoid conflicts
+    - ansible.builtin.set_fact:
+        ac_config_name: "test_ac_config-{{ 99999 | random }}"
+
+    - name: Create Anycast Configuration
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ ac_config_name }}"
+        anycast_ip_address: "10.0.0.0"
+        service: "DNS"
+        state: "present"
+      register: _ac_config
