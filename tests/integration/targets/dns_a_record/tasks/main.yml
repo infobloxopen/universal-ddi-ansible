@@ -364,7 +364,7 @@
           address: "15.0.0.0"
         type: "A"
         state: present
-      ignore_errors: yes
+      ignore_errors: true
       register: a_record2
     - assert:
         that:
