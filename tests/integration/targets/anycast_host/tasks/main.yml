@@ -107,6 +107,17 @@
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 1
           - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
+    - name: Get Anycast Config information and validate the On-Prem host
+      infoblox.universal_ddi.anycast_config_info:
+        id: "{{ _ac_config.id }}"
+      register: ac_config_info
+    - assert:
+        that:
+          - ac_config_info is not failed
+          - ac_config_info.objects | length == 1
+          - ac_config_info.objects[0].onprem_hosts | length == 1
+          - ac_config_info.objects[0].onprem_hosts[0].name == _infra_host_info.objects[0].display_name
+          - ac_config_info.objects[0].onprem_hosts[0].id == _infra_host_info.objects[0].legacy_id | int
 
     - name: Update Anycast Host with OSPF Routing Protocol enabled
       infoblox.universal_ddi.anycast_host:

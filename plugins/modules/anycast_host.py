@@ -304,7 +304,7 @@ EXAMPLES = r"""
         id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "example_anycast_config"
             routing_protocols: ["OSPF", "BGP"]
         config_bgp:
           asn: 6500

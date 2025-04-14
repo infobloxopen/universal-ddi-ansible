@@ -7,7 +7,7 @@
     # Create a random Service name to avoid conflicts
     - ansible.builtin.set_fact:
         service_name: "test-anycast-service-{{ 999999 | random | string }}"
-        host_display_name: "TF_TEST_HOST_01" #This is a real host and not a dummy one
+        host_display_name: "TF_TEST_HOST_01" #It has to be real host
 
     - name: Get Information about the Host
       infoblox.universal_ddi.infra_host_info:

@@ -1,0 +1,12 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+
+    - name: "Dissociate Anycast Host"
+      infoblox.universal_ddi.anycast_host:
+        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        state: "absent"
+      ignore_errors: true
