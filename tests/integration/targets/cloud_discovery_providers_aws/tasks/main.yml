@@ -249,9 +249,9 @@
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
           - aws_provider_info.objects[0].destination_types_enabled == ["DNS"]
-          - aws_provider_info.objects[0].destinations | length == 2
+          - aws_provider_info.objects[0].destinations | length == 2 #IPAM is default and appended to the destinations list while creating the job.
 
-    - name: Create an AWS cloud discovery provider with destinations account
+    - name: Create an AWS cloud discovery provider with destinations ACCOUNTS and IPAM.
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_aws_name }}"
         provider_type: "Amazon Web Services"

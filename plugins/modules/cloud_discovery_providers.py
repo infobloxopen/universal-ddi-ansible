@@ -32,7 +32,7 @@ options:
         default: present
     account_preference:
         description:
-            - "Account preference. For ex.: single, multiple, auto-discover-multiple."
+            - "Account preference."
         type: str
         required: true
         choices:
@@ -41,7 +41,7 @@ options:
             - "auto_discover_multiple"
     additional_config:
         description:
-            - "Additional configuration. Ex.: '{ \"excluded_object_types\": [], \"exclusion_account_list\": [], \"zone_forwarding\": \"true\" or \"false\" }'."
+            - "Additional configuration."
         type: dict
         suboptions:
             excluded_accounts:
@@ -86,11 +86,11 @@ options:
                         type: float
     credential_preference:
         description:
-            - "Credential preference. Ex.: '{ \"type\": \"static\" or \"delegated\", \"access_identifier_type\": \"role_arn\" or \"tenant_id\" or \"project_id\" }'."
+            - "Credential preference."
         type: dict
         suboptions:
             access_identifier_type:
-                description: "Type of access identifier, e.g., 'role_arn', 'tenant_id', or 'project_id'."
+                description: "Type of access identifier"
                 type: str
                 choices:
                     - "role_arn"
@@ -162,7 +162,7 @@ options:
                                 type: str
             destination_type:
                 description:
-                    - "Destination type: DNS / IPAM / ACCOUNT."
+                    - "Destination type"
                 type: str
                 choices:
                     - "DNS"
@@ -175,7 +175,7 @@ options:
         required: true
     provider_type:
         description:
-            - "Provider type. Ex.: Amazon Web Services, Google Cloud Platform, Microsoft Azure."
+            - "Provider type."
         type: str
         choices:
             - "Amazon Web Services"
