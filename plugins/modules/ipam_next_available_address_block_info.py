@@ -140,9 +140,7 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
             return None
 
     def find_address_block_by_tags(self):
-        tag_filter_str = None
-        if self.params["tag_filters"]:
-            tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
+        tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
 
         offset = 0
         all_results = []  # Initialize a list to accumulate results from all pages
@@ -169,9 +167,15 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             self.exit_json(**result)
 
+        count = self.params["count"]
+
         # Validate that count is not greater than 20
-        if self.params["count"] and self.params["count"] > 20:
+        if count and count > 20:
             self.fail_json(msg="Count parameter cannot be greater than 20.")
+
+        # Validate that count is not negative
+        if count and count < 0:
+            self.fail_json(msg="Count parameter cannot be negative.")
 
         if self.params["tag_filters"]:
             address_blocks = self.find_address_block_by_tags()
@@ -180,8 +184,8 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
 
             find_results = []
             for ab in address_blocks:
-                remaining_count = self.params["count"] - len(find_results)
-                while len(find_results) < self.params["count"]:
+                remaining_count = count - len(find_results)
+                while len(find_results) < count:
                     find_result = self.find_address_block(id=ab.id, count=remaining_count)
                     if find_result:
                         find_results.extend(find_result)
@@ -192,8 +196,8 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
                             break
 
             # Move the check for insufficient addresses outside of the loop
-            if len(find_results) < self.params["count"]:
-                self.fail_json(msg="Not enough addresses block found with the given tags.")
+            if len(find_results) < count:
+                self.fail_json(msg="Not enough address blocks found with the given tags.")
 
         else:
             find_results = self.find()

@@ -8,18 +8,11 @@
       infoblox.universal_ddi.ipam_address_block:
         address: "10.0.0.0/16"
         space: "{{ _ip_space.id }}"
-        state: "present"
-      register: address_block
-        
-    - name: "Create an Address Block with tags"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "192.168.1.0/24"
-        space: "{{ _ip_space.id }}"
         tags:
           environment: "test"
           location: "site-1"
         state: "present"
-      register: tagged_address_block
+      register: address_block
 
     - name: Get Next Available Address Block Information by ID and default Count
       infoblox.universal_ddi.ipam_next_available_address_block_info:
