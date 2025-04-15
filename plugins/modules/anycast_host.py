@@ -708,15 +708,14 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
 
             infra_host = infra_host_resp.results[0]
 
-            name = infra_host.display_name
             ip_address = infra_host.ip_address
 
             anycast_host_id = int(infra_host.legacy_id)
 
             # Construct the payload correctly as an OnpremHost object
             update_payload = OnpremHost(
-                name=name,
                 ip_address=ip_address,
+                **self.payload_params,
             )
 
             # Update the Anycast host with the retrieved infra host data

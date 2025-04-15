@@ -3,8 +3,8 @@
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
+  
   block:
-
     - name: Update call to enable Anycast Service on the Host (check mode)
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
@@ -12,7 +12,7 @@
         state: "present"
       check_mode: true
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
           id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -28,7 +28,7 @@
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -55,7 +55,7 @@
         state: "absent"
       check_mode: true
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -70,7 +70,7 @@
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -79,14 +79,6 @@
           - anycast_host is changed
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 0
-
-    #Initial PUT call to start the anycast service on the Infra host
-    - name: Update call to enable Anycast Service on the Host
-      infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-        name: "{{ _infra_host_info.objects[0].display_name }}"
-        state: "present"
-      register: anycast_host
 
     - name: Update Anycast Host with Anycast Config Reference
       infoblox.universal_ddi.anycast_host:
@@ -97,7 +89,7 @@
             routing_protocols: []
         state: "present"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
           id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -107,7 +99,7 @@
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 1
           - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-    - name: Get Anycast Config information and validate the On-Prem host
+    - name: Get Anycast Config information and validate the onprem host
       infoblox.universal_ddi.anycast_config_info:
         id: "{{ _ac_config.id }}"
       register: ac_config_info
@@ -138,7 +130,7 @@
           transmit_delay: 1
         state: "present"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
           id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -179,7 +171,7 @@
       register: anycast_host
     - debug:
         var: "{{ anycast_host | type_debug}}"
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
           id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -225,7 +217,7 @@
           transmit_delay: 2
         state: "present"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
           id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
@@ -272,7 +264,7 @@
               password: "test"
         state: "present"
       register: anycast_host
-    - name: Get Anycast Host Information
+    - name: Get the Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
