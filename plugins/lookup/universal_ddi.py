@@ -64,7 +64,14 @@ def return_base_url(obj_type):
         return "/api/anycast/v1"
     elif base_obj_type == "cloud_discovery":
         return "/api/cloud_discovery/v2"
-    elif base_obj_type == "dns_config" or base_obj_type == "dns_data" or base_obj_type == "ipam" or base_obj_type == "dhcp" or base_obj_type == "ipam_federation" or base_obj_type == "keys":
+    elif (
+        base_obj_type == "dns_config"
+        or base_obj_type == "dns_data"
+        or base_obj_type == "ipam"
+        or base_obj_type == "dhcp"
+        or base_obj_type == "ipam_federation"
+        or base_obj_type == "keys"
+    ):
         return "/api/ddi/v1"
     elif base_obj_type == "infra_mgmt":
         return "/api/infra/v1"
@@ -72,6 +79,7 @@ def return_base_url(obj_type):
         return "/api/host-activation/v1"
     else:
         raise AnsibleError(f"Invalid object type: {obj_type}")
+
 
 def get_object(obj_type, provider, filters, tfilters, fields):
     """Creating the GET API request for lookup"""
@@ -142,9 +150,9 @@ def get_object(obj_type, provider, filters, tfilters, fields):
 class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
         if not HAS_REQUESTS_LIB:
-            raise AnsibleError(
-                "The 'universal_ddi' lookup cannot be run without the 'requests' library installed."
-            )(REQUESTS_LIB_IMP_ERR)
+            raise AnsibleError("The 'universal_ddi' lookup cannot be run without the 'requests' library installed.")(
+                REQUESTS_LIB_IMP_ERR
+            )
         try:
             obj_type = terms[0]
         except IndexError:
