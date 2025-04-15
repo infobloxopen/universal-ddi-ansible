@@ -364,8 +364,8 @@ class HaGroupModule(UniversalDDIAnsibleModule):
             # Add prefix if needed
         if self.payload.anycast_config_id is not None:
             ac_id = self.payload.anycast_config_id
-            # if not ac_id.startswith("accm/ac_configs/"):
-            self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+            if not ac_id.startswith("accm/ac_configs/"):
+                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
 
         resp = HaGroupApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
@@ -377,8 +377,8 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         # Add prefix if needed
         if self.payload.anycast_config_id is not None:
             ac_id = self.payload.anycast_config_id
-            # if not ac_id.startswith("accm/ac_configs/"):
-            self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+            if not ac_id.startswith("accm/ac_configs/"):
+                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
 
         resp = HaGroupApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
