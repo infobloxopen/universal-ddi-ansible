@@ -361,7 +361,7 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-            # Add prefix if needed
+            # Add prefix if needed for anycast_config_id
         if self.payload.anycast_config_id is not None:
             ac_id = self.payload.anycast_config_id
             if not ac_id.startswith("accm/ac_configs/"):
@@ -374,7 +374,7 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-        # Add prefix if needed
+        # Add prefix if needed for anycast_config_id
         if self.payload.anycast_config_id is not None:
             ac_id = self.payload.anycast_config_id
             if not ac_id.startswith("accm/ac_configs/"):
