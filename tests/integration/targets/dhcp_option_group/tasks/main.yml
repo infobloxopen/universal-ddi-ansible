@@ -185,7 +185,7 @@
               group: "{{ option_group_2.id }}"
             - type: "option"
               option_code: "{{_option_code.id}}"
-              option_value: "False"
+              option_value: "false"
           state: "present"
       register: option_group
     - name: Get information about the DHCP Option
