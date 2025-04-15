@@ -143,6 +143,18 @@ EXAMPLES = r"""
           - host: "{{ host_2.id }}"
             role: "active"
         state: present
+        
+    - name: Create DHCP HA Group with mode anycast
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "example_ha_group"
+        mode: "anycast"
+        anycast_config_id: "{{ ac_config.id }}"
+        hosts:
+          - host: "{{ host_1.id }}"
+            role: "active"
+          - host: "{{ host_2.id }}"
+            role: "active"
+        state: present
       
     - name: "Delete DHCP HA Group"
       infoblox.universal_ddi.dhcp_ha_group:
@@ -357,12 +369,24 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
+            # Add prefix if needed
+        if self.payload.anycast_config_id is not None:
+            ac_id = self.payload.anycast_config_id
+            # if not ac_id.startswith("accm/ac_configs/"):
+            self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+
         resp = HaGroupApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
+
+        # Add prefix if needed
+        if self.payload.anycast_config_id is not None:
+            ac_id = self.payload.anycast_config_id
+            # if not ac_id.startswith("accm/ac_configs/"):
+            self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
 
         resp = HaGroupApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)

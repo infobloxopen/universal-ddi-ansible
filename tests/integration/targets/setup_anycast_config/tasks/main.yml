@@ -1,0 +1,27 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random Auth Zone to avoid conflicts
+    - ansible.builtin.set_fact:
+        _anycast_config_name: "anycast_config_name-{{ 999999 | random | string }}"
+
+    - name: Create Anycast Configuration
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ _anycast_config_name }}"
+        anycast_ip_address: "10.1.0.0"
+        service: "DHCP"
+        state: "present"
+      register: _ac_config
+    - name: Get Anycast Configuration Information
+      infoblox.universal_ddi.anycast_config_info:
+        service: "DHCP"
+        name: "{{ _anycast_config_name }}"
+      register: ac_config_info
+    - assert:
+        that:
+          - ac_config_info.objects[0].name == _anycast_config_name
+          - ac_config_info.objects[0].anycast_ip_address == "10.1.0.0"
+          - ac_config_info.objects[0].service == "DHCP"
