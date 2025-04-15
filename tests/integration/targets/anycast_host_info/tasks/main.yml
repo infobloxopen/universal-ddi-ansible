@@ -31,7 +31,7 @@
           - anycast_host is changed
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].name ==  host_display_name
+          - anycast_host_info.objects[0].name == host_display_name
           - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
 
   always:

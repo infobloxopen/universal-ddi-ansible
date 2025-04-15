@@ -7,14 +7,14 @@
 
     - name: Update call to enable Anycast Service on the Host (check mode)
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       check_mode: true
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+          id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -24,13 +24,13 @@
 
     - name: Update call to enable Anycast Service on the Host
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -40,7 +40,7 @@
 
     - name: Update call to enable Anycast Service on the Host (idempotent)
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       register: anycast_host
@@ -49,15 +49,15 @@
           - anycast_host is not changed
           - anycast_host is not failed
 
-    - name: Dissociate the Anycast Host (check mode)
+    - name: Delete the Anycast Host (check mode)
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       check_mode: true
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -65,14 +65,14 @@
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 1
 
-    - name: Dissociate the Anycast Host
+    - name: Delete the Anycast Host
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -83,14 +83,17 @@
     #Initial PUT call to start the anycast service on the Infra host
     - name: Update call to enable Anycast Service on the Host
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
+        anycast_config_refs:
+          - anycast_config_name: "{{ ac_config_name }}"
+            routing_protocols: []
       register: anycast_host
 
     - name: Update Anycast Host with Anycast Config Reference
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{ ac_config_name }}"
@@ -99,7 +102,7 @@
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+          id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -121,7 +124,7 @@
 
     - name: Update Anycast Host with OSPF Routing Protocol enabled
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{ ac_config_name }}"
@@ -140,7 +143,7 @@
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+          id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -162,7 +165,7 @@
 
     - name: Update Anycast Host with BGP Routing Protocol
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{ ac_config_name }}"
@@ -181,7 +184,7 @@
         var: "{{ anycast_host | type_debug}}"
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+          id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -200,7 +203,7 @@
 
     - name: Update Anycast Host with Both BGP and OSPF Routing Protocols
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{ ac_config_name }}"
@@ -227,7 +230,7 @@
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+          id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -255,7 +258,7 @@
 
     - name: Update Anycast Host BGP Routing Protocol with Multihop
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{ ac_config_name }}"
@@ -274,7 +277,7 @@
       register: anycast_host
     - name: Get Anycast Host Information
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -295,9 +298,9 @@
           - anycast_host_info.objects[0].config_bgp.neighbors[0].password == "test"
 
   always:
-    - name: "Dissociate Anycast Host"
+    - name: "Delete Anycast Host"
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 

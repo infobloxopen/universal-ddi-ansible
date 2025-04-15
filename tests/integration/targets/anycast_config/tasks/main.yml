@@ -178,7 +178,7 @@
           anycast_ip_address: "20.0.0.0"
           service: "DNS"
           onprem_hosts:
-            - id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+            - id: "{{ _infra_host_info.objects[0].legacy_id }}"
               name: "{{ _infra_host_info.objects[0].display_name }}"
           state: "present"
         register: ac_config

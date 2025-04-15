@@ -29,7 +29,7 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Get Anycast Host Information by ID
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
 
 """
 RETURN = r"""
@@ -333,7 +333,7 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
 
     def find_by_id(self):
         try:
-            resp = OnPremAnycastManagerApi(self.client).get_onprem_host(self.params["id"])
+            resp = OnPremAnycastManagerApi(self.client).get_onprem_host(int(self.params["id"]))
             return resp.results if resp.results else None  # Return object or None
         except NotFoundException:
             return None
@@ -346,7 +346,7 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
             return [result] if result else []
 
         try:
-            resp = OnPremAnycastManagerApi(self.client).get_onprem_host(self.params["id"])
+            resp = OnPremAnycastManagerApi(self.client).get_onprem_host(int(self.params["id"]))
 
             if not resp.results:
                 return []  # Return an empty list instead of None

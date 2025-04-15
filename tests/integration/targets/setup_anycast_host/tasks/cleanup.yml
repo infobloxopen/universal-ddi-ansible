@@ -5,8 +5,8 @@
       portal_key: "{{ portal_key }}"
   block:
 
-    - name: "Dissociate Anycast Host"
+    - name: "Delete Anycast Host"
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true

@@ -282,7 +282,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.infra_host_info:
         filters:
             display_name: "example_infra_host"
-      register: infra_host_info
+      register: _infra_host_info
 
     - name: Create an Anycast Service (required as parent)
       infoblox.universal_ddi.infra_service:
@@ -293,7 +293,7 @@ EXAMPLES = r"""
 
     - name: Update Anycast Host with Anycast Configuration References
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "example_anycast_config"
@@ -301,7 +301,7 @@ EXAMPLES = r"""
 
     - name: Update Anycast Host with Routing protocols and their configurations
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "example_anycast_config"
@@ -324,9 +324,9 @@ EXAMPLES = r"""
           transmit_delay: 1
         state: "present"
 
-    - name: "Dissociate the Anycast Host"
+    - name: "Delete the Anycast Host"
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
 
 """

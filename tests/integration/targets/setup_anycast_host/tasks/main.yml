@@ -7,7 +7,7 @@
 
     - name: Update call to enable Anycast Service on the Host
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       register: anycast_host
