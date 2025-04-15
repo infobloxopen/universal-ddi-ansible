@@ -86,9 +86,6 @@
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
-        anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
-            routing_protocols: []
       register: anycast_host
 
     - name: Update Anycast Host with Anycast Config Reference
