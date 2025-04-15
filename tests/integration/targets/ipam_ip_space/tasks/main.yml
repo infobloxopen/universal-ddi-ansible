@@ -620,6 +620,32 @@
             _federated_realm5.id
             ] | sort)
 
+    - name: "Create an IP space with DHCP Options"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ _option_code.id }}"
+            option_value: "false"
+          - type: "group"
+            group: "{{ _option_group.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].id == ip_space.id
+          - ip_space_info.objects[0].name == ip_space.object.name
+          - ip_space_info.objects[0].dhcp_options | length == 2
+          - ip_space_info.objects[0].dhcp_options[0].option_code == _option_code.id
+          - ip_space_info.objects[0].dhcp_options[0].option_value == "false"
+
   always:
     # Cleanup if the test fails
     - ansible.builtin.include_role:
