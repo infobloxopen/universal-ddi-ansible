@@ -341,7 +341,7 @@ class HaGroupModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 1:
                 return resp.results[0]
             if len(resp.results) > 1:
-                self.fail_json(msg=f"Found multiple HaGroup: {resp.results}")
+                self.fail_json(msg=f"Found multiple Ha Group: {resp.results}")
             if len(resp.results) == 0:
                 return None
 
