@@ -29,6 +29,7 @@
           - bulk_copy is not failed
           - bulk_copy.object.results | length == 1
 
+    # Recursive flag is not supported it is reserved for future use
     - name: Create a DNS Bulk Copy Job with recursive flag
       infoblox.universal_ddi.dns_bulk_copy:
         resources:
@@ -103,14 +104,57 @@
           - bulk_copy is changed
           - bulk_copy is not failed
           - bulk_copy.object.results | length == 1
+    
+    - name: Create a DNS Bulk Copy Job with NSGs configuration
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          nsgs:
+            - "{{ _auth_nsg.id }}"
+      register: bulk_copy_nsgs
+    - assert:
+        that:
+          - bulk_copy_nsgs is changed
+          - bulk_copy_nsgs is not failed
+          - bulk_copy_nsgs.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with TSIG Key configuration
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          external_primaries:
+            - type: "primary"
+              fqdn: "tsig.example.com"
+              address: "192.168.1.10"
+              tsig_enabled: true
+              tsig_key:
+                algorithm: "hmac_sha256"
+                name: "tsig-key.example.com"
+                secret: "SGVsbG8gV29ybGQh"
+                comment: "TSIG key for zone transfer"
+      register: bulk_copy_tsig
+    - assert:
+        that:
+          - bulk_copy_tsig is changed
+          - bulk_copy_tsig is not failed
+          - bulk_copy_tsig.object.results | length == 1
 
   always:
-    - name: Delete a record
+    - name: Delete the A record
       ansible.builtin.include_role:
         name: setup_dns_a_record
         tasks_from: cleanup.yml
 
-    - name: Delete the auth zone
+    - name: Delete the Auth NSG
+      ansible.builtin.include_role:
+        name: setup_dns_auth_nsg
+        tasks_from: cleanup.yml
+
+    - name: Delete the Auth zone
       ansible.builtin.include_role:
         name: setup_auth_zone
         tasks_from: cleanup.yml

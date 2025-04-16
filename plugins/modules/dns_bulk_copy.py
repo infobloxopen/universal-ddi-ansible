@@ -64,6 +64,12 @@ options:
                                     - "* I(hmac_sha384),"
                                     - "* I(hmac_sha512)."
                                 type: str
+                                choices:
+                                    - "hmac_sha256"
+                                    - "hmac_sha1"
+                                    - "hmac_sha224"
+                                    - "hmac_sha384"
+                                    - "hmac_sha512"
                             comment:
                                 description:
                                     - "Comment for TSIG key."
@@ -86,6 +92,9 @@ options:
                             - "* I(nsg),"
                             - "* I(primary)."
                         type: str
+                        choices:
+                            - nsg
+                            - primary
             external_secondaries:
                 description:
                     - "DNS secondaries external to BloxOne DDI. Order is not significant."
@@ -126,6 +135,12 @@ options:
                                     - "* I(hmac_sha384),"
                                     - "* I(hmac_sha512)."
                                 type: str
+                                choices:
+                                    - "hmac_sha256"
+                                    - "hmac_sha1"
+                                    - "hmac_sha224"
+                                    - "hmac_sha384"
+                                    - "hmac_sha512"
                             comment:
                                 description:
                                     - "Comment for TSIG key."
@@ -196,6 +211,7 @@ options:
             - "Indicates whether child objects should be copied or not."
             - "Defaults to I(false). Reserved for future use."
         type: bool
+        default: false
     resources:
         description:
             - "The resource identifier."
@@ -245,6 +261,12 @@ options:
                                     - "* I(hmac_sha384),"
                                     - "* I(hmac_sha512)."
                                 type: str
+                                choices:
+                                    - "hmac_sha256"
+                                    - "hmac_sha1"
+                                    - "hmac_sha224"
+                                    - "hmac_sha384"
+                                    - "hmac_sha512"
                             comment:
                                 description:
                                     - "Comment for TSIG key."
@@ -267,6 +289,9 @@ options:
                             - "* I(nsg),"
                             - "* I(primary)."
                         type: str
+                        choices:
+                            - nsg
+                            - primary
             external_secondaries:
                 description:
                     - "DNS secondaries external to BloxOne DDI. Order is not significant."
@@ -307,6 +332,12 @@ options:
                                     - "* I(hmac_sha384),"
                                     - "* I(hmac_sha512)."
                                 type: str
+                                choices:
+                                    - "hmac_sha256"
+                                    - "hmac_sha1"
+                                    - "hmac_sha224"
+                                    - "hmac_sha384"
+                                    - "hmac_sha512"
                             comment:
                                 description:
                                     - "Comment for TSIG key."
@@ -354,11 +385,44 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-- name: Create a DNS Bulk Copy Job (check mode)
+- name: Create a Source View
+  infoblox.universal_ddi.dns_view:
+    name: "{{ dns_view_name }}"
+    state: present
+  register: view_source
+
+- name: Create a dest View
+  infoblox.universal_ddi.dns_view:
+    name: "{{ dns_view_name_dest }}"
+    state: present
+  register: view_dest
+
+- name: Create an Auth Zone in a view
+  infoblox.universal_ddi.dns_auth_zone:
+    fqdn: "{{ _fqdn_auth_zone }}"
+    view:  "{{ _view.id }}"
+    primary_type: cloud
+    state: present
+  register: auth_zone
+
+- name: Create a DNS Bulk Copy Job.
   infoblox.universal_ddi.dns_bulk_copy:
     resources:
-      - "{{ _auth_zone.id }}"
-    target: "{{ _view_dest.id }}"
+      - "{{ auth_zone.id }}"
+    target: "{{ view_dest.id }}"
+
+- name: Create a DNS Bulk Copy Job.
+  infoblox.universal_ddi.dns_bulk_copy:
+    resources:
+      - "{{ auth_zone.id }}"
+    target: "{{ view_dest.id }}"
+    recursive: true
+    skip_on_error: true
+    auth_zone_config:
+      external_primaries:
+        - type: "primary"
+          fqdn: "test"
+          address: "1.1.1.1"
 """
 
 RETURN = r"""
@@ -879,7 +943,10 @@ def main():
                         tsig_key=dict(
                             type="dict",
                             options=dict(
-                                algorithm=dict(type="str"),
+                                algorithm=dict(
+                                    type="str",
+                                    choices=["hmac_sha256", "hmac_sha1", "hmac_sha224", "hmac_sha384", "hmac_sha512"],
+                                ),
                                 comment=dict(type="str"),
                                 key=dict(type="str", no_log=True),
                                 name=dict(type="str"),
@@ -887,7 +954,7 @@ def main():
                             ),
                             no_log=True,
                         ),
-                        type=dict(type="str"),
+                        type=dict(type="str", choices=["nsg", "primary"]),
                     ),
                 ),
                 external_secondaries=dict(
@@ -901,7 +968,10 @@ def main():
                         tsig_key=dict(
                             type="dict",
                             options=dict(
-                                algorithm=dict(type="str"),
+                                algorithm=dict(
+                                    type="str",
+                                    choices=["hmac_sha256", "hmac_sha1", "hmac_sha224", "hmac_sha384", "hmac_sha512"],
+                                ),
                                 comment=dict(type="str"),
                                 key=dict(type="str", no_log=True),
                                 name=dict(type="str"),
@@ -937,7 +1007,7 @@ def main():
                 nsgs=dict(type="list", elements="str"),
             ),
         ),
-        recursive=dict(type="bool"),
+        recursive=dict(type="bool", default=False),
         resources=dict(type="list", elements="str", required=True),
         secondary_zone_config=dict(
             type="dict",
@@ -953,7 +1023,10 @@ def main():
                         tsig_key=dict(
                             type="dict",
                             options=dict(
-                                algorithm=dict(type="str"),
+                                algorithm=dict(
+                                    type="str",
+                                    choices=["hmac_sha256", "hmac_sha1", "hmac_sha224", "hmac_sha384", "hmac_sha512"],
+                                ),
                                 comment=dict(type="str"),
                                 key=dict(type="str", no_log=True),
                                 name=dict(type="str"),
@@ -961,7 +1034,7 @@ def main():
                             ),
                             no_log=True,
                         ),
-                        type=dict(type="str"),
+                        type=dict(type="str", choices=["nsg", "primary"]),
                     ),
                 ),
                 external_secondaries=dict(
@@ -975,7 +1048,10 @@ def main():
                         tsig_key=dict(
                             type="dict",
                             options=dict(
-                                algorithm=dict(type="str"),
+                                algorithm=dict(
+                                    type="str",
+                                    choices=["hmac_sha256", "hmac_sha1", "hmac_sha224", "hmac_sha384", "hmac_sha512"],
+                                ),
                                 comment=dict(type="str"),
                                 key=dict(type="str", no_log=True),
                                 name=dict(type="str"),
@@ -1002,7 +1078,6 @@ def main():
     module = ViewModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[],
     )
 
     module.run_command()
