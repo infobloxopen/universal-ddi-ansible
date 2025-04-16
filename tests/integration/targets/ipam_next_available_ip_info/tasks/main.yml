@@ -94,11 +94,11 @@
         resource_type: "address_block"
         count: 10
         contiguous: true
-      register: multi_tag_address_block_result
+      register: multi_tag_address_block_continous_result
     - assert:
         that:
-          - multi_tag_address_block_result is not failed
-          - multi_tag_address_block_result.objects | length == 10
+          - multi_tag_address_block_continous_result is not failed
+          - multi_tag_address_block_continous_result.objects | length == 10
 
     - name: Get Next Available IP from multiple Address Block with tag filters
       infoblox.universal_ddi.ipam_next_available_ip_info:
@@ -107,11 +107,11 @@
         resource_type: "address_block"
         count: 16
         contiguous: true
-      register: multi_tag_address_block_result
+      register: multi_address_block_tag_result
     - assert:
         that:
-          - multi_tag_address_block_result is not failed
-          - multi_tag_address_block_result.objects | length == 16
+          - multi_address_block_tag_result is not failed
+          - multi_address_block_tag_result.objects | length == 16
 
     - name: Verify no results with non-matching tag combination
       infoblox.universal_ddi.ipam_next_available_ip_info:
