@@ -217,9 +217,11 @@ class NextAvailableIPInfoModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             self.exit_json(**result)
 
+        count = self.params["count"]
+
         # Validate count is within allowed range
-        if not 1 <= self.params["count"] <= 20:
-            self.fail_json(msg="count must be between 1 and 20")
+        if not 1 <= count <= 20:
+            self.fail_json(msg="count must be between 1 and 20.")
 
         if self.params["tag_filters"]:
             if not self.params["resource_type"]:
@@ -232,12 +234,21 @@ class NextAvailableIPInfoModule(UniversalDDIAnsibleModule):
                 self.fail_json(msg=f"No {resource_type}s found with the given tags.")
 
             find_results = []
-            for ab in resources:
-                remaining_count = self.params["count"] - len(find_results)
+            for resource in resources:
 
-                while len(find_results) < self.params["count"]:
+                # Check if the resource has next available ip
+                if count > 1:
+                    check_result = self.find_next_available_ip(
+                        id=resource.id, resource_type=self.params["resource_type"], count=1
+                    )
+                    if not check_result:
+                        continue
+
+                remaining_count = count - len(find_results)
+
+                while len(find_results) < count:
                     find_result = self.find_next_available_ip(
-                        id=ab.id, resource_type=self.params["resource_type"], count=remaining_count
+                        id=resource.id, resource_type=self.params["resource_type"], count=remaining_count
                     )
 
                     if find_result:
@@ -248,7 +259,7 @@ class NextAvailableIPInfoModule(UniversalDDIAnsibleModule):
                         if not remaining_count:
                             break
 
-            if len(find_results) < self.params["count"]:
+            if len(find_results) < count:
                 self.fail_json(msg=f"Not enough available IPs found in {resource_type}s with the given tags.")
         else:
             find_results = self.find()
