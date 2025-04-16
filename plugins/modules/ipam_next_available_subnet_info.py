@@ -200,7 +200,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
 
             find_results = []
             for ab in address_blocks:
-                
+
                 # Check if the address block has next available subnet
                 if count > 1:
                     check_result = self.find_subnet(id=ab.id, count=1)
