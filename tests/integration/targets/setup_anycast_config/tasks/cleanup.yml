@@ -1,0 +1,13 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: "Delete Anycast Configuration"
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ ac_config_name }}"
+        anycast_ip_address: "10.0.0.0"
+        service: "DNS"
+        state: "absent"
+      ignore_errors: true
