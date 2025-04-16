@@ -84,7 +84,7 @@
     - assert:
         that:
           - next_available_address_block_info is failed
-          - "'Count parameter cannot be greater than 20' in next_available_address_block_info.msg"
+          - "'count must be between 1 and 20.' in next_available_address_block_info.msg"
 
     - name: Get Next Available Address Block Information with count greater than 20
       infoblox.universal_ddi.ipam_next_available_address_block_info:
@@ -96,7 +96,7 @@
     - assert:
         that:
           - next_available_address_block_info is failed
-          - "'Count parameter cannot be greater than 20' in next_available_address_block_info.msg"
+          - "'count must be between 1 and 20.' in next_available_address_block_info.msg"
 
     - name: "Create a first Address Block with the same tags but smaller capacity"
       infoblox.universal_ddi.ipam_address_block:

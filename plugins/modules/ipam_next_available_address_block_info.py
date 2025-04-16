@@ -31,6 +31,7 @@ options:
             - Number of objects to generate. Default 1 if not set
         type: int
         required: false
+        default: 1
     tag_filters:
         description:
             - Filter dict to filter objects by tags
@@ -169,13 +170,9 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
 
         count = self.params["count"]
 
-        # Validate that count is not greater than 20
-        if count and count > 20:
-            self.fail_json(msg="Count parameter cannot be greater than 20.")
-
-        # Validate that count is not negative
-        if count and count < 0:
-            self.fail_json(msg="Count parameter cannot be negative.")
+        # Validate count is within allowed range
+        if not 1 <= count <= 20:
+            self.fail_json(msg="count must be between 1 and 20.")
 
         if self.params["tag_filters"]:
             address_blocks = self.find_address_block_by_tags()
@@ -218,7 +215,7 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         cidr=dict(type="int", required=True),
-        count=dict(type="int", required=False),
+        count=dict(type="int", required=False, default=1),
         tag_filters=dict(type="dict", required=False),
     )
 
