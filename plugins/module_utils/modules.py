@@ -127,7 +127,7 @@ def _is_changed(existing, payload):
                         if isinstance(v[i], dict) or isinstance(v[i], list):
                             changed = _is_changed(existing[k][i], v[i])
                         else:
-                            changed = existing[k][i] != v[i] # Direct comparison for primitives
+                            changed = existing[k][i] != v[i]  # Direct comparison for primitives
             elif isinstance(v, dict):
                 changed = _is_changed(existing[k], v)
             elif existing[k] != v:
