@@ -184,6 +184,13 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
 
             find_results = []
             for ab in address_blocks:
+                
+                # Check if the address block have the free addresse block
+                if count > 1:
+                    check_result = self.find_address_block(id=ab.id, count=1)
+                    if not check_result:
+                        continue
+
                 remaining_count = count - len(find_results)
                 while len(find_results) < count:
                     find_result = self.find_address_block(id=ab.id, count=remaining_count)
