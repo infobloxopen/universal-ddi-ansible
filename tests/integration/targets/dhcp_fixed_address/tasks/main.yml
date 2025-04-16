@@ -1,7 +1,6 @@
 ---
 #TODO: add tests
 # The following require additional plugins to be supported.
-# - Fixed Address Dhcp Options
 # - next available address
 
 - module_defaults:
@@ -396,7 +395,7 @@
           - fixed_address_info.objects[0].id == fixed_address.id
           - fixed_address_info.objects[0].address == "10.0.0.1"
           - fixed_address_info.objects[0].tags.location == tag_value
-          -
+
 #     "Requires Python Client to be updated"
 
 #    - name: Create a Next Available Fixed Address
@@ -416,6 +415,37 @@
 #        that:
 #          - fixed_address_info.objects | length == 1
 #          - fixed_address_info.objects[0].id == fixed_address.id
+
+    - name: Create a Fixed Address with DHCP Options
+      infoblox.universal_ddi.dhcp_fixed_address:
+        address: "10.0.0.1"
+        name: "{{ name }}"
+        match_type: "mac"
+        match_value: "00:00:00:00:00:00"
+        ip_space: "{{ _ip_space.id }}"
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ _option_code.id }}"
+            option_value: "false"
+          - type: "group"
+            group: "{{ _option_group.id }}"
+        state: "present"
+      register: fixed_address
+    - name: Get information about the Fixed Address
+      infoblox.universal_ddi.dhcp_fixed_address_info:
+        filters:
+          address: "10.0.0.1"
+          ip_space: "{{ _ip_space.id }}"
+      register: fixed_address_info
+    - assert:
+        that:
+          - fixed_address_info.objects | length == 1
+          - fixed_address_info.objects[0].id == fixed_address.id
+          - fixed_address_info.objects[0].address == "10.0.0.1"
+          - fixed_address_info.objects[0].dhcp_options[0].option_code == _option_code.id
+          - fixed_address_info.objects[0].dhcp_options[0].option_value == "false"
+          - fixed_address_info.objects[0].dhcp_options[1].group == _option_group.id
+          - fixed_address_info.objects[0].dhcp_options[1].type == "group"
 
   always:
     - name: Delete IP Space
