@@ -72,7 +72,7 @@ EXAMPLES = r"""
         space: "{{ ip_space.id }}"
         tags:
           environment: "production"
-          location: "data-center-1"
+          location: "site-1"
         state: "present"
 
     - name: "Get next available subnet by a single tag filter"
@@ -86,7 +86,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_next_available_subnet_info:
         tag_filters:
           environment: "production"
-          location: "data-center-1"
+          location: "site-1"
         cidr: 28
         count: 5
 """
@@ -183,6 +183,16 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             self.exit_json(**result)
 
+        count = self.params["count"]
+
+        # Validate that count is not greater than 20
+        if count and count > 20:
+            self.fail_json(msg="Count parameter cannot be greater than 20.")
+
+        # Validate that count is not negative
+        if count and count < 0:
+            self.fail_json(msg="Count parameter cannot be negative.")
+
         if self.params["tag_filters"]:
             address_blocks = self.find_address_blocks_by_tags()
             if not address_blocks:
@@ -190,8 +200,15 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
 
             find_results = []
             for ab in address_blocks:
-                remaining_count = self.params["count"] - len(find_results)
-                while len(find_results) < self.params["count"]:
+                
+                # Check if the address block has next available subnet
+                if count > 1:
+                    check_result = self.find_subnet(id=ab.id, count=1)
+                    if not check_result:
+                        continue
+
+                remaining_count = count - len(find_results)
+                while len(find_results) < count:
                     find_result = self.find_subnet(id=ab.id, count=remaining_count)
                     if find_result:
                         find_results.extend(find_result)
@@ -201,16 +218,12 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
                         if not remaining_count:
                             break
 
-            if len(find_results) < self.params["count"]:
+            if len(find_results) < count:
                 self.fail_json(msg="Not enough subnets found with the given tags.")
         else:
             find_results = self.find()
 
-        all_results = []
-        for r in find_results:
-            all_results.append(r.address)
-
-        result["objects"] = all_results
+        result["objects"] = [r.address for r in find_results]
         self.exit_json(**result)
 
 
