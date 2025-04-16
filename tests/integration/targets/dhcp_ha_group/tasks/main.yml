@@ -294,7 +294,7 @@
           - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
           - dhcp_ha_group_info.objects[0].tags.location ==  tag_value
 
-    - name: create a DHCP HA Group host with mode anycast
+    - name: Create a DHCP HA Group host with mode anycast
       infoblox.universal_ddi.dhcp_ha_group:
         name: "{{ ha_group_name }}"
         mode: "anycast"

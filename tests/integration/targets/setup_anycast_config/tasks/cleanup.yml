@@ -7,7 +7,7 @@
 
     - name: "Delete an Anycast Configuration"
       infoblox.universal_ddi.anycast_config:
-        name: "{{ _anycast_config_name }}"
+        name: "{{ anycast_config_name }}"
         anycast_ip_address: "10.1.0.0"
         service: "DHCP"
         state: absent

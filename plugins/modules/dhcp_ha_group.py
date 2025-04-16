@@ -125,6 +125,14 @@ EXAMPLES = r"""
           name: "Host2"
       register: host_2
       
+    - name: Create Anycast Configuration (required as parent)
+      infoblox.universal_ddi.anycast_config:
+        name: "{{ _anycast_config_name }}"
+        anycast_ip_address: "10.1.0.0"
+        service: "DHCP"
+        state: "present"
+      register: ac_config
+      
     - name: Create DHCP HA Group
       infoblox.universal_ddi.dhcp_ha_group:
         name: "example_ha_group"
