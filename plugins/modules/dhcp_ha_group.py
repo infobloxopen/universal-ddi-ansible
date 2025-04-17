@@ -127,7 +127,7 @@ EXAMPLES = r"""
       
     - name: Create Anycast Configuration (required as parent)
       infoblox.universal_ddi.anycast_config:
-        name: "{{ _anycast_config_name }}"
+        name: "{{ anycast_config }}"
         anycast_ip_address: "10.1.0.0"
         service: "DHCP"
         state: "present"
@@ -369,26 +369,20 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-            # Add prefix if needed for anycast_config_id
-        if self.payload.anycast_config_id is not None:
-            ac_id = self.payload.anycast_config_id
-            if not ac_id.startswith("accm/ac_configs/"):
-                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+        # Normalize anycast_config_id
+        updated_payload = self.__init_anycast_config_id()
 
-        resp = HaGroupApi(self.client).create(body=self.payload)
+        resp = HaGroupApi(self.client).create(body=updated_payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
 
-        # Add prefix if needed for anycast_config_id
-        if self.payload.anycast_config_id is not None:
-            ac_id = self.payload.anycast_config_id
-            if not ac_id.startswith("accm/ac_configs/"):
-                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+        # Normalize anycast_config_id
+        updated_payload = self.__init_anycast_config_id()
 
-        resp = HaGroupApi(self.client).update(id=self.existing.id, body=self.payload)
+        resp = HaGroupApi(self.client).update(id=self.existing.id, body=updated_payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
@@ -435,6 +429,16 @@ class HaGroupModule(UniversalDDIAnsibleModule):
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
         self.exit_json(**result)
+
+    def __init_anycast_config_id(self):
+        """
+        Add prefix to anycast_config_id if needed.
+        """
+        if self.payload.anycast_config_id is not None:
+            ac_id = self.payload.anycast_config_id
+            if not ac_id.startswith("accm/ac_configs/"):
+                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+        return self.payload
 
 
 def main():
