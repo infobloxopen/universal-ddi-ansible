@@ -387,20 +387,20 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 - name: Create a Source View
   infoblox.universal_ddi.dns_view:
-    name: "{{ dns_view_name }}"
+    name: "example_source_view"
     state: present
   register: view_source
 
 - name: Create a dest View
   infoblox.universal_ddi.dns_view:
-    name: "{{ dns_view_name_dest }}"
+    name: "example_dest_view"
     state: present
   register: view_dest
 
 - name: Create an Auth Zone in a view
   infoblox.universal_ddi.dns_auth_zone:
-    fqdn: "{{ _fqdn_auth_zone }}"
-    view:  "{{ _view.id }}"
+    fqdn: "example.com"
+    view:  "{{ view_source.id }}"
     primary_type: cloud
     state: present
   register: auth_zone
@@ -411,7 +411,7 @@ EXAMPLES = r"""
       - "{{ auth_zone.id }}"
     target: "{{ view_dest.id }}"
 
-- name: Create a DNS Bulk Copy Job.
+- name: Create a DNS Bulk Copy Job  with additional fields.
   infoblox.universal_ddi.dns_bulk_copy:
     resources:
       - "{{ auth_zone.id }}"

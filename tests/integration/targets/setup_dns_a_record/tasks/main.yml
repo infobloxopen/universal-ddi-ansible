@@ -12,5 +12,4 @@
           address: "192.168.10.10"
         type: "A"
         state: present
-      ignore_errors: true
       register: _a_record

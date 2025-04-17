@@ -144,6 +144,33 @@
           - bulk_copy_tsig.object.results | length == 1
 
   always:
+    - name: Get Information about the Auth Zone
+      infoblox.universal_ddi.dns_auth_zone_info:
+        filters:
+          fqdn: "{{ _auth_zone.object.fqdn }}"
+          view: "{{ _view_dest.id }}"
+      register: dest_zone_info
+
+    - name: Delete an A Record from a destination zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ dest_zone_info.objects[0].id }}"
+        rdata:
+          address: "192.168.10.10"
+        type: "A"
+        state: absent
+      ignore_errors: true
+      register: _a_record
+    
+    - name: Delete destination zones
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ item.fqdn }}"
+        primary_type: "{{ item.primary_type }}"
+        view: "{{ item.view }}"
+        state: absent
+      loop: "{{ dest_zone_info.objects }}"
+      when: dest_zone_info.objects is defined and dest_zone_info.objects | length > 0
+      ignore_errors: true
+
     - name: Delete the A record
       ansible.builtin.include_role:
         name: setup_dns_a_record
