@@ -1,0 +1,15 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  
+  block:
+    - ansible.builtin.set_fact:
+        auth_nsg_name: "test-auth-nsg-{{ 999999 | random | string }}"
+
+    - name: Create an Auth NSG
+      infoblox.universal_ddi.dns_auth_nsg:
+        name: "{{ auth_nsg_name }}"
+        state: present
+      register: _auth_nsg
