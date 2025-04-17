@@ -825,11 +825,24 @@ EXAMPLES = r"""
       tags:
         location: "site-1"
 
+  - name: Create a DHCP Option Code ( required as parent for DHCP Options)
+    infoblox.universal_ddi.dhcp_option_code:
+      code: 234
+      name: "option_code_name"
+      option_space: "{{ option_space.id }}"
+      type: "boolean"
+      state: present
+    register: option_code
+
   - name: "Create an IP space with Additional Fields"
     infoblox.universal_ddi.ipam_ip_space:
         name: "my-ip-space"
         dhcp_config:
             abandoned_reclaim_time: 3600
+        dhcp_options:
+          - type: "option"
+            option_code: "{{ option_code.id }}"
+            option_value: "false"
         inheritance_sources:
             dhcp_config:
                 lease_time:
