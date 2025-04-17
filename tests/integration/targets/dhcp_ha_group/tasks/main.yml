@@ -294,6 +294,37 @@
           - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
           - dhcp_ha_group_info.objects[0].tags.location ==  tag_value
 
+    - name: Create a DHCP HA Group host with mode anycast
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "anycast"
+        anycast_config_id: "{{ _ac_config.id }}"
+        comment: "test comment"
+        tags:
+          location: "{{ tag_value }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_3.objects[0].id }}"
+            role: "passive"
+      register: dhcp_ha_group
+    - name: Get DHCP HA Group Information
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group_info is not failed
+          - dhcp_ha_group_info.objects[0].hosts | length == 2
+          - dhcp_ha_group_info.objects[0].mode == "anycast"
+          - dhcp_ha_group_info.objects[0].hosts[0].host == host_info_1.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[1].host == host_info_3.objects[0].id
+          - dhcp_ha_group_info.objects[0].hosts[0].role == "active"
+          - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
+          - dhcp_ha_group_info.objects[0].tags.location ==  tag_value
+
   always:
     # Cleanup if the test fails
       - name: "Delete DHCP HA Group"
@@ -306,3 +337,8 @@
               role: "active"
           state: absent
         ignore_errors: true
+
+      - name: "Delete DHCP anycast config"
+        ansible.builtin.include_role:
+          name: setup_anycast_config
+          tasks_from: cleanup.yml
