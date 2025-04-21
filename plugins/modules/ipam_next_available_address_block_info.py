@@ -113,6 +113,10 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
         self._existing = None
         self._limit = 1000
 
+        # Validate count parameter if provided
+        if (self.params["count"] is not None) and (self.params["count"] <= 0 or self.params["count"] > 20):
+            self.fail_json(msg="Parameter 'count' must be between 1 and 20")
+
     def find(self):
         all_results = []
         offset = 0
@@ -140,28 +144,6 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
         except ApiException:
             return None
 
-    def find_address_block_by_tags(self):
-        tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
-
-        offset = 0
-        all_results = []  # Initialize a list to accumulate results from all pages
-
-        while True:
-            try:
-                resp = AddressBlockApi(self.client).list(
-                    offset=offset, limit=self._limit, tfilter=tag_filter_str, inherit="full"
-                )
-                all_results.extend(resp.results)  # Accumulate results from each page
-
-                if len(resp.results) < self._limit:
-                    break
-                offset += self._limit
-
-            except ApiException as e:
-                self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
-
-        return all_results
-
     def run_command(self):
         result = dict(objects=[])
 
@@ -170,12 +152,8 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
 
         count = self.params["count"]
 
-        # Validate count is within allowed range
-        if not 1 <= count <= 20:
-            self.fail_json(msg="count must be between 1 and 20.")
-
         if self.params["tag_filters"]:
-            address_blocks = self.find_address_block_by_tags()
+            address_blocks = self.find_address_blocks_by_tags(self.params["tag_filters"])
             if not address_blocks:
                 self.fail_json(msg="No address block found with the given tags.")
 
