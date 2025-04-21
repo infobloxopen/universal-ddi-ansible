@@ -32,4 +32,4 @@
           environment: "test"
           location: "site-2"
         state: "present"
-      register: small_tagged_address_block
+      register: small_tagged_address_block_2
