@@ -13,4 +13,3 @@
         type: "A"
         state: absent
       ignore_errors: true
-      register: _a_record
