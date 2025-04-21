@@ -36,7 +36,7 @@ options:
 EXAMPLES = """
 - name: fetch all IP Space objects
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ipspace', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://stage.csp.infoblox.com', 'portal_key': 'c96c7ad83735f70c0ad95e1a68684cc07b5566b06e6227f481267dc1593f4d48'}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ipspace', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': ''}) }}"
 
 """  # noqa: E501
 
