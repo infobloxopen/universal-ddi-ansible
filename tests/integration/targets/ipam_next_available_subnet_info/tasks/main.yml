@@ -5,26 +5,6 @@
       portal_key: "{{ portal_key }}"
   block:
 
-    - name: "Create an Address Block with tags"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "192.168.0.0/27"
-        space: "{{ _ip_space.id }}"
-        tags:
-          environment: "test"
-          location: "site-1"
-        state: "present"
-      register: tagged_address_block
-
-    - name: "Create a second Address Block with the same tags but smaller capacity"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "172.16.0.0/27"
-        space: "{{ _ip_space.id }}"
-        tags:
-          environment: "test"
-          location: "site-1"
-        state: "present"
-      register: small_tagged_address_block
-
     - name: "Get information about the next available Subnet"
       infoblox.universal_ddi.ipam_next_available_subnet_info:
         id: "{{ _address_block.id }}"
@@ -102,13 +82,26 @@
         tag_filters:
           environment: "test"
         cidr: 24
-        count: 25  # Greater than maximum allowed count of 20
+        count: 25  # Count is greater than the maximum allowed count of 20
       register: subnet_info
       ignore_errors: true
     - assert:
         that:
           - subnet_info is failed
-          - "'Parameter \\'count\\' cannot exceed 20' in subnet_info.msg"
+          - "'Parameter \\'count\\' must be between 1 and 20' in subnet_info.msg"
+
+    - name: "Get next available subnet with count of zero"
+      infoblox.universal_ddi.ipam_next_available_subnet_info:
+        tag_filters:
+          environment: "test"
+        cidr: 24
+        count: 0  # Count is less than the minimum allowed count of 1
+      register: subnet_info
+      ignore_errors: true
+    - assert:
+        that:
+          - subnet_info is failed
+          - "'Parameter \\'count\\' must be between 1 and 20' in subnet_info.msg"
 
     - name: "Get next available subnet with valid tags but insufficient available subnets"
       infoblox.universal_ddi.ipam_next_available_subnet_info:

@@ -28,7 +28,7 @@ options:
         required: true
     count:
         description:
-            - Number of address blocks to generate. Default 1 if not set.
+            - Number of address blocks to generate. Default 1 if not set. Maximum 20.
         type: int
         required: false
         default: 1
@@ -56,6 +56,15 @@ EXAMPLES = r"""
         state: "present"
       register: address_block
 
+    - name: "Create an Address Block with tags"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "192.168.0.0/16"
+        space: "{{ ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "site-1"
+        state: "present"
+
     - name: "Get information about the Subnet"
       infoblox.universal_ddi.ipam_next_available_subnet_info:
         id: "{{ address_block.id }}"
@@ -66,15 +75,6 @@ EXAMPLES = r"""
         id: "{{ address_block.id }}"
         cidr: 24
         count: 5
-
-    - name: "Create an Address Block with tags"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "192.168.0.0/16"
-        space: "{{ ip_space.id }}"
-        tags:
-          environment: "production"
-          location: "site-1"
-        state: "present"
 
     - name: "Get next available subnet by a single tag filter"
       infoblox.universal_ddi.ipam_next_available_subnet_info:
@@ -122,8 +122,8 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         self._limit = 1000
 
         # Validate count parameter if provided
-        if self.params["count"] is not None and self.params["count"] > 20:
-            self.fail_json(msg="Parameter 'count' cannot exceed 20")
+        if (self.params["count"] is not None) and (self.params["count"] <= 0 or self.params["count"] > 20):
+            self.fail_json(msg="Parameter 'count' must be between 1 and 20")
 
     def find_subnet(self, id=None, count=None):
         try:
@@ -186,10 +186,6 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
 
         count = self.params["count"]
 
-        # Validate count is within allowed range
-        if not 1 <= count <= 20:
-            self.fail_json(msg="count must be between 1 and 20.")
-
         if self.params["tag_filters"]:
             address_blocks = self.find_address_blocks_by_tags()
             if not address_blocks:
@@ -198,7 +194,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
             find_results = []
             for ab in address_blocks:
 
-                # Check if the address block has next available subnet
+                # Check if the address block has free subnet available
                 if count > 1:
                     check_result = self.find_subnet(id=ab.id, count=1)
                     if not check_result:
