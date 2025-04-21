@@ -132,32 +132,6 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         except ApiException:
             return None
 
-    def find_address_blocks_by_tags(self):
-        tag_filter_str = None
-        if self.params["tag_filters"]:
-            tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
-
-        offset = 0
-        all_results = []  # Initialize a list to accumulate all results
-
-        while True:
-            try:
-                resp = AddressBlockApi(self.client).list(
-                    offset=offset, limit=self._limit, tfilter=tag_filter_str, inherit="full"
-                )
-
-                # Accumulate results from this page
-                all_results.extend(resp.results)
-
-                if len(resp.results) < self._limit:
-                    break
-                offset += self._limit
-
-            except ApiException as e:
-                self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
-
-        return all_results
-
     def find(self):
         all_results = []
         offset = 0
@@ -187,7 +161,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         count = self.params["count"]
 
         if self.params["tag_filters"]:
-            address_blocks = self.find_address_blocks_by_tags()
+            address_blocks = self.find_address_blocks_by_tags(self.params["tag_filters"])
             if not address_blocks:
                 self.fail_json(msg="No address block found with the given tags.")
 
