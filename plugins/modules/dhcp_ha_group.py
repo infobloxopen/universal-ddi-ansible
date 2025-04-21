@@ -127,7 +127,7 @@ EXAMPLES = r"""
       
     - name: Create Anycast Configuration (required as parent)
       infoblox.universal_ddi.anycast_config:
-        name: "{{ anycast_config }}"
+        name: "anycast_config"
         anycast_ip_address: "10.1.0.0"
         service: "DHCP"
         state: "present"
