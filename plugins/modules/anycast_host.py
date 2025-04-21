@@ -290,6 +290,13 @@ EXAMPLES = r"""
         pool_id: "{{ _infra_host_info.objects[0].pool_id }}"
         service_type: "anycast"
         state: "present"
+    
+    - name: Create an Anycast Configuration (required as parent)
+      infoblox.universal_ddi.anycast_config:
+        name: "example_anycast_config"
+        anycast_ip_address: "10.0.0.0"
+        service: "DNS"
+        state: "present"
 
     - name: Update Anycast Host with Anycast Configuration References
       infoblox.universal_ddi.anycast_host:
