@@ -391,7 +391,7 @@ EXAMPLES = r"""
     state: present
   register: view_source
 
-- name: Create a dest View
+- name: Create a destination View
   infoblox.universal_ddi.dns_view:
     name: "example_dest_view"
     state: present

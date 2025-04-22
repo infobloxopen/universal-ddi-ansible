@@ -159,7 +159,6 @@
         type: "A"
         state: absent
       ignore_errors: true
-      register: _a_record
     
     - name: Delete destination zones
       infoblox.universal_ddi.dns_auth_zone:

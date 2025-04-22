@@ -15,7 +15,7 @@
         state: present
       register: _view
 
-    - name: Create a dest View
+    - name: Create a destination View
       infoblox.universal_ddi.dns_view:
         name: "{{ dns_view_name_dest }}"
         state: present

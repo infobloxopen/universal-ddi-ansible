@@ -10,7 +10,7 @@
         state: absent
       ignore_errors: true
 
-    - name: "Delete DNS Dest View"
+    - name: "Delete DNS destination View"
       infoblox.universal_ddi.dns_view:
         name: "{{ dns_view_name_dest }}"
         state: absent
