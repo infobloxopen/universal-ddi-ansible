@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_next_available_address_block_info
-short_description: Manage NextAvailableAddressBlock
+short_description: Retrieves the next available address blocks in the specified address block.
 description:
-    - Manage NextAvailableAddressBlock
-version_added: 2.0.0
+    - Retrieves the next available address blocks in the specified address block.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

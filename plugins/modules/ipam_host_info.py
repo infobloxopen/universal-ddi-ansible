@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_host_info
-short_description: Manage IpamHost
+short_description: Retrieves IPAM Hosts.
 description:
-    - Manage IpamHost
-version_added: 2.0.0
+    - Retrieves information about existing IPAM Hosts.
+    - The IPAM host object represents any network connected equipment that is assigned one or more IP Addresses.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -69,12 +70,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the IpamHost object
+        - ID of the IPAM host object
     type: str
     returned: Always
 objects:
     description:
-        - IpamHost object
+        - IPAM host object
     type: list
     elements: dict
     returned: Always

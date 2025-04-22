@@ -10,11 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: anycast_config_info
-short_description: Retrieves Anycast Configurations
+short_description: Retrieves Anycast Configurations.
 description:
     - Retrieve all named Anycast configurations for the account.
     - Supports filtering based on account, service, and other query parameters.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

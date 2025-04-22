@@ -14,7 +14,7 @@ short_description: Manages a Federated Block
 description:
     - Manages a Federated Block.
     - The Federated Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

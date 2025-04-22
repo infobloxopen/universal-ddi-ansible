@@ -11,10 +11,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: infra_join_token
-short_description: Manage JoinToken
+short_description: Manages a Host Activation Join Token.
 description:
-    - Manage JoinToken
-version_added: 2.0.0
+    - Manages a Host Activation Join Token.
+    - A join token is random character string which is used for instant validation of new hosts.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

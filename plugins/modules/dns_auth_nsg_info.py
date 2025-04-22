@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_auth_nsg_info
-short_description: Manage AuthNsg
+short_description: Retrieves Authoritative DNS Server Groups.
 description:
-    - Manage AuthNsg
-version_added: 2.0.0
+    - Retrieves information about existing Authoritative DNS Server Groups.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

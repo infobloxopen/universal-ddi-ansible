@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: tsig_key_info
-short_description: Retrieves TSIG Keys
+short_description: Retrieves TSIG Keys.
 description:
     - Retrieves information about existing TSIG Keys.
-version_added: 2.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

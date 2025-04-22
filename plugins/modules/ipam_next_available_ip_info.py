@@ -10,11 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_next_available_ip_info
-short_description: Retrieves the Next available IP addresses
+short_description: Retrieves the next available IP addresses.
 description:
-    - Retrieves the next available IP addresses in the specified resource
+    - Retrieves the next available IP addresses in the specified resource.
     - The resource can be an address block, subnet or range.
-version_added: 2.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

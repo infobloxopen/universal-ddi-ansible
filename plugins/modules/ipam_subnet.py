@@ -10,11 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_subnet
-short_description: Manage Subnet
+short_description: Manages a Subnet.
 description:
-    - Manage Subnet
+    - Manages a Subnet.
     - The Subnet object represents a set of addresses from which addresses are assigned to network equipment interfaces.
-version_added: 2.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

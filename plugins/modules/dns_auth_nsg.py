@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_auth_nsg
-short_description: Manage AuthNsg
+short_description: Manages an Authoritative DNS Server Group for authoritative zones.
 description:
-    - Manage AuthNSG
-version_added: 2.0.0
+    - Manages an Authoritative DNS Server Group for authoritative zones.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

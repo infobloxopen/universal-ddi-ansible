@@ -14,7 +14,7 @@ short_description: Manage an Address
 description:
     - Manage an Address
     - The Address object represents any single IP address within a given IP space.
-version_added: 2.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -113,7 +113,7 @@ EXAMPLES = r"""
     - name: Create an Address with Additional Fields
       infoblox.universal_ddi.ipam_address:
         address: "10.0.0.3"
-        comment: "test comment"
+        comment: "example comment"
         space: "{{ _ip_space.id }}"
         tags:
             "location": "site 1"

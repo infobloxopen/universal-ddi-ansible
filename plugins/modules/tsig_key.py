@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: tsig_key
-short_description: Manage TSIG Key
+short_description: Manages a TSIG Key.
 description:
-    - Manage TSIG Key
-version_added: 2.0.0
+    - Manages a TSIG Key.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -66,14 +66,14 @@ extends_documentation_fragment:
 EXAMPLES = r"""
 - name: Create TSIG Key
   infoblox.universal_ddi.tsig_key:
-    name: "test-tsig-key"
+    name: "example-tsig-key"
     secret: "rA+n89+aOCjFVNzBPbYkl+j3oQcl4U19JAkCIK9Ad8k="
     algorithm: "hmac_sha512"
     state: present
 
 - name: Create TSIG Key with additional Fields
   infoblox.universal_ddi.tsig_key:
-    name: "test-tsig-key"
+    name: "example-tsig-key"
     secret: "fA+n89+aOCjFVNzBPbYkl+j3oQcl4U19JAkCIK9Ad8k="
     algorithm: "hmac_sha512"
     state: present
@@ -82,7 +82,7 @@ EXAMPLES = r"""
       
 - name: Create TSIG Key with secret dynamically generated
   infoblox.universal_ddi.tsig_key:
-    name: "test-tsig-key2"
+    name: "example-tsig-key2"
     algorithm: "hmac_sha512"
     state: present
     tags:
@@ -90,7 +90,7 @@ EXAMPLES = r"""
 
 - name: Delete TSIG Key
   infoblox.universal_ddi.tsig_key:
-    name: "test-tsig-key"
+    name: "example-tsig-key"
     state: absent
 """  # noqa: E501
 

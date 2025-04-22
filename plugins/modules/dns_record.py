@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_record
-short_description: Manage DNS Resource Record
+short_description: Manages a DNS resource record in an authoritative zone.
 description:
-    - Manage DNS Resource Record
-version_added: 2.0.0
+    - Manages a DNS resource record in an authoritative zone.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

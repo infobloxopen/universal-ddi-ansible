@@ -14,7 +14,7 @@ short_description: Manages Anycast Configuration.
 description:
     - Manages Anycast Configuration.
     - Anycast configuration comprises common anycast configuration data that is defined in support of one service on a set of on-prem hosts.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

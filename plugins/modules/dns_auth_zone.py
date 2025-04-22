@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_auth_zone
-short_description: Manage AuthZone
+short_description: Manages an authoritative zone.
 description:
-    - Manage AuthZone
-version_added: 2.0.0
+    - Manages an authoritative zone.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

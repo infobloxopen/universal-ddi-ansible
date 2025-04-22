@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_view
-short_description: Manage View
+short_description: Manages a DNS View.
 description:
-    - Manage View
-version_added: 2.0.0
+    - Manages a DNS View.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
