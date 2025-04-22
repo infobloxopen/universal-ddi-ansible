@@ -137,7 +137,7 @@ releases:
       name: tsig_key_info
       namespace: ''
     release_date: '2025-02-06'
-  1.1.0:
+  1.1.0: #TBD
     changes:
       release_summary: Extended Support for Universal DDI Ansible Collection.
     modules:
@@ -195,7 +195,13 @@ releases:
     - description: Get IPAM Federation Federated Block information.
       name: ipam_federation_federated_block_info
       namespace: ''
-    - description: Get IPAM Federation Federated Block information.
-      name: ipam_federation_federated_block_info
+    - description: Manage DNS Bulk Copy.
+      name: dns_bulk_copy
+      namespace: ''
+    - description: Manage Cloud Discovery Providers.
+      name: cloud_discovery_providers
+      namespace: ''
+    - description: Get Cloud Discovery Providers information.
+      name: cloud_discovery_providers_info
       namespace: ''
     release_date: '2025-04-30'
