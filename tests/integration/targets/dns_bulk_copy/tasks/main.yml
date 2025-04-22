@@ -143,8 +143,23 @@
           - bulk_copy_tsig is not failed
           - bulk_copy_tsig.object.results | length == 1
 
+    - name: Create a DNS Bulk Copy Job for secondary zone
+      infoblox.universal_ddi.dns_bulk_copy:
+        resources:
+          - "{{ _auth_zone_secondary.id }}"
+        target: "{{ _view_dest.id }}"
+        secondary_zone_config:
+          internal_secondaries:
+            - host: "{{ _infra_host_info_1.objects[0].id }}"
+      register: bulk_copy_secondary
+    - assert:
+        that:
+          - bulk_copy_secondary is changed
+          - bulk_copy_secondary is not failed
+          - bulk_copy_secondary.object.results | length == 1
+
   always:
-    - name: Get Information about the Auth Zone
+    - name: Get Information about the destination Auth Zone
       infoblox.universal_ddi.dns_auth_zone_info:
         filters:
           fqdn: "{{ _auth_zone.object.fqdn }}"
@@ -188,4 +203,9 @@
     - name: Delete the View
       ansible.builtin.include_role:
         name: setup_view
+        tasks_from: cleanup.yml
+    
+    - name: Delete destination the View
+      ansible.builtin.include_role:
+        name: setup_dns_bulk_copy
         tasks_from: cleanup.yml

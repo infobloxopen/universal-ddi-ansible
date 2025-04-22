@@ -57,12 +57,6 @@ options:
                             algorithm:
                                 description:
                                     - "TSIG key algorithm."
-                                    - "Possible values:"
-                                    - "* I(hmac_sha256),"
-                                    - "* I(hmac_sha1),"
-                                    - "* I(hmac_sha224),"
-                                    - "* I(hmac_sha384),"
-                                    - "* I(hmac_sha512)."
                                 type: str
                                 choices:
                                     - "hmac_sha256"
@@ -128,12 +122,6 @@ options:
                             algorithm:
                                 description:
                                     - "TSIG key algorithm."
-                                    - "Possible values:"
-                                    - "* I(hmac_sha256),"
-                                    - "* I(hmac_sha1),"
-                                    - "* I(hmac_sha224),"
-                                    - "* I(hmac_sha384),"
-                                    - "* I(hmac_sha512)."
                                 type: str
                                 choices:
                                     - "hmac_sha256"
@@ -254,12 +242,6 @@ options:
                             algorithm:
                                 description:
                                     - "TSIG key algorithm."
-                                    - "Possible values:"
-                                    - "* I(hmac_sha256),"
-                                    - "* I(hmac_sha1),"
-                                    - "* I(hmac_sha224),"
-                                    - "* I(hmac_sha384),"
-                                    - "* I(hmac_sha512)."
                                 type: str
                                 choices:
                                     - "hmac_sha256"
@@ -325,12 +307,6 @@ options:
                             algorithm:
                                 description:
                                     - "TSIG key algorithm."
-                                    - "Possible values:"
-                                    - "* I(hmac_sha256),"
-                                    - "* I(hmac_sha1),"
-                                    - "* I(hmac_sha224),"
-                                    - "* I(hmac_sha384),"
-                                    - "* I(hmac_sha512)."
                                 type: str
                                 choices:
                                     - "hmac_sha256"

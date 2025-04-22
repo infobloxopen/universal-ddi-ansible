@@ -1,0 +1,32 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random View name to avoid conflicts
+    - ansible.builtin.set_fact:
+        dns_view_name: "my-test-view-{{ 999999 | random | string }}"
+        dns_view_name_dest: "my-test-view-{{ 999999 | random | string }}"
+        host_name: "TF_TEST_HOST_01"
+        fqdn_auth_secondary_zone: "test-auth-zone-secondary-{{ 999999 | random | string }}.com."
+
+    - name: Create a destination View
+      infoblox.universal_ddi.dns_view:
+        name: "{{ dns_view_name_dest }}"
+        state: present
+      register: _view_dest
+    
+    - name: Create a Secondary Auth Zone in a view
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ fqdn_auth_secondary_zone }}"
+        view:  "{{ _view.id }}"
+        primary_type: external
+        state: present
+      register: _auth_zone_secondary
+    
+    - name: Get Host Information
+      infoblox.universal_ddi.dns_host_info:
+        filters:
+          name: "{{ host_name }}"
+      register: _infra_host_info_1
