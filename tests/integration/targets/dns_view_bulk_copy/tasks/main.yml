@@ -1,0 +1,211 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - name: Create a DNS Bulk Copy Job (check mode)
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+      check_mode: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is not changed
+          - bulk_copy is not failed
+
+    - name: Create a DNS Bulk Copy Job
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    # Recursive flag is not supported it is reserved for future use
+    - name: Create a DNS Bulk Copy Job with recursive flag
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        recursive: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with skip on error
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        skip_on_error: true
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with auth zone config
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          external_primaries:
+            - type: "primary"
+              fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with forward zone config
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        forward_zone_config:
+          external_forwarders:
+            - fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with secondary zone config
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        secondary_zone_config:
+          external_secondaries:
+            - fqdn: "test"
+              address: "1.1.1.1"
+      register: bulk_copy
+    - assert:
+        that:
+          - bulk_copy is changed
+          - bulk_copy is not failed
+          - bulk_copy.object.results | length == 1
+    
+    - name: Create a DNS Bulk Copy Job with NSGs configuration
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          nsgs:
+            - "{{ _auth_nsg.id }}"
+      register: bulk_copy_nsgs
+    - assert:
+        that:
+          - bulk_copy_nsgs is changed
+          - bulk_copy_nsgs is not failed
+          - bulk_copy_nsgs.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job with TSIG Key configuration
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone.id }}"
+        target: "{{ _view_dest.id }}"
+        auth_zone_config:
+          external_primaries:
+            - type: "primary"
+              fqdn: "tsig.example.com"
+              address: "192.168.1.10"
+              tsig_enabled: true
+              tsig_key:
+                algorithm: "hmac_sha256"
+                name: "tsig-key.example.com"
+                secret: "SGVsbG8gV29ybGQh"
+                comment: "TSIG key for zone transfer"
+      register: bulk_copy_tsig
+    - assert:
+        that:
+          - bulk_copy_tsig is changed
+          - bulk_copy_tsig is not failed
+          - bulk_copy_tsig.object.results | length == 1
+
+    - name: Create a DNS Bulk Copy Job for secondary zone
+      infoblox.universal_ddi.dns_view_bulk_copy:
+        resources:
+          - "{{ _auth_zone_secondary.id }}"
+        target: "{{ _view_dest.id }}"
+        secondary_zone_config:
+          internal_secondaries:
+            - host: "{{ _infra_host_info_1.objects[0].id }}"
+      register: bulk_copy_secondary
+    - assert:
+        that:
+          - bulk_copy_secondary is changed
+          - bulk_copy_secondary is not failed
+          - bulk_copy_secondary.object.results | length == 1
+
+  always:
+    - name: Get Information about the destination Auth Zone
+      infoblox.universal_ddi.dns_auth_zone_info:
+        filters:
+          fqdn: "{{ _auth_zone.object.fqdn }}"
+          view: "{{ _view_dest.id }}"
+      register: dest_zone_info
+
+    - name: Delete an A Record from a destination zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ dest_zone_info.objects[0].id }}"
+        rdata:
+          address: "192.168.10.10"
+        type: "A"
+        state: absent
+      ignore_errors: true
+    
+    - name: Delete destination zones
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ item.fqdn }}"
+        primary_type: "{{ item.primary_type }}"
+        view: "{{ item.view }}"
+        state: absent
+      loop: "{{ dest_zone_info.objects }}"
+      when: dest_zone_info.objects is defined and dest_zone_info.objects | length > 0
+      ignore_errors: true
+
+    - name: Delete the A record
+      ansible.builtin.include_role:
+        name: setup_dns_a_record
+        tasks_from: cleanup.yml
+
+    - name: Delete the Auth NSG
+      ansible.builtin.include_role:
+        name: setup_dns_auth_nsg
+        tasks_from: cleanup.yml
+
+    - name: Delete the Auth zone
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml
+    
+    - name: Delete destination the View
+      ansible.builtin.include_role:
+        name: setup_dns_view_bulk_copy
+        tasks_from: cleanup.yml

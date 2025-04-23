@@ -1,0 +1,27 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: Delete a Secondary Auth Zone in a source view
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ fqdn_auth_secondary_zone }}"
+        view:  "{{ _view.id }}"
+        primary_type: external
+        state: absent
+      ignore_errors: true
+
+    - name: Delete a Secondary Auth Zone in a destination view
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ fqdn_auth_secondary_zone }}"
+        view:  "{{ _view_dest.id }}"
+        primary_type: external
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete DNS destination view"
+      infoblox.universal_ddi.dns_view:
+        name: "{{ dns_view_name_dest }}"
+        state: absent
+      ignore_errors: true
