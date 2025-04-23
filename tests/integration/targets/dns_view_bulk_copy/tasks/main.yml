@@ -6,7 +6,7 @@
 
   block:
     - name: Create a DNS Bulk Copy Job (check mode)
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -18,7 +18,7 @@
           - bulk_copy is not failed
 
     - name: Create a DNS Bulk Copy Job
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -31,7 +31,7 @@
 
     # Recursive flag is not supported it is reserved for future use
     - name: Create a DNS Bulk Copy Job with recursive flag
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -44,7 +44,7 @@
           - bulk_copy.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job with skip on error
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -57,7 +57,7 @@
           - bulk_copy.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job with auth zone config
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -74,7 +74,7 @@
           - bulk_copy.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job with forward zone config
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -90,7 +90,7 @@
           - bulk_copy.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job with secondary zone config
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -106,7 +106,7 @@
           - bulk_copy.object.results | length == 1
     
     - name: Create a DNS Bulk Copy Job with NSGs configuration
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -121,7 +121,7 @@
           - bulk_copy_nsgs.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job with TSIG Key configuration
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone.id }}"
         target: "{{ _view_dest.id }}"
@@ -144,7 +144,7 @@
           - bulk_copy_tsig.object.results | length == 1
 
     - name: Create a DNS Bulk Copy Job for secondary zone
-      infoblox.universal_ddi.dns_bulk_copy:
+      infoblox.universal_ddi.dns_view_bulk_copy:
         resources:
           - "{{ _auth_zone_secondary.id }}"
         target: "{{ _view_dest.id }}"
@@ -207,5 +207,5 @@
     
     - name: Delete destination the View
       ansible.builtin.include_role:
-        name: setup_dns_bulk_copy
+        name: setup_dns_view_bulk_copy
         tasks_from: cleanup.yml

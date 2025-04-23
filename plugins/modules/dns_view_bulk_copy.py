@@ -9,7 +9,7 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: dns_bulk_copy
+module: dns_view_bulk_copy
 short_description: Copy DNS objects from one view to another
 description:
     - Copy DNS objects from one view to another
@@ -382,13 +382,13 @@ EXAMPLES = r"""
   register: auth_zone
 
 - name: Create a DNS Bulk Copy Job.
-  infoblox.universal_ddi.dns_bulk_copy:
+  infoblox.universal_ddi.dns_view_bulk_copy:
     resources:
       - "{{ auth_zone.id }}"
     target: "{{ view_dest.id }}"
 
 - name: Create a DNS Bulk Copy Job  with additional fields.
-  infoblox.universal_ddi.dns_bulk_copy:
+  infoblox.universal_ddi.dns_view_bulk_copy:
     resources:
       - "{{ auth_zone.id }}"
     target: "{{ view_dest.id }}"
