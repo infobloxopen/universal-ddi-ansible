@@ -14,7 +14,7 @@ short_description: Manage an Address
 description:
     - Manage an Address
     - The Address object represents any single IP address within a given IP space.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

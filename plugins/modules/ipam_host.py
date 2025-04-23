@@ -14,7 +14,7 @@ short_description: Manages an IPAM Host.
 description:
     - Manages an IPAM Host.
     - The IPAM host object represents any network connected equipment that is assigned one or more IP Addresses.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -15,7 +15,7 @@ short_description: Manages a Host Activation Join Token.
 description:
     - Manages a Host Activation Join Token.
     - A join token is random character string which is used for instant validation of new hosts.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

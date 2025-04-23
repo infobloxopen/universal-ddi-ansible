@@ -13,7 +13,7 @@ module: dns_auth_zone
 short_description: Manages an authoritative zone.
 description:
     - Manages an authoritative zone.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -13,7 +13,7 @@ module: dns_forward_zone
 short_description: Manages a forwarding zone
 description:
     - Manages a forwarding zone
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

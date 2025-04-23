@@ -14,7 +14,7 @@ short_description: Retrieves DNS Hosts.
 description:
     - Retrieves information about existing DNS Hosts
     - A DNS Host object associates DNS configuration with hosts.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

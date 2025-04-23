@@ -14,7 +14,7 @@ short_description: Retrieves Host Activation Join Tokens.
 description:
     - Retrieves information about existing Host Activation Join Tokens.
     - A join token is random character string which is used for instant validation of new hosts.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

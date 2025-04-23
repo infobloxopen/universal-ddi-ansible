@@ -13,7 +13,7 @@ module: dns_auth_nsg_info
 short_description: Retrieves Authoritative DNS Server Groups.
 description:
     - Retrieves information about existing Authoritative DNS Server Groups.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

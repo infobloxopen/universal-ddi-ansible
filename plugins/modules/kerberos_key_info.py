@@ -13,7 +13,7 @@ module: kerberos_key_info
 short_description: Retrieves Kerberos Keys.
 description:
     - Retrieves information about existing Kerberos Keys.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

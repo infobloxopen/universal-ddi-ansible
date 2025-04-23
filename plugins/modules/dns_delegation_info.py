@@ -13,7 +13,7 @@ module: dns_delegation_info
 short_description: Retrieves zone delegations.
 description:
     - Retrieves information about existing zone delegations.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

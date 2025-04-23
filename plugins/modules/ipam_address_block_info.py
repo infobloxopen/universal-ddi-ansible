@@ -14,7 +14,7 @@ short_description: Retrieves Address Blocks.
 description:
     - Retrieves information about existing Address Blocks.
     - The Address Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

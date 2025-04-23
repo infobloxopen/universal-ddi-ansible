@@ -15,7 +15,7 @@ description:
     - Manages DNS Hosts.
     - A DNS Host object associates a DNS Config Profile with an on-prem host.
     - This resource represents an existing backend object that cannot be created or deleted through API calls. Instead, it can only be updated.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

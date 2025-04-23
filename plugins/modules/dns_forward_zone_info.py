@@ -13,7 +13,7 @@ module: dns_forward_zone_info
 short_description: Retrieves Forward DNS Zones.
 description:
     - Retrieves information about existing Forward DNS Zones.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

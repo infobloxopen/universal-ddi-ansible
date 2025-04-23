@@ -14,7 +14,7 @@ short_description: Manages a Subnet.
 description:
     - Manages a Subnet.
     - The Subnet object represents a set of addresses from which addresses are assigned to network equipment interfaces.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

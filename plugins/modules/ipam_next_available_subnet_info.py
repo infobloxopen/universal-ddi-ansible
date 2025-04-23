@@ -13,7 +13,7 @@ module: ipam_next_available_subnet_info
 short_description: Retrieves the Next available subnet.
 description:
     - Retrieves the Next Available Subnet in the specified Address Block.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

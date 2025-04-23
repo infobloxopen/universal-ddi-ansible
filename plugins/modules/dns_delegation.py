@@ -13,7 +13,7 @@ module: dns_delegation
 short_description: Manages a zone delegation.
 description:
     - Manages a zone delegation.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

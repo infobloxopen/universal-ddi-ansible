@@ -13,7 +13,7 @@ module: infra_service_info
 short_description: Retrieve Infrastructure Services
 description:
     - Retrieves information about existing Infrastructure Services
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

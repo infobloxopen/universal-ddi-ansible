@@ -13,7 +13,7 @@ module: dns_acl_info
 short_description: Retrieves Access Control Lists.
 description:
     - Retrieves information about existing named Access Control Lists.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

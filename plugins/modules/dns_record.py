@@ -13,7 +13,7 @@ module: dns_record
 short_description: Manages a DNS resource record in an authoritative zone.
 description:
     - Manages a DNS resource record in an authoritative zone.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

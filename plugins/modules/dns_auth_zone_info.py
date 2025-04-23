@@ -13,7 +13,7 @@ module: dns_auth_zone_info
 short_description: Retrieves Authoritative DNS Zones.
 description:
     - Retrieves information about existing Authoritative DNS Zones.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

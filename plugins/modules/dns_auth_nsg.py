@@ -13,7 +13,7 @@ module: dns_auth_nsg
 short_description: Manages an Authoritative DNS Server Group for authoritative zones.
 description:
     - Manages an Authoritative DNS Server Group for authoritative zones.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -14,7 +14,7 @@ short_description: Manages a DNS Config Profile.
 description:
     - Manage a DNS Config Profile
     - A Server (DNS Config Profile) is a named configuration profile that can be shared for specified list of hosts.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

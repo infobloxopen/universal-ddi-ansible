@@ -13,7 +13,7 @@ module: dns_view
 short_description: Manages a DNS View.
 description:
     - Manages a DNS View.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

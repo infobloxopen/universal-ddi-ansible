@@ -13,7 +13,7 @@ module: dns_forward_nsg
 short_description: Manages a Forward DNS Server Group for forward zones.
 description:
     - Manages a Forward DNS Server Group for forward zones.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

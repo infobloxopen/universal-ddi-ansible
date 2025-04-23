@@ -13,7 +13,7 @@ module: tsig_key_info
 short_description: Retrieves TSIG Keys.
 description:
     - Retrieves information about existing TSIG Keys.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -13,7 +13,7 @@ module: infra_service
 short_description: Manages an Infrastructure Service.
 description:
     - Manages an Infrastructure Service.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

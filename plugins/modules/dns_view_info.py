@@ -13,7 +13,7 @@ module: dns_view_info
 short_description: Retrieves DNS Views.
 description:
     - Retrieves information about existing DNS Views.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

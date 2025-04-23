@@ -13,7 +13,7 @@ module: dns_record_info
 short_description: Retrieves DNS Resource Record
 description:
     - Retrieves information about existing DNS Resource Records
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -14,7 +14,7 @@ short_description: Manages an IP Space.
 description:
     - Manages an IP Space.
     - The IP Space object represents an entire address space.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -14,7 +14,7 @@ short_description: Retrieves the next available IP addresses.
 description:
     - Retrieves the next available IP addresses in the specified resource.
     - The resource can be an address block, subnet or range.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

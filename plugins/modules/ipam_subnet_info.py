@@ -14,7 +14,7 @@ short_description: Retrieve a Subnet.
 description:
     - Retrieves information about existing Subnets.
     - The Subnet object represents a set of addresses from which addresses are assigned to network equipment interfaces.
-version_added: 1.1.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
