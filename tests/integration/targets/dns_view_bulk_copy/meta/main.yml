@@ -1,0 +1,2 @@
+---
+dependencies: [setup_view, setup_dns_view_bulk_copy, setup_auth_zone, setup_dns_auth_nsg, setup_dns_a_record]

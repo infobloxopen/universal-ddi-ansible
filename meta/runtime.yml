@@ -32,6 +32,7 @@ action_groups:
     - dns_record_info
     - dns_host
     - dns_host_info
+    - dns_view_bulk_copy
 
   ipam:
     - ipam_ip_space
