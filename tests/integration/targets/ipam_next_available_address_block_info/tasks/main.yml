@@ -101,6 +101,34 @@
           - next_available_address_block_info is not failed
           - next_available_address_block_info.objects | length == 15
 
+    - name: Retrieves info on the next available address block across multiple blocks with the same tags but insufficient availability.
+      infoblox.universal_ddi.ipam_next_available_address_block_info:
+        tag_filters:
+          environment: "test"
+          location: "site-2"
+        cidr: 30
+        count: 20  # Should require combining results from multiple blocks
+      register: next_available_address_block_info
+      ignore_errors: true
+    - assert:
+        that:
+          - next_available_address_block_info is failed
+          - "'Requested 20 address blocks but only 16 were available' in next_available_address_block_info.msg"
+    
+    - name: Next available address block the CIDR greater than the parent block.
+      infoblox.universal_ddi.ipam_next_available_address_block_info:
+        tag_filters:
+          environment: "test"
+          location: "site-2"
+        cidr: 16
+        count: 20  # Should require combining results from multiple blocks
+      register: next_available_address_block_info
+      ignore_errors: true
+    - assert:
+        that:
+          - next_available_address_block_info is failed
+          - "\"The next available network's cidr value must be greater than parent and between 1 and 32.\" in next_available_address_block_info.msg"
+
   always:
     # Cleanup if the test fails
     - ansible.builtin.include_role:
