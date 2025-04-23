@@ -318,6 +318,12 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         self._payload = HAGroup.from_dict(self._payload_params)
         self._existing = None
 
+       # Add prefix to anycast_config_id if needed.
+        if self.payload.anycast_config_id is not None:
+            ac_id = self.payload.anycast_config_id
+            if not ac_id.startswith("accm/ac_configs/"):
+                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+
     @property
     def existing(self):
         return self._existing
@@ -369,20 +375,20 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-        # Normalize anycast_config_id
-        updated_payload = self.__init_anycast_config_id()
+        # # Normalize anycast_config_id
+        # updated_payload = self.__init_anycast_config_id()
 
-        resp = HaGroupApi(self.client).create(body=updated_payload)
+        resp = HaGroupApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
 
-        # Normalize anycast_config_id
-        updated_payload = self.__init_anycast_config_id()
+        # # Normalize anycast_config_id
+        # updated_payload = self.__init_anycast_config_id()
 
-        resp = HaGroupApi(self.client).update(id=self.existing.id, body=updated_payload)
+        resp = HaGroupApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
@@ -430,15 +436,15 @@ class HaGroupModule(UniversalDDIAnsibleModule):
 
         self.exit_json(**result)
 
-    def __init_anycast_config_id(self):
-        """
-        Add prefix to anycast_config_id if needed.
-        """
-        if self.payload.anycast_config_id is not None:
-            ac_id = self.payload.anycast_config_id
-            if not ac_id.startswith("accm/ac_configs/"):
-                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
-        return self.payload
+    # def __init_anycast_config_id(self):
+    #     """
+    #     Add prefix to anycast_config_id if needed.
+    #     """
+    #     if self.payload.anycast_config_id is not None:
+    #         ac_id = self.payload.anycast_config_id
+    #         if not ac_id.startswith("accm/ac_configs/"):
+    #             self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+    #     return self.payload
 
 
 def main():

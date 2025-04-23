@@ -4,7 +4,7 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random Anycast to avoid conflicts
+     # Create a random Anycast Config name to avoid conflicts
     - ansible.builtin.set_fact:
         anycast_config_name: "anycast_config_name-{{ 999999 | random | string }}"
 
