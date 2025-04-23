@@ -28,7 +28,7 @@
           - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
 
   always:
-    - name: "Dissociate Anycast Host"
+    - name: "Delete Anycast Host"
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
         state: "absent"

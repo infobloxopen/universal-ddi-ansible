@@ -59,26 +59,6 @@ options:
                     - "The autonomous system number of this BGP- or anycast-enabled on-prem host."
                 type: int
                 required: true
-            asn_text:
-                description:
-                    - "Examples:"
-                    - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                    - V(0.1         | 1            | 1             |     Valid)
-                    - V(1           | 1            | 1             |     Valid)
-                    - V(65535       | 65535        | 65535         |     Valid)
-                    - V(0.65535     | 65535        | 65535         |     Valid)
-                    - V(1.0         | 65536        | 65536         |     Valid)
-                    - V(1.1         | 65537        | 65537         |     Valid)
-                    - V(1.65535     | 131071       | 131071        |     Valid)
-                    - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                    - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                    - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                    - V(0.65536     |              |               |   Invalid)
-                    - V(65535.655536|              |               |   Invalid)
-                    - V(65536.0     |              |               |   Invalid)
-                    - V(65536.65535 |              |               |   Invalid)
-                    - V(            | 4294967296   | 4294967296    |   Invalid)
-                type: str
             holddown_secs:
                 description: 
                     - "BGP route hold-down timer."
@@ -104,26 +84,6 @@ options:
                             - "The autonomous system number of this BGP neighbor."
                         type: int
                         required: true
-                    asn_text:
-                        description:
-                            - "Examples:"
-                            - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                            - V(0.1         | 1            | 1             |     Valid)
-                            - V(1           | 1            | 1             |     Valid)
-                            - V(65535       | 65535        | 65535         |     Valid)
-                            - V(0.65535     | 65535        | 65535         |     Valid)
-                            - V(1.0         | 65536        | 65536         |     Valid)
-                            - V(1.1         | 65537        | 65537         |     Valid)
-                            - V(1.65535     | 131071       | 131071        |     Valid)
-                            - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                            - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                            - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                            - V(0.65536     |              |               |   Invalid)
-                            - V(65535.655536|              |               |   Invalid)
-                            - V(65536.0     |              |               |   Invalid)
-                            - V(65536.65535 |              |               |   Invalid)
-                            - V(            | 4294967296   | 4294967296    |   Invalid)
-                        type: str
                     ip_address:
                         description:
                             - "IPv4 address of the BGP neighbor."
@@ -382,27 +342,6 @@ item:
                         - "The autonomous system number of this BGP- or anycast-enabled on-prem host."
                     type: int
                     returned: Always
-                asn_text:
-                  description:
-                    - "Examples:"
-                    - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                    - V(0.1         | 1            | 1             |     Valid)
-                    - V(1           | 1            | 1             |     Valid)
-                    - V(65535       | 65535        | 65535         |     Valid)
-                    - V(0.65535     | 65535        | 65535         |     Valid)
-                    - V(1.0         | 65536        | 65536         |     Valid)
-                    - V(1.1         | 65537        | 65537         |     Valid)
-                    - V(1.65535     | 131071       | 131071        |     Valid)
-                    - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                    - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                    - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                    - V(0.65536     |              |               |   Invalid)
-                    - V(65535.655536|              |               |   Invalid)
-                    - V(65536.0     |              |               |   Invalid)
-                    - V(65536.65535 |              |               |   Invalid)
-                    - V(            | 4294967296   | 4294967296    |   Invalid)
-                  type: str
-                  returned: Always
                 holddown_secs:
                     description: 
                         - "BGP route hold-down timer."
@@ -429,27 +368,6 @@ item:
                             description: 
                                 - "The autonomous system number of this BGP neighbor."
                             type: int
-                            returned: Always
-                        asn_text:
-                            description:
-                                - "Examples:"
-                                - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                                - V(0.1         | 1            | 1             |     Valid)
-                                - V(1           | 1            | 1             |     Valid)
-                                - V(65535       | 65535        | 65535         |     Valid)
-                                - V(0.65535     | 65535        | 65535         |     Valid)
-                                - V(1.0         | 65536        | 65536         |     Valid)
-                                - V(1.1         | 65537        | 65537         |     Valid)
-                                - V(1.65535     | 131071       | 131071        |     Valid)
-                                - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                                - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                                - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                                - V(0.65536     |              |               |   Invalid)
-                                - V(65535.655536|              |               |   Invalid)
-                                - V(65536.0     |              |               |   Invalid)
-                                - V(65536.65535 |              |               |   Invalid)
-                                - V(            | 4294967296   | 4294967296    |   Invalid)
-                            type: str
                             returned: Always
                         ip_address:
                             description:
@@ -627,14 +545,8 @@ from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules imp
 try:
     from anycast import OnPremAnycastManagerApi, OnpremHost
     from infra_mgmt import HostsApi
-    from universal_ddi_client import (
-        ApiException,
-        BadRequestException,
-        ForbiddenException,
-        NotFoundException,
-        ServiceException,
-        UnauthorizedException,
-    )
+    from universal_ddi_client import ApiException, NotFoundException
+
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
@@ -682,19 +594,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
                     return None
                 self.fail_json(msg=str(e))
 
-            except BadRequestException as e:
-                self.fail_json(msg=str(e))
-
-            except UnauthorizedException as e:
-                self.fail_json(msg=str(e))
-
-            except ForbiddenException as e:
-                self.fail_json(msg=str(e))
-
-            except ServiceException as e:
-                self.fail_json(msg=str(e))
-
-            except Exception as e:
+            except ApiException as e:
                 self.fail_json(msg=str(e))
 
         return None
@@ -710,6 +610,8 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
             filter_query = f"legacy_id=='{legacy_id}'"
             infra_host_resp = HostsApi(self.client).list(filter=filter_query)
 
+            if not hasattr(infra_host_resp, "results") or infra_host_resp.results is None:
+                infra_host_resp.results = []
             if not infra_host_resp.results:
                 self.fail_json(msg=f"No Infra Host found with Legacy ID {legacy_id}.")
 
@@ -805,7 +707,6 @@ def main():
             type="dict",
             options=dict(
                 asn=dict(type="int", required=True),
-                asn_text=dict(type="str"),
                 holddown_secs=dict(type="int", default=90),
                 keep_alive_secs=dict(type="int", default=30),
                 link_detect=dict(type="bool"),
@@ -814,7 +715,6 @@ def main():
                     elements="dict",
                     options=dict(
                         asn=dict(type="int", required=True),
-                        asn_text=dict(type="str"),
                         ip_address=dict(type="str", required=True),
                         max_hop_count=dict(type="int"),
                         multihop=dict(type="bool"),

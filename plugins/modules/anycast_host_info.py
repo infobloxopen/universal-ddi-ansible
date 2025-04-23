@@ -76,27 +76,6 @@ item:
                         - "The autonomous system number of this BGP- or anycast-enabled on-prem host."
                     type: int
                     returned: Always
-                asn_text:
-                  description:
-                    - "Examples:"
-                    - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                    - V(0.1         | 1            | 1             |     Valid)
-                    - V(1           | 1            | 1             |     Valid)
-                    - V(65535       | 65535        | 65535         |     Valid)
-                    - V(0.65535     | 65535        | 65535         |     Valid)
-                    - V(1.0         | 65536        | 65536         |     Valid)
-                    - V(1.1         | 65537        | 65537         |     Valid)
-                    - V(1.65535     | 131071       | 131071        |     Valid)
-                    - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                    - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                    - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                    - V(0.65536     |              |               |   Invalid)
-                    - V(65535.655536|              |               |   Invalid)
-                    - V(65536.0     |              |               |   Invalid)
-                    - V(65536.65535 |              |               |   Invalid)
-                    - V(            | 4294967296   | 4294967296    |   Invalid)
-                  type: str
-                  returned: Always
                 holddown_secs:
                     description: 
                         - "BGP route hold-down timer."
@@ -123,27 +102,6 @@ item:
                             description: 
                                 - "The autonomous system number of this BGP neighbor."
                             type: int
-                            returned: Always
-                        asn_text:
-                            description:
-                                - "Examples:"
-                                - V(ASDOT       | ASPLAIN      | INTEGER       | VALID/INVALID)
-                                - V(0.1         | 1            | 1             |     Valid)
-                                - V(1           | 1            | 1             |     Valid)
-                                - V(65535       | 65535        | 65535         |     Valid)
-                                - V(0.65535     | 65535        | 65535         |     Valid)
-                                - V(1.0         | 65536        | 65536         |     Valid)
-                                - V(1.1         | 65537        | 65537         |     Valid)
-                                - V(1.65535     | 131071       | 131071        |     Valid)
-                                - V(65535.0     | 4294901760   | 4294901760    |     Valid)
-                                - V(65535.1     | 4294901761   | 4294901761    |     Valid)
-                                - V(65535.65535 | 4294967295   | 4294967295    |     Valid)
-                                - V(0.65536     |              |               |   Invalid)
-                                - V(65535.655536|              |               |   Invalid)
-                                - V(65536.0     |              |               |   Invalid)
-                                - V(65536.65535 |              |               |   Invalid)
-                                - V(            | 4294967296   | 4294967296    |   Invalid)
-                            type: str
                             returned: Always
                         ip_address:
                             description:
@@ -329,7 +287,6 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(OnPremAnycastManagerInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
-        self._limit = 1000
 
     def find_by_id(self):
         try:
@@ -348,10 +305,10 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
         try:
             resp = OnPremAnycastManagerApi(self.client).get_onprem_host(int(self.params["id"]))
 
-            if not resp.results:
-                return []  # Return an empty list instead of None
+            if not resp.result:
+                resp.result = []
 
-            return [resp.results]  # Ensure result is returned inside a list
+            return resp.result
 
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
@@ -376,6 +333,7 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
 def main():
     module_args = dict(
         id=dict(type="int", required=True),
+        # name = dict(type="str", required=True),
     )
 
     module = OnPremAnycastManagerInfoModule(
