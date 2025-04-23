@@ -113,6 +113,16 @@ EXAMPLES = r"""
           - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: present
+    
+    - name: "Delete DHCP HA Group"
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "example_ha_group"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+        state: absent
         
     - name: Create DHCP HA Group with mode anycast
       infoblox.universal_ddi.dhcp_ha_group:
@@ -126,15 +136,6 @@ EXAMPLES = r"""
             role: "active"
         state: present
       
-    - name: "Delete DHCP HA Group"
-      infoblox.universal_ddi.dhcp_ha_group:
-        name: "example_ha_group"
-        hosts:
-          - host: "{{ host_info_1.objects[0].id }}"
-            role: "active"
-          - host: "{{ host_info_2.objects[0].id }}"
-            role: "active"
-        state: absent
 """  # noqa: E501
 
 RETURN = r"""
