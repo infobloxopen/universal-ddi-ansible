@@ -10,14 +10,14 @@
         id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: []
         state: "present"
       register: anycast_host
 
     - name: Get Anycast Host Information by ID
       infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
       register: anycast_host_info
     - assert:
         that:
@@ -25,12 +25,12 @@
           - anycast_host_info is not failed
           - anycast_host_info.objects | length == 1
           - anycast_host_info.objects[0].name == host_display_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
+          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name ==  anycast_config_name
 
   always:
     - name: "Delete Anycast Host"
       infoblox.universal_ddi.anycast_host:
-        id: "{{ _infra_host_info.objects[0].legacy_id | int }}"
+        id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       ignore_errors: true
 

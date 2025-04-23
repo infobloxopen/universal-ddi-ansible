@@ -12,15 +12,10 @@
         state: "present"
       check_mode: true
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 0
+          - anycast_host.object | length == 0
 
     - name: Update call to enable Anycast Service on the Host
       infoblox.universal_ddi.anycast_host:
@@ -28,15 +23,9 @@
         name: "{{ _infra_host_info.objects[0].display_name }}"
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
 
     - name: Update call to enable Anycast Service on the Host (idempotent)
       infoblox.universal_ddi.anycast_host:
@@ -55,50 +44,32 @@
         state: "absent"
       check_mode: true
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
 
     - name: Delete the Anycast Host
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         state: "absent"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 0
 
     - name: Update Anycast Host with Anycast Config Reference
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{ anycast_config_name }}"
             routing_protocols: []
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
     - name: Get Anycast Config information and validate the onprem host
       infoblox.universal_ddi.anycast_config_info:
         id: "{{ _ac_config.id }}"
@@ -116,7 +87,7 @@
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: ['OSPF']
         config_ospf:
           area_type: "STANDARD"
@@ -130,34 +101,27 @@
           transmit_delay: 1
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[0] == "OSPF"
-          - anycast_host_info.objects[0].config_ospf.area_type == "STANDARD"
-          - anycast_host_info.objects[0].config_ospf.area == "10.10.0.1"
-          - anycast_host_info.objects[0].config_ospf.authentication_type == "Clear"
-          - anycast_host_info.objects[0].config_ospf.interface == "eth0"
-          - anycast_host_info.objects[0].config_ospf.authentication_key == "YXV0aGV"
-          - anycast_host_info.objects[0].config_ospf.hello_interval == 10
-          - anycast_host_info.objects[0].config_ospf.dead_interval == 40
-          - anycast_host_info.objects[0].config_ospf.retransmit_interval == 5
-          - anycast_host_info.objects[0].config_ospf.transmit_delay == 1
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
+          - anycast_host.object.anycast_config_refs[0].routing_protocols | length == 1
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[0] == "OSPF"
+          - anycast_host.object.config_ospf.area_type == "STANDARD"
+          - anycast_host.object.config_ospf.area == "10.10.0.1"
+          - anycast_host.object.config_ospf.authentication_type == "Clear"
+          - anycast_host.object.config_ospf.interface == "eth0"
+          - anycast_host.object.config_ospf.hello_interval == 10
+          - anycast_host.object.config_ospf.dead_interval == 40
+          - anycast_host.object.config_ospf.retransmit_interval == 5
+          - anycast_host.object.config_ospf.transmit_delay == 1
 
     - name: Update Anycast Host with BGP Routing Protocol
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: ['BGP']
         config_bgp:
           asn: 6500
@@ -168,31 +132,25 @@
               ip_address: "172.28.4.198"
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[0] == "BGP"
-          - anycast_host_info.objects[0].config_bgp.asn == 6500
-          - anycast_host_info.objects[0].config_bgp.holddown_secs == 180
-          - anycast_host_info.objects[0].config_bgp.keep_alive_secs == 60
-          - anycast_host_info.objects[0].config_bgp.neighbors | length == 1
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].asn == 6501
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].ip_address == "172.28.4.198"
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
+          - anycast_host.object.anycast_config_refs[0].routing_protocols | length == 1
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[0] == "BGP"
+          - anycast_host.object.config_bgp.asn == 6500
+          - anycast_host.object.config_bgp.holddown_secs == 180
+          - anycast_host.object.config_bgp.keep_alive_secs == 60
+          - anycast_host.object.config_bgp.neighbors | length == 1
+          - anycast_host.object.config_bgp.neighbors[0].asn == 6501
+          - anycast_host.object.config_bgp.neighbors[0].ip_address == "172.28.4.198"
 
     - name: Update Anycast Host with Both BGP and OSPF Routing Protocols
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: ["BGP", "OSPF"]
         config_bgp:
           asn: 6601
@@ -214,40 +172,33 @@
           transmit_delay: 2
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-          id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols | length == 2
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[0] == "BGP"
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[1] == "OSPF"
-          - anycast_host_info.objects[0].config_bgp.asn == 6601
-          - anycast_host_info.objects[0].config_bgp.holddown_secs == 200
-          - anycast_host_info.objects[0].config_bgp.neighbors | length == 1
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].asn == 6501
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].ip_address == "172.28.4.198"
-          - anycast_host_info.objects[0].config_ospf.area_type == "NSSA"
-          - anycast_host_info.objects[0].config_ospf.area == "10.10.0.2"
-          - anycast_host_info.objects[0].config_ospf.authentication_type == "MD5"
-          - anycast_host_info.objects[0].config_ospf.interface == "ens160"
-          - anycast_host_info.objects[0].config_ospf.authentication_key == "YXV0aGV"
-          - anycast_host_info.objects[0].config_ospf.hello_interval == 20
-          - anycast_host_info.objects[0].config_ospf.dead_interval == 50
-          - anycast_host_info.objects[0].config_ospf.retransmit_interval == 10
-          - anycast_host_info.objects[0].config_ospf.transmit_delay == 2
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
+          - anycast_host.object.anycast_config_refs[0].routing_protocols | length == 2
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[0] == "BGP"
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[1] == "OSPF"
+          - anycast_host.object.config_bgp.asn == 6601
+          - anycast_host.object.config_bgp.holddown_secs == 200
+          - anycast_host.object.config_bgp.neighbors | length == 1
+          - anycast_host.object.config_bgp.neighbors[0].asn == 6501
+          - anycast_host.object.config_bgp.neighbors[0].ip_address == "172.28.4.198"
+          - anycast_host.object.config_ospf.area_type == "NSSA"
+          - anycast_host.object.config_ospf.area == "10.10.0.2"
+          - anycast_host.object.config_ospf.authentication_type == "MD5"
+          - anycast_host.object.config_ospf.interface == "ens160"
+          - anycast_host.object.config_ospf.hello_interval == 20
+          - anycast_host.object.config_ospf.dead_interval == 50
+          - anycast_host.object.config_ospf.retransmit_interval == 10
+          - anycast_host.object.config_ospf.transmit_delay == 2
 
     - name: Update Anycast Host BGP Routing Protocol with Multihop
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: ["BGP"]
         config_bgp:
           asn: 6500
@@ -261,54 +212,41 @@
               password: "test"
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[0] == "BGP"
-          - anycast_host_info.objects[0].config_bgp.asn == 6500
-          - anycast_host_info.objects[0].config_bgp.holddown_secs == 180
-          - anycast_host_info.objects[0].config_bgp.keep_alive_secs == 60
-          - anycast_host_info.objects[0].config_bgp.neighbors | length == 1
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].asn == 6501
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].ip_address == "172.28.4.198"
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].multihop == true
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].max_hop_count == 2
-          - anycast_host_info.objects[0].config_bgp.neighbors[0].password == "test"
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
+          - anycast_host.object.anycast_config_refs[0].routing_protocols | length == 1
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[0] == "BGP"
+          - anycast_host.object.config_bgp.asn == 6500
+          - anycast_host.object.config_bgp.holddown_secs == 180
+          - anycast_host.object.config_bgp.keep_alive_secs == 60
+          - anycast_host.object.config_bgp.neighbors | length == 1
+          - anycast_host.object.config_bgp.neighbors[0].asn == 6501
+          - anycast_host.object.config_bgp.neighbors[0].ip_address == "172.28.4.198"
+          - anycast_host.object.config_bgp.neighbors[0].multihop == true
+          - anycast_host.object.config_bgp.neighbors[0].max_hop_count == 2
 
     - name: Update the Anycast Host with OSPFv3 protocol enabled
       infoblox.universal_ddi.anycast_host:
         id: "{{ _infra_host_info.objects[0].legacy_id }}"
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
-          - anycast_config_name: "{{ ac_config_name }}"
+          - anycast_config_name: "{{  anycast_config_name }}"
             routing_protocols: [ 'OSPFv3' ]
         config_ospfv3:
           area: "::1"
           interface: "eth1"
         state: "present"
       register: anycast_host
-    - name: Get the Anycast Host Information
-      infoblox.universal_ddi.anycast_host_info:
-        id: "{{ _infra_host_info.objects[0].legacy_id }}"
-      register: anycast_host_info
     - assert:
         that:
           - anycast_host is changed
-          - anycast_host_info is not failed
-          - anycast_host_info.objects | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].anycast_config_name == ac_config_name
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols | length == 1
-          - anycast_host_info.objects[0].anycast_config_refs[0].routing_protocols[0] == "OSPFv3"
-          - anycast_host_info.objects[0].config_ospfv3.area == "::1"
-          - anycast_host_info.objects[0].config_ospfv3.interface == "eth1"
+          - anycast_host.object.anycast_config_refs[0].anycast_config_name ==  anycast_config_name
+          - anycast_host.object.anycast_config_refs[0].routing_protocols | length == 1
+          - anycast_host.object.anycast_config_refs[0].routing_protocols[0] == "OSPFv3"
+          - anycast_host.object.config_ospfv3.area == "::1"
+          - anycast_host.object.config_ospfv3.interface == "eth1"
 
   always:
     - name: "Delete Anycast Host"

@@ -13,6 +13,7 @@ module: anycast_host_info
 short_description: "Retrieves Anycast Host Information"
 description:
     - "Retrieves Anycast Host Information by its ID."
+    - "NOTE: PUT call is necessary to initialize the Onprem Host to support GET call"
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
