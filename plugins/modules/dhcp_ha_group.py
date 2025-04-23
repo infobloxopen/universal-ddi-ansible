@@ -50,24 +50,6 @@ options:
                 description:
                     - "The address on which this host listens."
                 type: str
-            heartbeats:
-                description:
-                    - "Last successful heartbeat received from its peer/s. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: list
-                elements: dict
-                suboptions:
-                    peer:
-                        description:
-                            - "The name of the peer."
-                        type: str
-                    successful_heartbeat:
-                        description:
-                            - "The timestamp as a string of the last successful heartbeat received from the peer above."
-                        type: str
-                    successful_heartbeat_v6:
-                        description:
-                            - "The timestamp as a string of the last successful DHCPv6 heartbeat received from the peer above."
-                        type: str
             host:
                 description:
                     - "The resource identifier."
@@ -95,14 +77,6 @@ options:
             - "The name of the HA group. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
         required: true 
-    status:
-        description:
-            - "Status of the HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-        type: str
-    status_v6:
-        description:
-            - "Status of the DHCPv6 HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-        type: str
     tags:
         description:
             - "The tags for the HA group."
@@ -318,7 +292,7 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         self._payload = HAGroup.from_dict(self._payload_params)
         self._existing = None
 
-       # Add prefix to anycast_config_id if needed.
+        # Add prefix to anycast_config_id if needed.
         if self.payload.anycast_config_id is not None:
             ac_id = self.payload.anycast_config_id
             if not ac_id.startswith("accm/ac_configs/"):
@@ -375,18 +349,12 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
 
-        # # Normalize anycast_config_id
-        # updated_payload = self.__init_anycast_config_id()
-
         resp = HaGroupApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
-
-        # # Normalize anycast_config_id
-        # updated_payload = self.__init_anycast_config_id()
 
         resp = HaGroupApi(self.client).update(id=self.existing.id, body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
@@ -436,16 +404,6 @@ class HaGroupModule(UniversalDDIAnsibleModule):
 
         self.exit_json(**result)
 
-    # def __init_anycast_config_id(self):
-    #     """
-    #     Add prefix to anycast_config_id if needed.
-    #     """
-    #     if self.payload.anycast_config_id is not None:
-    #         ac_id = self.payload.anycast_config_id
-    #         if not ac_id.startswith("accm/ac_configs/"):
-    #             self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
-    #     return self.payload
-
 
 def main():
     module_args = dict(
@@ -459,15 +417,6 @@ def main():
             required=True,
             options=dict(
                 address=dict(type="str"),
-                heartbeats=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        peer=dict(type="str"),
-                        successful_heartbeat=dict(type="str"),
-                        successful_heartbeat_v6=dict(type="str"),
-                    ),
-                ),
                 host=dict(type="str"),
                 role=dict(type="str"),
             ),
@@ -479,8 +428,6 @@ def main():
             default="active-active",
         ),
         name=dict(type="str", required=True),
-        status=dict(type="str"),
-        status_v6=dict(type="str"),
         tags=dict(type="dict"),
     )
 
