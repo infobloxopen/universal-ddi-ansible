@@ -108,9 +108,9 @@ EXAMPLES = r"""
         name: "example_ha_group"
         mode: "active-active"
         hosts:
-          - host: "{{ host_1.id }}"
+          - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
-          - host: "{{ host_2.id }}"
+          - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: present
         
@@ -120,9 +120,9 @@ EXAMPLES = r"""
         mode: "anycast"
         anycast_config_id: "{{ ac_config.id }}"
         hosts:
-          - host: "{{ host_1.id }}"
+          - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
-          - host: "{{ host_2.id }}"
+          - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: present
       
@@ -130,9 +130,9 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_ha_group:
         name: "example_ha_group"
         hosts:
-          - host: "{{ host_1.id }}"
+          - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
-          - host: "{{ host_2.id }}"
+          - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: absent
 """  # noqa: E501
