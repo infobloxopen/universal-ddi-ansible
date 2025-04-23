@@ -87,13 +87,13 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "Host1"
-      register: host_1
+      register: host_info_1
 
     - name: Get DHCP Host 2 information by filters (required as parent)
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "Host2"
-      register: host_2
+      register: host_info_2
       
     - name: Create Anycast Configuration (required as parent)
       infoblox.universal_ddi.anycast_config:
