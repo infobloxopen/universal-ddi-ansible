@@ -9,6 +9,7 @@
     - ansible.builtin.set_fact:
         cloud_discovery_provider_gcp_name: "test_gcp_{{ 999999 | random | string }}"
         config_access_id: "1{{ 999999999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create an GCP cloud discovery provider
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -24,7 +25,7 @@
             restricted_to_accounts:
               - "{{ config_access_id }}"
         tags:
-          location: "site-1"
+          location: "{{ tag_value }}"
         state: present
       register: gcp_provider
 
@@ -41,7 +42,7 @@
           - gcp_provider_info.objects[0].account_preference == "single"
           - gcp_provider_info.objects[0].credential_preference.access_identifier_type == "project_id"
           - gcp_provider_info.objects[0].credential_preference.credential_type == "dynamic"
-          - gcp_provider_info.objects[0].tags.location == "site-1"
+          - gcp_provider_info.objects[0].tags.location == tag_value
 
     - name: Get GCP cloud discovery provider by ID
       infoblox.universal_ddi.cloud_discovery_providers_info:
@@ -64,7 +65,7 @@
     - name: Get GCP cloud discovery provider by tag filters
       infoblox.universal_ddi.cloud_discovery_providers_info:
         tag_filters:
-          location: "site-1"
+          location: "{{ tag_value }}"
       register: gcp_provider_info_by_tag
     - assert:
         that:
@@ -72,16 +73,16 @@
           - gcp_provider_info_by_tag.objects[0].name == cloud_discovery_provider_gcp_name
 
   always:
-     - name: "Delete a GCP cloud discovery provider"
-       infoblox.universal_ddi.cloud_discovery_providers:
-         name: "{{ cloud_discovery_provider_gcp_name }}"
-         provider_type: "Google Cloud Platform"
-         account_preference: "single"
-         credential_preference:
-           access_identifier_type: "project_id"
-           credential_type: "dynamic"
-         source_configs:
-           - credential_config:
-               access_identifier: "{{ config_access_id }}"
-         state: absent
-         ignore_errors: true
+    - name: "Delete a GCP cloud discovery provider"
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_gcp_name }}"
+        provider_type: "Google Cloud Platform"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "project_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+              access_identifier: "{{ config_access_id }}"
+        state: absent
+      ignore_errors: true
