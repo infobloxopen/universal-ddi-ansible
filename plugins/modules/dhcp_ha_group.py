@@ -133,7 +133,7 @@ EXAMPLES = r"""
           - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
           - host: "{{ host_info_2.objects[0].id }}"
-            role: "active"
+            role: "passive"
         state: present
       
 """  # noqa: E501
