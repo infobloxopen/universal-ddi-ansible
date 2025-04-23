@@ -58,10 +58,6 @@ options:
                 description:
                     - "The role of this host in the HA relationship: I(active) or I(passive)."
                 type: str
-    ip_space:
-        description:
-            - "The resource identifier."
-        type: str
     mode:
         description:
             - "The mode of the HA group."
@@ -421,7 +417,6 @@ def main():
                 role=dict(type="str"),
             ),
         ),
-        ip_space=dict(type="str"),
         mode=dict(
             type="str",
             choices=["active-active", "active-passive", "advanced-active-passive", "anycast"],
