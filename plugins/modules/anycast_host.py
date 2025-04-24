@@ -607,6 +607,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
         try:
             legacy_id = str(self.params["id"])
 
+            # Retrieve the infra host using the legacy ID if the host exists
             filter_query = f"legacy_id=='{legacy_id}'"
             infra_host_resp = HostsApi(self.client).list(filter=filter_query)
 
@@ -621,7 +622,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
 
             anycast_host_id = int(infra_host.legacy_id)
 
-            # Construct the payload correctly as an OnpremHost object
+            # Update the payload with the retrieved IP address
             update_payload = OnpremHost(
                 ip_address=ip_address,
                 **self.payload_params,

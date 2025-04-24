@@ -11,7 +11,6 @@
         name: "{{ _infra_host_info.objects[0].display_name }}"
         anycast_config_refs:
           - anycast_config_name: "{{  anycast_config_name }}"
-            routing_protocols: []
         state: "present"
       register: anycast_host
 

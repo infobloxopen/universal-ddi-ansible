@@ -334,7 +334,6 @@ class OnPremAnycastManagerInfoModule(UniversalDDIAnsibleModule):
 def main():
     module_args = dict(
         id=dict(type="int", required=True),
-        # name = dict(type="str", required=True),
     )
 
     module = OnPremAnycastManagerInfoModule(
