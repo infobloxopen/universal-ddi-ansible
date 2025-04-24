@@ -68,8 +68,8 @@ results:
      - The result of the lookup call or the error provided by the API.
 """
 
-import traceback
 import os
+import traceback
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
