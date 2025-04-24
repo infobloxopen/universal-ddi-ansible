@@ -12,7 +12,7 @@ DOCUMENTATION = """
 name: universal_ddi_lookup
 author: Infoblox Inc. (@infobloxopen)
 short_description: Query Universal DDI objects using the Universal DDI APIs
-version_added: "1.0.0"
+version_added: "1.1.0"
 description:
   - Uses the Universal DDI APIs to fetch specific objects.  This lookup
     supports adding additional keywords to filter the return data and specify
