@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: cloud_discovery_providers
-short_description: Manage Cloud Providers
+short_description: Manage Cloud Discovery Providers
 description:
-    - Manage Cloud Providers
+    - Manage Cloud Discovery Providers
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -272,13 +272,12 @@ EXAMPLES = r"""
         provider_type: "Amazon Web Services"
         account_preference: "single"
         credential_preference:
-          access_identifier_type: "account_id"
-          credential_type: "static"
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
         source_configs:
           - credential_config:
                 access_identifier: "arn:aws:iam::123456789123:role/infoblox_discovery"
         state: present
-        register: aws_provider
 
     - name: Create an AWS cloud discovery provider with additional attributes
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -286,11 +285,11 @@ EXAMPLES = r"""
         provider_type: "Amazon Web Services"
         account_preference: "single"
         credential_preference:
-          access_identifier_type: "account_id"
+          access_identifier_type: "tenent_id"
           credential_type: "static"
         source_configs:
           - credential_config:
-                access_identifier: "arn:aws:iam::123456789123:role/infoblox_discovery"
+                access_identifier: "arn:aws:iam::234567891234:role/infoblox_discovery_1"
         additional_config:
           excluded_accounts:
             - "123456789012"
@@ -331,7 +330,6 @@ EXAMPLES = r"""
           - credential_config:
                 access_identifier: "123456789012"
         state: present
-        register: gcp_provider
 
     - name: Create an Azure cloud discovery provider 
       infoblox.universal_ddi.cloud_discovery_providers:
@@ -340,12 +338,11 @@ EXAMPLES = r"""
         account_preference: "single"
         credential_preference:
           access_identifier_type: "subscription_id"
-          credential_type: "static"
+          credential_type: "dynamic"
         source_configs:
           - credential_config:
                 access_identifier: "123456789012"
         state: present
-        register: azure_provider
 """  # noqa: E501
 
 RETURN = r"""
