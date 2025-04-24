@@ -6,12 +6,14 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+import os
+
 DOCUMENTATION = """
 ---
-name: universal_ddi
+name: universal_ddi_lookup
 author: Infoblox Inc. (@infobloxopen)
-short_description: Query Infoblox BloxOne DDI objects
-version_added: "1.1.0"
+short_description: Query Universal DDI objects using the Universal DDI APIs
+version_added: "1.0.0"
 description:
   - Uses the Universal DDI APIs to fetch specific objects.  This lookup
     supports adding additional keywords to filter the return data and specify
@@ -23,24 +25,50 @@ options:
     _terms:
       description: The name of the object to returned from Universal DDI API
       required: True
+      type: str
     fields:
-      description: The list of field names to return for the specified object.
+      type: list
+      description:
+        - The list of field names to return for the specified object.
     filters:
-      description: a dict object that is used to filter the return objects
+      description: 
+        - A dict object that is used to filter the return objects
+      type: dict
     tfilters:
-      description: a dict object that is used to filter the return objects based on tags
+      description: 
+        - A dict object containing tags that are used to filter the return objects
+      type: dict
     provider:
-      description: a dict object containing Universal DDI Portal URL and key
+      description: 
+        - A dict object containing Universal DDI Portal URL and Key for authentication
+        - The portal URL and key can be set in the environment variables using `portal_url` and `portal_key` respectively.
+        - Default value for portal_url is "https://csp.infoblox.com".
 """
 
 EXAMPLES = """
-- name: fetch all IP Space objects
+- name: List all IP Spaces
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ipspace', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': ''}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+    
+- name: List all IP Spaces and output specific fields
+  ansible.builtin.set_fact:
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+
+- name: Get an IP Space using name as a filter using environment variables
+  ansible.builtin.set_fact:
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', filters={'name': 'hostname.ansible.com'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+
+- name: Get all IP Spaces using tag filters
+  ansible.builtin.set_fact:
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', tfilters={'location': 'site-1'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
 
 """  # noqa: E501
 
-RETURN = """ # """
+RETURN = """
+results:
+    description: 
+     - The result of the lookup call or the error provided by the API
+"""
 
 import traceback
 
@@ -84,12 +112,16 @@ def return_base_url(obj_type):
 def get_object(obj_type, provider, filters, tfilters, fields):
     """Creating the GET API request for lookup"""
     try:
-        portal_url = provider["portal_url"]
-        portal_key = provider["portal_key"]
+
+        if len(provider) > 0 :
+            portal_url = provider["portal_url"]
+            portal_key = provider["portal_key"]
+        else:
+            portal_url = os.getenv("portal_url","https://csp.infoblox.com")
+            portal_key = os.getenv("portal_key",None)
+
     except KeyError:
         return (
-            True,
-            False,
             {
                 "status": "400",
                 "response": "Invalid Syntax for provider",
@@ -139,12 +171,12 @@ def get_object(obj_type, provider, filters, tfilters, fields):
         raise Exception("API request failed")
 
     if result.status_code in [200, 201, 204]:
-        return False, False, result.json()
+        return [result.json()]
     elif result.status_code == 401:
-        return True, False, result.content
+        return [result.content]
     else:
         meta = {"status": result.status_code, "response": result.json()}
-        return True, False, meta
+        return [meta]
 
 
 class LookupModule(LookupBase):
