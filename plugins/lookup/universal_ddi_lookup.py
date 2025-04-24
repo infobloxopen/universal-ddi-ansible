@@ -6,7 +6,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-import os
 
 DOCUMENTATION = """
 ---
@@ -27,20 +26,19 @@ options:
       required: True
       type: str
     fields:
-      type: list
       description:
         - The list of field names to return for the specified object.
     filters:
-      description: 
-        - A dict object that is used to filter the return objects
+      description:
+        - A dict object that is used to filter the return objects.
       type: dict
     tfilters:
-      description: 
-        - A dict object containing tags that are used to filter the return objects
+      description:
+        - A dict object containing tags that are used to filter the return objects.
       type: dict
     provider:
-      description: 
-        - A dict object containing Universal DDI Portal URL and Key for authentication
+      description:
+        - A dict object containing Universal DDI Portal URL and Key for authentication.
         - The portal URL and key can be set in the environment variables using `portal_url` and `portal_key` respectively.
         - Default value for portal_url is "https://csp.infoblox.com".
 """
@@ -66,11 +64,12 @@ EXAMPLES = """
 
 RETURN = """
 results:
-    description: 
-     - The result of the lookup call or the error provided by the API
+    description:
+     - The result of the lookup call or the error provided by the API.
 """
 
 import traceback
+import os
 
 from ansible.errors import AnsibleError
 from ansible.plugins.lookup import LookupBase
@@ -113,12 +112,12 @@ def get_object(obj_type, provider, filters, tfilters, fields):
     """Creating the GET API request for lookup"""
     try:
 
-        if len(provider) > 0 :
+        if len(provider) > 0:
             portal_url = provider["portal_url"]
             portal_key = provider["portal_key"]
         else:
-            portal_url = os.getenv("portal_url","https://csp.infoblox.com")
-            portal_key = os.getenv("portal_key",None)
+            portal_url = os.getenv("portal_url", "https://csp.infoblox.com")
+            portal_key = os.getenv("portal_key", None)
 
     except KeyError:
         return (
