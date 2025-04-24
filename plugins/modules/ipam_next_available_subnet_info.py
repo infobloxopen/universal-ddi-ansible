@@ -56,7 +56,7 @@ EXAMPLES = r"""
         state: "present"
       register: address_block
 
-    - name: "Create an Address Block with tags"
+    - name: "Create an Address Block with tags (required as parent for filtering via tags)"
       infoblox.universal_ddi.ipam_address_block:
         address: "192.168.0.0/16"
         space: "{{ ip_space.id }}"

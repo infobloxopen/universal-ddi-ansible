@@ -32,6 +32,7 @@ class UniversalDDIAnsibleModule(AnsibleModule):
 
         super(UniversalDDIAnsibleModule, self).__init__(*args, **kwargs)
         self._client = None
+        self._limit = 1000
 
         if not HAS_UNIVERSAL_DDI_CLIENT:
             self.fail_json(
