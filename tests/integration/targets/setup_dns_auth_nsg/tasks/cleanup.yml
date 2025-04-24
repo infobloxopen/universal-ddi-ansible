@@ -1,0 +1,12 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - name: Delete an Auth NSG
+      infoblox.universal_ddi.dns_auth_nsg:
+        name: "{{ auth_nsg_name }}"
+        state: absent
+      ignore_errors: true
