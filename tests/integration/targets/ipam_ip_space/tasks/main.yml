@@ -28,8 +28,8 @@
 
     - name: "Create an IP space"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        state: "present"
+          name: "{{ name }}"
+          state: "present"
       register: ip_space
     - name: Get information about the IP space
       infoblox.universal_ddi.ipam_ip_space_info:
@@ -45,8 +45,8 @@
 
     - name: "Create an IP space (idempotent)"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        state: "present"
+          name: "{{ name }}"
+          state: "present"
       register: ip_space
     - assert:
         that:
@@ -72,13 +72,13 @@
 
     - name: "Delete IP Space"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        state: "absent"
+          name: "{{ name }}"
+          state: "absent"
       register: ip_space
     - name: Get information about the IP space
       infoblox.universal_ddi.ipam_ip_space_info:
-        filters:
-          name: "{{ name }}"
+          filters:
+            name: "{{ name }}"
       register: ip_space_info
     - assert:
         that:
@@ -88,8 +88,8 @@
 
     - name: "Delete IP Space (idempotent)"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        state: "absent"
+          name: "{{ name }}"
+          state: "absent"
       register: ip_space
     - assert:
         that:
@@ -119,35 +119,35 @@
     # Create an IP space with DHCP configuration value overridden
     - name: "Create an IP space with DHCP configuration value overridden"
       infoblox.universal_ddi.ipam_ip_space:
-        name: "{{ name }}"
-        dhcp_config:
-          lease_time: 3600
-        inheritance_sources:
+          name: "{{ name }}"
           dhcp_config:
-            lease_time:
-              action: override
-            # The API currently requires all fields inside the inheritance config to be explicitly provided,
-            # or it fails with error 'The value of an inheritance action field is not valid'.
-            abandoned_reclaim_time:
-              action: inherit
-            abandoned_reclaim_time_v6:
-              action: inherit
-            allow_unknown:
-              action: inherit
-            allow_unknown_v6:
-              action: inherit
-            echo_client_id:
-              action: inherit
-            filters:
-              action: inherit
-            filters_v6:
-              action: inherit
-            ignore_client_uid:
-              action: inherit
-            ignore_list:
-              action: inherit
-            lease_time_v6:
-              action: inherit
+              lease_time: 3600
+          inheritance_sources:
+              dhcp_config:
+                  lease_time:
+                    action: override
+                  # The API currently requires all fields inside the inheritance config to be explicitly provided,
+                  # or it fails with error 'The value of an inheritance action field is not valid'.
+                  abandoned_reclaim_time:
+                    action: inherit
+                  abandoned_reclaim_time_v6:
+                    action: inherit
+                  allow_unknown:
+                      action: inherit
+                  allow_unknown_v6:
+                    action: inherit
+                  echo_client_id:
+                    action: inherit
+                  filters:
+                    action: inherit
+                  filters_v6:
+                    action: inherit
+                  ignore_client_uid:
+                    action: inherit
+                  ignore_list:
+                    action: inherit
+                  lease_time_v6:
+                    action: inherit
     - name: Get information about the IP space
       infoblox.universal_ddi.ipam_ip_space_info:
         filters:
@@ -504,7 +504,7 @@
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
         default_realms:
-          - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm1.id }}"
         state: "present"
       register: ip_space
     - name: Get information about the IP Space
@@ -543,11 +543,11 @@
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
         default_realms:
-          - "{{ _federated_realm1.id }}"
-          - "{{ _federated_realm2.id }}"
-          - "{{ _federated_realm3.id }}"
-          - "{{ _federated_realm4.id }}"
-          - "{{ _federated_realm5.id }}"
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm2.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm4.id }}"
+         - "{{ _federated_realm5.id }}"
         state: "present"
       register: ip_space
     - name: Get information about the IP Space
@@ -572,9 +572,9 @@
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
         default_realms:
-          - "{{ _federated_realm1.id }}"
-          - "{{ _federated_realm3.id }}"
-          - "{{ _federated_realm5.id }}"
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm5.id }}"
         state: "present"
       register: ip_space
     - name: Get information about the IP Space
@@ -597,10 +597,10 @@
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
         default_realms:
-          - "{{ _federated_realm1.id }}"
-          - "{{ _federated_realm2.id }}"
-          - "{{ _federated_realm3.id }}"
-          - "{{ _federated_realm5.id }}"
+         - "{{ _federated_realm1.id }}"
+         - "{{ _federated_realm2.id }}"
+         - "{{ _federated_realm3.id }}"
+         - "{{ _federated_realm5.id }}"
         state: "present"
       register: ip_space
     - name: Get information about the IP Space
