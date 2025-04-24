@@ -22,19 +22,21 @@ requirements:
 
 options:
     _terms:
-      description: The name of the object to returned from Universal DDI API
+      description:  The name of the object to be returned from the Universal DDI API
       required: True
       type: str
     fields:
       description:
         - The list of field names to return for the specified object.
+      type: list
+      elements: str
     filters:
       description:
-        - A dict object that is used to filter the return objects.
+        - A dictionary containing filters that are used to filter the return objects.
       type: dict
     tfilters:
       description:
-        - A dict object containing tags that are used to filter the return objects.
+        - A dictionary containing tags that are used to filter the return objects.
       type: dict
     provider:
       description:
@@ -66,6 +68,8 @@ RETURN = """
 results:
     description:
      - The result of the lookup call or the error provided by the API.
+    type: list
+    returned: Always
 """
 
 import os
