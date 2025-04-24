@@ -137,9 +137,11 @@ releases:
       name: tsig_key_info
       namespace: ''
     release_date: '2025-02-06'
-  1.1.0: #TBD
+  1.1.0:
     changes:
       release_summary: Extended Support for Universal DDI Ansible Collection.
+    minor_changes:
+      - Add ``primary_ip4/6`` to ``netbox_ip_address`` (https://github.com/netbox-community/ansible_modules/issues/10)
     modules:
     - description: Manage DHCP Host.
       name: dhcp_host
@@ -177,11 +179,11 @@ releases:
     - description: Get DHCP Server information.
       name: dhcp_server_info
       namespace: ''
-    - description: Manage DHCP Server.
-      name: dhcp_server
+    - description: Manage DHCP Fixed Address.
+      name: dhcp_fixed_address
       namespace: ''
-    - description: Get DHCP Server information.
-      name: dhcp_server_info
+    - description: Get DHCP Fixed Address information.
+      name: dhcp_fixed_address_info
       namespace: ''
     - description: Manage IPAM Federation Federated Realm.
       name: ipam_federation_federated_realm
@@ -196,12 +198,24 @@ releases:
       name: ipam_federation_federated_block_info
       namespace: ''
     - description: Manage DNS Bulk Copy.
-      name: dns_bulk_copy
+      name: dns_view_bulk_copy
       namespace: ''
     - description: Manage Cloud Discovery Providers.
       name: cloud_discovery_providers
       namespace: ''
     - description: Get Cloud Discovery Providers information.
       name: cloud_discovery_providers_info
+      namespace: ''
+    - description: Manage Anycast Config.
+      name: anycast_config
+      namespace: ''
+    - description: Get Anycast Config information.
+      name: anycast_config_info
+      namespace: ''
+    - description: Manage Anycast Host.
+      name: anycast_host
+      namespace: ''
+    - description: Get Anycast Host information.
+      name: anycast_host_info
       namespace: ''
     release_date: '2025-04-30'
