@@ -1,0 +1,65 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        option_group_name: "test-option-group-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DHCP Option Group
+      infoblox.universal_ddi.dhcp_option_group:
+          name: "{{ option_group_name }}"
+          tags:
+            location: "{{ tag_value }}"
+          state: "present"
+      register: option_group
+
+    - name: Get information about the DHCP Option Group by ID
+      infoblox.universal_ddi.dhcp_option_group_info:
+        filters:
+          id: "{{ option_group.id }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].name == option_group_name
+          - option_group_info.objects[0].id == option_group.id
+
+    - name: Get information about the DHCP option Group by filter (Name)
+      infoblox.universal_ddi.dhcp_option_group_info:
+        filters:
+          name: "{{ option_group_name }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+
+    - name: Get information about the DHCP Option Group by filter query
+      infoblox.universal_ddi.dhcp_option_group_info:
+        filter_query: "name=='{{ option_group_name }}'"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+
+    - name: Get information about the DHCP Option Group by tag filters
+      infoblox.universal_ddi.dhcp_option_group_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: option_group_info
+    - assert:
+        that:
+          - option_group_info.objects | length == 1
+          - option_group_info.objects[0].id == option_group.id
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete DHCP Option group"
+      infoblox.universal_ddi.dhcp_option_group:
+        name: "{{ option_group_name }}"
+        state: absent
