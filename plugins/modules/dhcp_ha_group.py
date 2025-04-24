@@ -50,24 +50,6 @@ options:
                 description:
                     - "The address on which this host listens."
                 type: str
-            heartbeats:
-                description:
-                    - "Last successful heartbeat received from its peer/s. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-                type: list
-                elements: dict
-                suboptions:
-                    peer:
-                        description:
-                            - "The name of the peer."
-                        type: str
-                    successful_heartbeat:
-                        description:
-                            - "The timestamp as a string of the last successful heartbeat received from the peer above."
-                        type: str
-                    successful_heartbeat_v6:
-                        description:
-                            - "The timestamp as a string of the last successful DHCPv6 heartbeat received from the peer above."
-                        type: str
             host:
                 description:
                     - "The resource identifier."
@@ -76,10 +58,6 @@ options:
                 description:
                     - "The role of this host in the HA relationship: I(active) or I(passive)."
                 type: str
-    ip_space:
-        description:
-            - "The resource identifier."
-        type: str
     mode:
         description:
             - "The mode of the HA group."
@@ -95,14 +73,6 @@ options:
             - "The name of the HA group. Must contain 1 to 256 characters. Can include UTF-8."
         type: str
         required: true 
-    status:
-        description:
-            - "Status of the HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-        type: str
-    status_v6:
-        description:
-            - "Status of the DHCPv6 HA group. This field is set when the I(collect_stats) is set to I(true) in the I(GET) I(/dhcp/ha_group) request."
-        type: str
     tags:
         description:
             - "The tags for the HA group."
@@ -117,34 +87,55 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "Host1"
-      register: host_1
+      register: host_info_1
 
     - name: Get DHCP Host 2 information by filters (required as parent)
       infoblox.universal_ddi.dhcp_host_info:
         filters:
           name: "Host2"
-      register: host_2
+      register: host_info_2
+      
+    - name: Create Anycast Configuration (required as parent)
+      infoblox.universal_ddi.anycast_config:
+        name: "anycast_config"
+        anycast_ip_address: "10.1.0.0"
+        service: "DHCP"
+        state: "present"
+      register: ac_config
       
     - name: Create DHCP HA Group
       infoblox.universal_ddi.dhcp_ha_group:
         name: "example_ha_group"
         mode: "active-active"
         hosts:
-          - host: "{{ host_1.id }}"
+          - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
-          - host: "{{ host_2.id }}"
+          - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: present
-      
+    
     - name: "Delete DHCP HA Group"
       infoblox.universal_ddi.dhcp_ha_group:
         name: "example_ha_group"
         hosts:
-          - host: "{{ host_1.id }}"
+          - host: "{{ host_info_1.objects[0].id }}"
             role: "active"
-          - host: "{{ host_2.id }}"
+          - host: "{{ host_info_2.objects[0].id }}"
             role: "active"
         state: absent
+        
+    - name: Create DHCP HA Group with mode anycast
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "example_ha_group"
+        mode: "anycast"
+        anycast_config_id: "{{ ac_config.id }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "passive"
+        state: present
+      
 """  # noqa: E501
 
 RETURN = r"""
@@ -298,6 +289,12 @@ class HaGroupModule(UniversalDDIAnsibleModule):
         self._payload = HAGroup.from_dict(self._payload_params)
         self._existing = None
 
+        # Add prefix to anycast_config_id if needed.
+        if self.payload.anycast_config_id is not None:
+            ac_id = self.payload.anycast_config_id
+            if not ac_id.startswith("accm/ac_configs/"):
+                self.payload.anycast_config_id = f"accm/ac_configs/{ac_id}"
+
     @property
     def existing(self):
         return self._existing
@@ -417,28 +414,16 @@ def main():
             required=True,
             options=dict(
                 address=dict(type="str"),
-                heartbeats=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        peer=dict(type="str"),
-                        successful_heartbeat=dict(type="str"),
-                        successful_heartbeat_v6=dict(type="str"),
-                    ),
-                ),
                 host=dict(type="str"),
                 role=dict(type="str"),
             ),
         ),
-        ip_space=dict(type="str"),
         mode=dict(
             type="str",
             choices=["active-active", "active-passive", "advanced-active-passive", "anycast"],
             default="active-active",
         ),
         name=dict(type="str", required=True),
-        status=dict(type="str"),
-        status_v6=dict(type="str"),
         tags=dict(type="dict"),
     )
 
