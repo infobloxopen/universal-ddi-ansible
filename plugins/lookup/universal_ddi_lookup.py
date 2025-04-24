@@ -48,19 +48,19 @@ options:
 EXAMPLES = """
 - name: List all IP Spaces
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi_lookup','ipam/ip_space', provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
     
 - name: List all IP Spaces and output specific fields
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi_lookup','ipam/ip_space', fields=['id', 'name', 'comment'] , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
 
-- name: Get an IP Space using name as a filter using environment variables
+- name: Get an IP Space using name as a filters
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', filters={'name': 'hostname.ansible.com'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi_lookup','ipam/ip_space', filters={'name': 'hostname.ansible.com'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
 
 - name: Get all IP Spaces using tag filters
   ansible.builtin.set_fact:
-    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi','ipam/ip_space', tfilters={'location': 'site-1'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
+    ip_space: "{{ lookup('infoblox.universal_ddi.universal_ddi_lookup','ipam/ip_space', tfilters={'location': 'site-1'} , provider={'portal_url': 'https://csp.infoblox.com', 'portal_key': 'portal_key'}) }}"
 
 """  # noqa: E501
 
