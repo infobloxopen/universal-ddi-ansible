@@ -109,6 +109,9 @@ objects:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
+    import json
+    import re
+
     from ipam import AddressBlockApi
     from universal_ddi_client import ApiException
 except ImportError:
@@ -129,8 +132,42 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
         try:
             resp = AddressBlockApi(self.client).list_next_available_subnet(id=id, cidr=self.params["cidr"], count=count)
             return resp.results
-        except ApiException:
+        except ApiException as e:
+            # If it's a "fewer than requested" error, extract available count
+            if e.status == 400:
+                available_count = self.extract_available_count_from_error(e.body)
+                return available_count
             return None
+
+    def extract_available_count_from_error(self, error_body):
+        """
+        Extract the available count from an API error message.
+
+        This function parses the error response when the API returns an error about
+        having fewer available networks than requested.
+
+        :param error_body: The error response body from the API
+        :return: The number of available networks (int), or 0 if the count couldn't be extracted
+        """
+        available_count = 0
+        try:
+            # Parse the JSON error body
+            error_json = json.loads(error_body)
+            if "error" in error_json and len(error_json["error"]) > 0:
+                error_message = error_json["error"][0]["message"]
+
+                # Use regex to extract the number after "The available networks are: "
+                match = re.search(r"The available networks are: (\d+)", error_message)
+                if match:
+                    available_count = int(match.group(1))
+                else:
+                    # If regex fails send fail message
+                    self.fail_json(msg=f"{error_message}")
+
+        except (json.JSONDecodeError, KeyError, IndexError, ValueError) as parse_error:
+            self.fail_json(msg="Failed to parse error body: {parse_error}")
+
+        return available_count
 
     def find(self):
         all_results = []
@@ -167,26 +204,31 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
 
             find_results = []
             for ab in address_blocks:
-
-                # Check if the address block has free subnet available
-                if count > 1:
-                    check_result = self.find_subnet(id=ab.id, count=1)
-                    if not check_result:
-                        continue
+                if len(find_results) >= count:
+                    break
 
                 remaining_count = count - len(find_results)
-                while len(find_results) < count:
-                    find_result = self.find_subnet(id=ab.id, count=remaining_count)
-                    if find_result:
-                        find_results.extend(find_result)
-                        break
-                    else:
-                        remaining_count -= 1
-                        if not remaining_count:
-                            break
+                find_result = self.find_subnet(id=ab.id, count=remaining_count)
 
+                if isinstance(find_result, int):
+                    # We got back an available count from error parsing
+                    if find_result == 0:
+                        # No addresses available in this block
+                        continue
+                    elif find_result < remaining_count:
+                        # We got fewer than requested, so we need to adjust the count
+                        # and try to find more subnets
+                        find_results.extend(self.find_subnet(id=ab.id, count=find_result))
+
+                elif find_result:
+                    # We got the requested results
+                    find_results.extend(find_result)
+
+            if len(find_results) == 0:
+                self.fail_json(msg="No subnets available with the given tags and CIDR.")
+            # Add warning if we couldn't find all requested address blocks
             if len(find_results) < count:
-                self.fail_json(msg="Not enough subnets found with the given tags.")
+                self.fail_json(msg=f"Requested {count} subnets but only {len(find_results)} were available")
         else:
             find_results = self.find()
 
