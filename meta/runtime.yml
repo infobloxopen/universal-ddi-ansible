@@ -94,3 +94,5 @@ action_groups:
   anycast:
     - anycast_config
     - anycast_config_info
+    - anycast_host
+    - anycast_host_info
