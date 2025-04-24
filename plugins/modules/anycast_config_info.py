@@ -137,7 +137,7 @@ objects:
             contains:
                 id:
                     description: 
-                        - "Numeric host identifier"
+                        - "Resource Identifier of Onprem Host. It is the equivalent of Legacy ID extracted from the Onprem Host"
                     type: int
                     returned: Always
                 ip_address:
