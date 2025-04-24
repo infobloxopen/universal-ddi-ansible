@@ -8,7 +8,7 @@ The collection provides modules to automate your Universal DDI (DHCP, DNS and IP
 
 ### Migration from Legacy Modules
 
-We recommend migrating from the legacy B1DDI Collection since they will be deprecated in the near future. Please expect a few breaking changes while migrating from legacy modules to the new collection modules. A migration guide will be published soon to help you with the migration process.
+We recommend migrating from the legacy B1DDI Collection as it will be deprecated in the near future. Please expect a few breaking changes while migrating from legacy modules to the new collection modules. To help you with the migration process, refer to our comprehensive [Migration Guide](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/docs/MIGRATION.md).
 
 ### Plugin Documentation 
 
@@ -160,6 +160,10 @@ Please refer to the [Ansible Debug Module](https://docs.ansible.com/ansible/late
 ## Release Notes
 
 For detailed information about the latest updates, new features, bug fixes, and improvements, please visit our [Changelog](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/CHANGELOG.rst)
+
+## Contributing
+
+We welcome your contributions to the Universal DDI Collection! Please check out our [Contribution Guide](https://github.com/infobloxopen/universal-ddi-ansible/blob/master/docs/CONTRIBUTING.md) for guidelines on how to submit pull requests, report issues, and contribute to the project.
 
 ## Support
 
