@@ -31,16 +31,6 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    tag_filters:
-        description:
-            - Filter dict to filter objects by tags
-        type: dict
-        required: false
-    tag_filter_query:
-        description:
-            - Filter query to filter objects by tags
-        type: str
-        required: false
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -63,10 +53,6 @@ EXAMPLES = r"""
   infoblox.universal_ddi.cloud_discovery_providers_info:
     filter_query: "provider_type=='Amazon Web Services' and name=='aws_provider_name'"
 
-- name: Get AWS cloud discovery provider by tag filters
-  infoblox.universal_ddi.cloud_discovery_providers_info:
-    tag_filters:
-      environment: "production"
 """
 
 RETURN = r"""
@@ -502,20 +488,12 @@ class ProvidersInfoModule(UniversalDDIAnsibleModule):
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
 
-        tag_filter_str = None
-        if self.params["tag_filters"] is not None:
-            tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["tag_filters"].items()])
-        elif self.params["tag_filter_query"] is not None:
-            tag_filter_str = self.params["tag_filter_query"]
-
         all_results = []
         offset = 0
 
         while True:
             try:
-                resp = ProvidersApi(self.client).list(
-                    offset=offset, limit=self._limit, filter=filter_str, tfilter=tag_filter_str
-                )
+                resp = ProvidersApi(self.client).list(offset=offset, limit=self._limit, filter=filter_str)
 
                 # If no results, set results to empty list
                 if not resp.results:
@@ -554,8 +532,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        tag_filters=dict(type="dict", required=False),
-        tag_filter_query=dict(type="str", required=False),
     )
 
     module = ProvidersInfoModule(
@@ -563,7 +539,6 @@ def main():
         supports_check_mode=True,
         mutually_exclusive=[
             ["id", "filters", "filter_query"],
-            ["id", "tag_filters", "tag_filter_query"],
         ],
     )
     module.run_command()

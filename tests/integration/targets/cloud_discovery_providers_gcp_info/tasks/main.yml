@@ -62,16 +62,6 @@
           - gcp_provider_info_by_query.objects | length == 1
           - gcp_provider_info_by_query.objects[0].name == cloud_discovery_provider_gcp_name
 
-    - name: Get GCP cloud discovery provider by tag filters
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        tag_filters:
-          location: "{{ tag_value }}"
-      register: gcp_provider_info_by_tag
-    - assert:
-        that:
-          - gcp_provider_info_by_tag.objects | length == 1
-          - gcp_provider_info_by_tag.objects[0].name == cloud_discovery_provider_gcp_name
-
   always:
     - name: "Delete a GCP cloud discovery provider"
       infoblox.universal_ddi.cloud_discovery_providers:

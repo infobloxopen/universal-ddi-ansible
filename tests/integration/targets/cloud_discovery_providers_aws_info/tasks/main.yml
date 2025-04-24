@@ -59,16 +59,6 @@
           - aws_provider_info_by_query.objects | length == 1
           - aws_provider_info_by_query.objects[0].name == cloud_discovery_provider_aws_name
 
-    - name: Get AWS cloud discovery provider by tag filters
-      infoblox.universal_ddi.cloud_discovery_providers_info:
-        tag_filters:
-          location: "{{ tag_value }}"
-      register: aws_provider_info_by_tag
-    - assert:
-        that:
-          - aws_provider_info_by_tag.objects | length == 1
-          - aws_provider_info_by_tag.objects[0].name == cloud_discovery_provider_aws_name
-
   always:
     - name: "Delete an AWS cloud discovery provider"
       infoblox.universal_ddi.cloud_discovery_providers:
