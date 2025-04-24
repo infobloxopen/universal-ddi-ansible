@@ -5,9 +5,6 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import absolute_import, division, print_function
 
-import json
-import re
-
 __metaclass__ = type
 
 DOCUMENTATION = r"""
@@ -104,6 +101,9 @@ objects:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
+    import json
+    import re
+
     from ipam import AddressBlockApi
     from universal_ddi_client import ApiException
 except ImportError:
