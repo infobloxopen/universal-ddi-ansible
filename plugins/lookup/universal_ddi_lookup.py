@@ -69,7 +69,6 @@ results:
     description:
      - The result of the lookup call or the error provided by the API.
     type: list
-    returned: Always
 """
 
 import os
