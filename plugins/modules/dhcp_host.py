@@ -63,13 +63,13 @@ EXAMPLES = r"""
 
     - name: Update DHCP Host
       infoblox.universal_ddi.dhcp_host:
-        id: "{{ infra_host_info.id }}"
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
         server: "{{ server.id }}"
         state: present
 
     - name: "Dissociate DHCP Host"
       infoblox.universal_ddi.dhcp_host:
-        id: "{{ infra_host_info.legacy_id }}"
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
 
     - name: Delete the DHCP Server
