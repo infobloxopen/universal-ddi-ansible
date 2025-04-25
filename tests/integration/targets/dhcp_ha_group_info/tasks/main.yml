@@ -1,0 +1,85 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        ha_group_name: "test-ha-group-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+        host_display_name: "TF_TEST_HOST_03"
+        host_display_name_2: "TF_TEST_HOST_01"
+
+    - name: Get DHCP Host 1 information by filters
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{host_display_name}}"
+      register: host_info_1
+    - assert:
+        that:
+          - host_info_1.objects[0].name == host_display_name
+
+    - name: Get DHCP Host 2 information by filters
+      infoblox.universal_ddi.dhcp_host_info:
+        filters:
+          name: "{{host_display_name_2}}"
+      register: host_info_2
+    - assert:
+        that:
+          - host_info_2.objects[0].name == host_display_name_2
+
+    - name: Create DHCP HA Group
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        mode: "active-active"
+        tags:
+          location: "{{ tag_value }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+      register: dhcp_ha_group
+
+    - name: Get DHCP HA Group Information by filters
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filters:
+          name: "{{ ha_group_name }}"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group is changed
+          - dhcp_ha_group.failed == false
+          - dhcp_ha_group_info.objects | length == 1
+
+    - name: Get DHCP HA Group Information by filter query
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        filter_query: "name=='{{ ha_group_name }}'"
+      register: dhcp_ha_group_info
+    - assert:
+        that:
+          - dhcp_ha_group_info.objects | length == 1
+          - dhcp_ha_group_info.objects[0].name == ha_group_name
+
+    - name: Get DHCP HA Group Information by tag filters
+      infoblox.universal_ddi.dhcp_ha_group_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+    - assert:
+        that:
+          - dhcp_ha_group_info.objects | length > 0
+          - dhcp_ha_group_info.objects[0].tags.location == tag_value
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete DHCP HA Group"
+      infoblox.universal_ddi.dhcp_ha_group:
+        name: "{{ ha_group_name }}"
+        hosts:
+          - host: "{{ host_info_1.objects[0].id }}"
+            role: "active"
+          - host: "{{ host_info_2.objects[0].id }}"
+            role: "active"
+        state: absent
+      ignore_errors: true

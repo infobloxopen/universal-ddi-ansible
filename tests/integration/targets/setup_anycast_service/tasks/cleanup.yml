@@ -1,0 +1,13 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: "Delete Anycast Service"
+      infoblox.universal_ddi.infra_service:
+        name: "{{ service_name }}"
+        pool_id: "{{ _infra_host_info.objects[0].pool_id }}"
+        service_type: "anycast"
+        state: "absent"
+      ignore_errors: true

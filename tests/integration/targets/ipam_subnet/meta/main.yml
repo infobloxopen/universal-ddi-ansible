@@ -1,2 +1,2 @@
 ---
-dependencies: [setup_ip_space, setup_address_block, setup_multiple_realms, setup_federation_federated_block]
+dependencies: [setup_ip_space, setup_address_block, setup_multiple_realms, setup_federation_federated_block, setup_option_code, setup_option_group]
