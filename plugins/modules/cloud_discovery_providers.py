@@ -276,7 +276,7 @@ EXAMPLES = r"""
           credential_type: "dynamic"
         source_configs:
           - credential_config:
-                access_identifier: "arn:aws:iam::123456789123:role/infoblox_discovery"
+                access_identifier: "arn:aws:iam::422983262101:role/infoblox_discovery"
         state: present
 
     - name: Create an AWS cloud discovery provider with additional attributes
@@ -285,8 +285,8 @@ EXAMPLES = r"""
         provider_type: "Amazon Web Services"
         account_preference: "single"
         credential_preference:
-          access_identifier_type: "tenent_id"
-          credential_type: "static"
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
         source_configs:
           - credential_config:
                 access_identifier: "arn:aws:iam::234567891234:role/infoblox_discovery_1"
@@ -328,7 +328,7 @@ EXAMPLES = r"""
           credential_type: "dynamic"
         source_configs:
           - credential_config:
-                access_identifier: "123456789012"
+              access_identifier: "123456789012"
         state: present
 
     - name: Create an Azure cloud discovery provider 
@@ -337,11 +337,13 @@ EXAMPLES = r"""
         provider_type: "Microsoft Azure"
         account_preference: "single"
         credential_preference:
-          access_identifier_type: "subscription_id"
+          access_identifier_type: "tenant_id"
           credential_type: "dynamic"
         source_configs:
           - credential_config:
-                access_identifier: "123456789012"
+              access_identifier: "123456789012"
+            restricted_to_accounts:
+              - "123456789013"
         state: present
 """  # noqa: E501
 
