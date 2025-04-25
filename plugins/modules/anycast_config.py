@@ -55,6 +55,11 @@ options:
             - "The list of on-prem hosts associated with the anycast configuration."
             - "Struct on-prem host reference."
         suboptions:
+            id:
+                description:
+                    - "Resource Identifier of Onprem Host. It is the equivalent of Legacy ID extracted from the Onprem Host"
+                type: int
+                required: true
             ip_address:
                 description:
                     - "IPv4 address of the host in string format"
@@ -69,6 +74,7 @@ options:
                 description:
                     - "A user friendly name of the host would be, example 'DNS HOST 1', 'Central Office Server'"
                 type: str
+                required: true
         type: list
         elements: dict
     service:
@@ -181,7 +187,7 @@ objects:
             contains:
                 id:
                     description: 
-                        - "Numeric host identifier"
+                        - "Resource Identifier of Onprem Host. It is the equivalent of Legacy ID extracted from the Onprem Host"
                     type: int
                     returned: Always
                 ip_address:
@@ -378,9 +384,10 @@ def main():
             type="list",
             elements="dict",
             options=dict(
+                id=dict(type="int", required=True),
                 ip_address=dict(type="str"),
                 ipv6_address=dict(type="str"),
-                name=dict(type="str"),
+                name=dict(type="str", required=True),
             ),
         ),
         service=dict(type="str", required=True, choices=["DNS", "DHCP", "DFP"]),
