@@ -99,7 +99,7 @@ EXAMPLES = r"""
 
     - name: "Dissociate DNS Host"
       infoblox.universal_ddi.dns_host:
-        id: "{{ infra_host_info.legacy_id }}"
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
         state: "absent"
 
     - name: Delete the DNS Server
