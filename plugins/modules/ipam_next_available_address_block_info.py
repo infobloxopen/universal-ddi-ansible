@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_next_available_address_block_info
-short_description: Manage NextAvailableAddressBlock
+short_description: Retrieves the Next Available Address Block
 description:
-    - Manage NextAvailableAddressBlock
+    - This module retrieves the next available subnet within a specified address block based on the provided CIDR and optional filters.
 version_added: 2.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
