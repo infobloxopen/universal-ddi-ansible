@@ -1,0 +1,130 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: Create Address Block with tags
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.1.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter1"
+        state: "present"
+      register: _tagged_address_block
+    
+    - name: Create another Address Block with different tags
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.2.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "staging"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_address_block_2
+    
+    - name: Create another Address Block with different tags
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.3.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_address_block_3
+
+    - name: Create subnet with tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.1.0/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter1"
+        state: "present"
+      register: _tagged_subnet_1
+    
+    - name: Create subnet with different tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.2.0/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "staging"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_subnet_2
+    
+    - name: Create another subnet with different tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.3.0/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_subnet_3
+    
+    # Create a subnet for address block for next available ip
+    - name: Create subnet with tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.1.16/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter1"
+        state: "present"
+      register: _tagged_subnet_1
+    
+    - name: Create subnet with different tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.2.16/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "staging"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_subnet_2
+    
+    - name: Create another subnet with different tags
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.3.16/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_subnet_3
+    
+        # Create ranges with different tag combinations
+    - name: Create range with production+datacenter1 tags
+      infoblox.universal_ddi.ipam_range:
+        start: "10.0.1.1"
+        end: "10.0.1.14"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter1"
+        state: "present"
+      register: _tagged_range_1
+    
+    - name: Create range with staging+datacenter2 tags
+      infoblox.universal_ddi.ipam_range:
+        start: "10.0.2.1"
+        end: "10.0.2.14"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "staging"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_range_2
+    
+    - name: Create range with production+datacenter2 tags
+      infoblox.universal_ddi.ipam_range:
+        start: "10.0.3.1"
+        end: "10.0.3.14"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+          location: "datacenter2"
+        state: "present"
+      register: _tagged_range_3
