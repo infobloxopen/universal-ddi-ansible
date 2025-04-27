@@ -14,33 +14,3 @@
         space: "{{ _ip_space.id }}"
         state: "present"
       register: _address_block
-    
-    - name: Create Address Block with tags
-      infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.1.0/27"
-        space: "{{ _ip_space.id }}"
-        tags:
-          environment: "production"
-          location: "datacenter1"
-        state: "present"
-      register: _tagged_address_block
-    
-    - name: Create another Address Block with different tags
-      infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.2.0/27"
-        space: "{{ _ip_space.id }}"
-        tags:
-          environment: "staging"
-          location: "datacenter2"
-        state: "present"
-      register: _tagged_address_block_2
-    
-    - name: Create another Address Block with different tags
-      infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.3.0/27"
-        space: "{{ _ip_space.id }}"
-        tags:
-          environment: "production"
-          location: "datacenter2"
-        state: "present"
-      register: _tagged_address_block_3

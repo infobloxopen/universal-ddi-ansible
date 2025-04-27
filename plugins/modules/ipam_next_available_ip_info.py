@@ -55,6 +55,40 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+    - name: "Create an IP space required as parent"
+      infoblox.universal_ddi.ipam_ip_space:
+          name: "ip_space"
+          state: "present"
+      register: _ip_space
+
+    - name: "Create an Address Block required as parent"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+        state: "present"
+      register: _address_block
+
+    - name: "Create a Subnet required as parent"
+      infoblox.universal_ddi.ipam_subnet:
+        address: "10.0.0.0/24"
+        space: "{{ _ip_space.id }}"
+        tags:
+            environment: "production"
+        state: "present"
+      register: _subnet
+    
+    - name: "Create range required as parent"
+      infoblox.universal_ddi.ipam_range:
+        start: "10.0.0.1"
+        end: "10.0.0.14"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "production"
+        state: "present"
+      register: _range
+    
     - name: Get Information about Next Available IP in Address Block
       infoblox.universal_ddi.ipam_next_available_ip_info:
         id: "{{ _address_block.id }}"
