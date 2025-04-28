@@ -1,2 +1,2 @@
 ---
-dependencies: [setup_view,setup_dns_forward_nsg,setup_dns_host_info]
+dependencies: [setup_view, setup_dns_forward_nsg, setup_dns_host_info]
