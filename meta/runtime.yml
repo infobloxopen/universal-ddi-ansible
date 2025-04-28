@@ -8,6 +8,7 @@ action_groups:
           - dns
           - keys
           - infra
+          - cloud_discovery
           - dhcp
           - anycast
 
@@ -69,6 +70,10 @@ action_groups:
     - infra_host_info
     - infra_service
     - infra_service_info
+
+  cloud_discovery:
+    - cloud_discovery_providers
+    - cloud_discovery_providers_info
 
   dhcp:
     - dhcp_fixed_address
