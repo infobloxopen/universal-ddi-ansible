@@ -20,7 +20,7 @@ options:
         description:
             - "ID of the object"
         type: int
-        required: false
+        required: true
     state:
         description:
             - "Indicate desired state of the object"
@@ -674,7 +674,7 @@ class OnPremAnycastManagerModule(UniversalDDIAnsibleModule):
 
 def main():
     module_args = dict(
-        id=dict(type="int", required=False),
+        id=dict(type="int", required=True),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         anycast_config_refs=dict(
             type="list",
