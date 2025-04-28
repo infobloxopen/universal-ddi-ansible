@@ -3,7 +3,8 @@
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
-  block:    
+
+  block:
     - name: "Create an Address Block"
       infoblox.universal_ddi.ipam_address_block:
         address: "10.0.0.0/16"
