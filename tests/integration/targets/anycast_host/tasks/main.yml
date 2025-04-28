@@ -162,6 +162,7 @@
           area_type: "NSSA"
           area: "10.10.0.2"
           authentication_type: "MD5"
+          cost: 10
           authentication_key_id: 120
           interface: "ens160"
           authentication_key: "YXV0aGV"
@@ -187,6 +188,7 @@
           - anycast_host.object.config_ospf.area == "10.10.0.2"
           - anycast_host.object.config_ospf.authentication_type == "MD5"
           - anycast_host.object.config_ospf.interface == "ens160"
+          - anycast_host.object.config_ospf.cost == 10
           - anycast_host.object.config_ospf.hello_interval == 20
           - anycast_host.object.config_ospf.dead_interval == 50
           - anycast_host.object.config_ospf.retransmit_interval == 10
