@@ -200,10 +200,6 @@ options:
                     - "The estimated time for transmitting link state advertisements."
                 default: 1
                 type: int
-    created_at:
-        description: 
-            - "The date and time this host was created in the anycast service database."
-        type: str
     ip_address:
         description:
             - "IPv4 address of the on-prem host"
@@ -215,10 +211,6 @@ options:
     name:
         description: 
             - "A user-friendly name of the host. Example: 'dns-host-1', 'Central Office Server'"
-        type: str
-    updated_at:
-        description: 
-            - "The date and time this host was last updated in the anycast service database."
         type: str
 
 extends_documentation_fragment:
