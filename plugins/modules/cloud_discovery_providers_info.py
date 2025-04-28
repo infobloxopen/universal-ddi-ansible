@@ -13,7 +13,7 @@ module: cloud_discovery_providers_info
 short_description: Retrieves Cloud Discovery Providers.
 description:
     - Retrieves information about existing Cloud Discovery Providers.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
