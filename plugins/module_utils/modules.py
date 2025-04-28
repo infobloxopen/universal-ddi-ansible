@@ -32,6 +32,7 @@ class UniversalDDIAnsibleModule(AnsibleModule):
 
         super(UniversalDDIAnsibleModule, self).__init__(*args, **kwargs)
         self._client = None
+        self._limit = 1000
 
         if not HAS_UNIVERSAL_DDI_CLIENT:
             self.fail_json(
@@ -59,6 +60,42 @@ class UniversalDDIAnsibleModule(AnsibleModule):
             setattr(update_body, field, None)
 
         return update_body
+
+    def find_address_blocks_by_tags(self, tag_filters):
+        """
+        Find address blocks by tag filters.
+
+        :param tag_filters: Dictionary of tag key-value pairs to filter by
+        :return: List of address blocks matching the tag filters
+        """
+
+        from ipam import AddressBlockApi
+        from universal_ddi_client import ApiException
+
+        tag_filter_str = None
+        if tag_filters:
+            tag_filter_str = " and ".join([f"{k}=='{v}'" for k, v in tag_filters.items()])
+
+        offset = 0
+        all_results = []  # Initialize a list to accumulate all results
+
+        while True:
+            try:
+                resp = AddressBlockApi(self.client).list(
+                    offset=offset, limit=self._limit, tfilter=tag_filter_str, inherit="full"
+                )
+
+                # Accumulate results from this page
+                all_results.extend(resp.results)
+
+                if len(resp.results) < self._limit:
+                    break
+                offset += self._limit
+
+            except ApiException as e:
+                self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
+
+        return all_results
 
 
 def universal_ddi_client_common_argument_spec():

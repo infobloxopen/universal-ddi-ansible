@@ -1,8 +1,4 @@
 ---
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - Next Available Address in Range
-
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -45,6 +41,325 @@
         that:
           - next_available_address_info is not failed
           - next_available_address_info.objects | length == 1
+    
+    - name: Get Information about Next Available IP in Range
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        id: "{{ _tagged_range_1.id }}"
+        count: 5
+      register: next_available_range_info
+    - assert:
+        that:
+          - next_available_range_info is not failed
+          - next_available_range_info.objects | length == 5
+
+    - name: Get Information about Next Available IP in Range Default Count
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        id: "{{ _tagged_range_1.id }}"
+      register: next_available_range_info
+    - assert:
+        that:
+          - next_available_range_info is not failed
+          - next_available_range_info.objects | length == 1
+
+    - name: Get Next Available IP in Address Blocks filtered by tags
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 10
+      register: next_available_address_info_tags
+    - assert:
+        that:
+          - next_available_address_info_tags is not failed
+          - next_available_address_info_tags.objects | length == 10
+
+    - name: Get Next Available IP in Address Block with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter2"
+        resource_type: "address_block"
+        count: 3
+      register: multi_tag_address_block_result
+    - assert:
+        that:
+          - multi_tag_address_block_result is not failed
+          - multi_tag_address_block_result.objects | length == 3
+
+    - name: Get Continous Next Available IP in Address Block with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter1"
+        resource_type: "address_block"
+        count: 10
+        contiguous: true
+      register: multi_tag_address_block_continous_result
+    - assert:
+        that:
+          - multi_tag_address_block_continous_result is not failed
+          - multi_tag_address_block_continous_result.objects | length == 10
+
+    - name: Get Next Available IP from multiple Address Block with tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          location: "datacenter2"
+        resource_type: "address_block"
+        count: 16
+        contiguous: true
+      register: multi_address_block_tag_result
+    - assert:
+        that:
+          - multi_address_block_tag_result is not failed
+          - multi_address_block_tag_result.objects | length == 16
+
+    - name: Verify no results with non-matching tag combination
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter3"
+        resource_type: "address_block"
+        count: 1
+      register: non_matching_tags_result
+      ignore_errors: true
+    - assert:
+        that:
+          - non_matching_tags_result is failed
+          - "'No address_blocks found with the given tags.' in non_matching_tags_result.msg"
+
+    - name: Test count=0 with address block (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 0
+      register: zero_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - zero_count_result is failed
+          - "'count must be between 1 and 20' in zero_count_result.msg"
+    
+    - name: Test count=21 with address block (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "address_block"
+        count: 21
+      register: large_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - large_count_result is failed
+          - "'count must be between 1 and 20' in large_count_result.msg"
+
+    - name: Test without required resource_type
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        count: 1
+      register: missing_resource_type_result
+      ignore_errors: true
+    - assert:
+        that:
+          - missing_resource_type_result is failed
+
+    - name: Test with invalid resource_type
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "invalid_type"
+        count: 1
+      register: invalid_resource_type_result
+      ignore_errors: true
+    - assert:
+        that:
+          - invalid_resource_type_result is failed
+          - "'value of resource_type must be one of' in invalid_resource_type_result.msg"
+
+    - name: Get Next Available IP in Subnets filtered by tags
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 10
+      register: next_available_subnet_info_tags
+    - assert:
+        that:
+          - next_available_subnet_info_tags is not failed
+          - next_available_subnet_info_tags.objects | length == 10
+
+    - name: Get Next Available IP in Subnet with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter2"
+        resource_type: "subnet"
+        count: 3
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 3
+
+    - name: Get Continuous Next Available IP in Subnet with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter1"
+        resource_type: "subnet"
+        count: 10
+        contiguous: true
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 10
+
+    - name: Get Next Available IP from multiple Subnets with tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          location: "datacenter2"
+        resource_type: "subnet"
+        count: 16
+        contiguous: true
+      register: multi_tag_subnet_result
+    - assert:
+        that:
+          - multi_tag_subnet_result is not failed
+          - multi_tag_subnet_result.objects | length == 16
+
+    - name: Verify no results with non-matching tag combination for subnet
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter3"
+        resource_type: "subnet"
+        count: 1
+      register: non_matching_tags_result
+      ignore_errors: true
+    - assert:
+        that:
+          - non_matching_tags_result is failed
+          - "'No subnets found with the given tags.' in non_matching_tags_result.msg"
+
+    - name: Test count=0 with subnet (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 0
+      register: zero_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - zero_count_result is failed
+          - "'count must be between 1 and 20' in zero_count_result.msg"
+
+    - name: Test count=21 with subnet (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "subnet"
+        count: 21
+      register: large_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - large_count_result is failed
+          - "'count must be between 1 and 20' in large_count_result.msg"
+
+    - name: Get Next Available IP in Ranges filtered by tags
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "range"
+        count: 10
+      register: next_available_range_info_tags
+    - assert:
+        that:
+          - next_available_range_info_tags is not failed
+          - next_available_range_info_tags.objects | length == 10
+
+    - name: Get Next Available IP in Range with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter2"
+        resource_type: "range"
+        count: 3
+      register: multi_tag_range_result
+    - assert:
+        that:
+          - multi_tag_range_result is not failed
+          - multi_tag_range_result.objects | length == 3
+
+    - name: Get Continuous Next Available IP in Range with multiple tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter1"
+        resource_type: "range"
+        count: 10
+        contiguous: true
+      register: multi_tag_range_result
+    - assert:
+        that:
+          - multi_tag_range_result is not failed
+          - multi_tag_range_result.objects | length == 10
+
+    - name: Get Next Available IP from multiple Ranges with tag filters
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          location: "datacenter2"
+        resource_type: "range"
+        count: 16
+        contiguous: true
+      register: multi_tag_range_result
+    - assert:
+        that:
+          - multi_tag_range_result is not failed
+          - multi_tag_range_result.objects | length == 16
+
+    - name: Verify no results with non-matching tag combination for range
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+          location: "datacenter3"
+        resource_type: "range"
+        count: 1
+      register: non_matching_tags_result
+      ignore_errors: true
+    - assert:
+        that:
+          - non_matching_tags_result is failed
+          - "'No ranges found with the given tags.' in non_matching_tags_result.msg"
+
+    - name: Test count=0 with range (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "range"
+        count: 0
+      register: zero_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - zero_count_result is failed
+          - "'count must be between 1 and 20' in zero_count_result.msg"
+
+    - name: Test count=21 with range (should fail)
+      infoblox.universal_ddi.ipam_next_available_ip_info:
+        tag_filters:
+          environment: "production"
+        resource_type: "range"
+        count: 21
+      register: large_count_result
+      ignore_errors: true
+    - assert:
+        that:
+          - large_count_result is failed
+          - "'count must be between 1 and 20' in large_count_result.msg"
 
   always:
       # Cleanup if the test fails
