@@ -139,9 +139,13 @@ releases:
     release_date: '2025-02-06'
   1.1.0:
     changes:
-      release_summary: Extended Support for Universal DDI Ansible Collection.
-    minor_changes:
-      - Add ``primary_ip4/6`` to ``netbox_ip_address`` (https://github.com/netbox-community/ansible_modules/issues/10)
+      release_summary:
+      - Added support for DHCP and IPAM Federation modules.
+      - Added support for Cloud Discovery Providers modules.
+      - Added support for DNS Bulk Copy modules.
+      - Added Support for Tag Filters for Next Available IP.
+      - Added support for Tag Filter for Next Available subnet.
+      - Added support for Tag filters in Next Available Address Block.
     modules:
     - description: Manage DHCP Host.
       name: dhcp_host
