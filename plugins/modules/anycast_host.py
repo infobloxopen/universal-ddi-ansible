@@ -69,10 +69,6 @@ options:
                     - "BGP keep-alive timer."
                 type: int
                 default: 30
-            link_detect:
-                description: 
-                    - "Enable/disable link detection. Example: true"
-                type: bool
             neighbors:
                 description: 
                     - "List of BGP Neighbor structs."
@@ -101,10 +97,6 @@ options:
                         description: 
                             - "The BGP protocol access password for this BGP neighbor; max 25 characters long."
                         type: str
-            preamble:
-                description:
-                    - "Any predefined BGP configuration, with embedded new lines; the preamble will be prepended to the generated BGP configuration."
-                type: str
     config_ospf:
         description: 
             - "Defines the OSPF configuration for one anycast-enabled on-prem host."
@@ -159,10 +151,6 @@ options:
                     - "Name of the interface that is configured with external IP address of the host. Example: 'eth0'"
                 type: str
                 required: true
-            preamble:
-                description:
-                    - "Any predefined OSPF configuration, with embedded new lines; the preamble will be prepended to the generated BGP configuration."
-                type: str
             retransmit_interval:
                 description: 
                     - "The period, in seconds, of retransmitting for the OSPF Database Description and Link State Requests."
@@ -710,7 +698,6 @@ def main():
                 asn=dict(type="int", required=True),
                 holddown_secs=dict(type="int", default=90),
                 keep_alive_secs=dict(type="int", default=30),
-                link_detect=dict(type="bool"),
                 neighbors=dict(
                     type="list",
                     elements="dict",
@@ -722,7 +709,6 @@ def main():
                         password=dict(type="str", no_log=True),
                     ),
                 ),
-                preamble=dict(type="str"),
             ),
         ),
         config_ospf=dict(
@@ -737,7 +723,6 @@ def main():
                 dead_interval=dict(type="int", default=40),
                 hello_interval=dict(type="int", default=10),
                 interface=dict(type="str", required=True),
-                preamble=dict(type="str"),
                 retransmit_interval=dict(type="int", default=5),
                 transmit_delay=dict(type="int", default=1),
             ),
@@ -754,11 +739,9 @@ def main():
                 transmit_delay=dict(type="int", default=1),
             ),
         ),
-        created_at=dict(type="str"),
         ip_address=dict(type="str"),
         ipv6_address=dict(type="str"),
         name=dict(type="str"),
-        updated_at=dict(type="str"),
     )
 
     module = OnPremAnycastManagerModule(
