@@ -1,0 +1,15 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  
+  block:
+    - ansible.builtin.set_fact:
+        forward_nsg_name: "test-auth-nsg-{{ 999999 | random | string }}"
+
+    - name: Create an Forward NSG
+      infoblox.universal_ddi.dns_forward_nsg:
+        name: "{{ forward_nsg_name }}"
+        state: present
+      register: _forward_nsg

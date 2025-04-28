@@ -1,2 +1,2 @@
 ---
-dependencies: [setup_view]
+dependencies: [setup_view,setup_dns_auth_nsg,setup_dns_host_info]

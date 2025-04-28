@@ -1,10 +1,4 @@
 ---
-
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - internal_secondaries
-# - nsgs
-
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -320,6 +314,28 @@
           - auth_zone is not failed
           - auth_zone_info.objects | length == 1
 
+    - name: Create an Auth Zone with Internal Secondaries
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ fqdn }}"
+        primary_type: cloud
+        view: "{{ _view.id }}"
+        internal_secondaries:
+          - host: "{{ _dns_host_info.objects[0].id }}"
+        state: present
+      register: auth_zone
+    - name: Get Information about the Auth Zone
+      infoblox.universal_ddi.dns_auth_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+          view: "{{ _view.id }}"
+      register: auth_zone_info
+    - assert:
+        that:
+          - auth_zone_info is not failed
+          - auth_zone_info.objects | length == 1
+          - auth_zone_info.objects[0].id == auth_zone.id
+          - auth_zone_info.objects[0].internal_secondaries[0].host == _dns_host_info.objects[0].id
+
     - name: Create an Auth Zone with Notify
       infoblox.universal_ddi.dns_auth_zone:
         fqdn: "{{ fqdn }}"
@@ -340,6 +356,28 @@
           - auth_zone_info.objects | length == 1
           - auth_zone_info.objects[0].id == auth_zone.id
           - auth_zone_info.objects[0].notify == true
+
+    - name: Create an Auth Zone with NSG
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "{{ fqdn }}"
+        primary_type: cloud
+        view: "{{ _view.id }}"
+        nsgs:
+          - "{{ _auth_nsg.id }}"
+        state: present
+      register: secondary_forward_nsg
+    - name: Get Information about the Auth Zone
+      infoblox.universal_ddi.dns_auth_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+          view: "{{ _view.id }}"
+      register: auth_zone_info
+    - assert:
+        that:
+          - auth_zone_info is not failed
+          - auth_zone_info.objects | length == 1
+          - auth_zone_info.objects[0].id == auth_zone.id
+          - auth_zone_info.objects[0].nsgs[0] == _auth_nsg.id
 
     - name: Create an Auth Zone with Query ACL
       infoblox.universal_ddi.dns_auth_zone:
@@ -498,6 +536,11 @@
         view: "{{ _view.id }}"
         state: "absent"
       ignore_errors: true
+
+    - name: "Delete Auth NSG"
+      ansible.builtin.include_role:
+        name: setup_dns_auth_nsg
+        tasks_from: cleanup.yml
 
     - name: "Delete the View"
       ansible.builtin.include_role:
