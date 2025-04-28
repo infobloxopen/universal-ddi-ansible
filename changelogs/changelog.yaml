@@ -222,4 +222,4 @@ releases:
     - description: Get Anycast Host information.
       name: anycast_host_info
       namespace: ''
-    release_date: '2025-04-30'
+    release_date: '2025-04-29'
