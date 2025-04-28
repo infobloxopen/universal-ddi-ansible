@@ -1,4 +1,4 @@
-universal-ddi-python-client >= 1.1.0
+universal-ddi-python-client >= 0.1.1
 flynt
 isort
 black
