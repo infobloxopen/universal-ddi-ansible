@@ -142,9 +142,9 @@ releases:
       release_summary:
       - Added support for DHCP and IPAM Federation modules.
       - Added support for Cloud Discovery Providers modules.
-      - Added support for DNS Bulk Copy modules.
+      - Added support for DNS View Bulk Copy module.
       - Added Support for Tag Filters for Next Available IP.
-      - Added support for Tag Filter for Next Available subnet.
+      - Added support for Tag Filter for Next Available Subnet.
       - Added support for Tag filters in Next Available Address Block.
     modules:
     - description: Manage DHCP Host.
@@ -201,7 +201,7 @@ releases:
     - description: Get IPAM Federation Federated Block information.
       name: ipam_federation_federated_block_info
       namespace: ''
-    - description: Manage DNS Bulk Copy.
+    - description: Manage DNS View Bulk Copy.
       name: dns_view_bulk_copy
       namespace: ''
     - description: Manage Cloud Discovery Providers.
