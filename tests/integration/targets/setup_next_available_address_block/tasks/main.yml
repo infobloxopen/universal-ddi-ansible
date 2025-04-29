@@ -1,0 +1,25 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:    
+    - name: "Create a first Address Block with the same tags but smaller capacity"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "172.16.0.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test"
+          location: "site-2"
+        state: "present"
+      register: small_tagged_address_block
+      
+    - name: "Create a second Address Block with the same tags"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "172.17.0.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test"
+          location: "site-2"
+        state: "present"
+      register: small_tagged_address_block_2

@@ -1,2 +1,2 @@
 ---
-dependencies: [setup_ip_space]
+dependencies: [setup_ip_space, setup_address_block, setup_next_available_address_block]
