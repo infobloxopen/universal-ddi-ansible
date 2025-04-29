@@ -139,25 +139,55 @@ releases:
     release_date: '2025-02-06'
   1.1.0:
     changes:
-      release_summary:
-      - Added support for DHCP and IPAM Federation modules.
-      - Added support for Cloud Discovery Providers modules.
-      - Added support for DNS View Bulk Copy module.
-      - Added Support for Tag Filters for Next Available IP.
-      - Added support for Tag Filter for Next Available Subnet.
-      - Added support for Tag filters in Next Available Address Block.
+      release_summary: '- Added support for DHCP and IPAM Federation modules.
+
+        - Added support for Cloud Discovery Providers module.
+
+        - Added support for DNS View Bulk Copy module.
+
+        - Added Support for Tag Filters for Next Available IP.
+
+        - Added support for Tag Filter for Next Available Subnet.
+
+        - Added support for Tag filters in Next Available Address Block.
+
+        '
     modules:
+    - description: Manage Anycast Config.
+      name: anycast_config
+      namespace: ''
+    - description: Get Anycast Config information.
+      name: anycast_config_info
+      namespace: ''
+    - description: Manage Anycast Host.
+      name: anycast_host
+      namespace: ''
+    - description: Get Anycast Host information.
+      name: anycast_host_info
+      namespace: ''
+    - description: Manage Cloud Discovery Providers.
+      name: cloud_discovery_providers
+      namespace: ''
+    - description: Get Cloud Discovery Providers information.
+      name: cloud_discovery_providers_info
+      namespace: ''
+    - description: Manage DHCP Fixed Address.
+      name: dhcp_fixed_address
+      namespace: ''
+    - description: Get DHCP Fixed Address information.
+      name: dhcp_fixed_address_info
+      namespace: ''
+    - description: Manage DHCP HA Group.
+      name: dhcp_ha_group
+      namespace: ''
+    - description: Get DHCP HA Group information.
+      name: dhcp_ha_group_info
+      namespace: ''
     - description: Manage DHCP Host.
       name: dhcp_host
       namespace: ''
     - description: Get DHCP Host information.
       name: dhcp_host_info
-      namespace: ''
-    - description: Manage DHCP Option Space.
-      name: dhcp_option_space
-      namespace: ''
-    - description: Get DHCP Option Space information.
-      name: dhcp_option_space_info
       namespace: ''
     - description: Manage DHCP Option Code.
       name: dhcp_option_code
@@ -171,11 +201,11 @@ releases:
     - description: Get DHCP Option Group information.
       name: dhcp_option_group_info
       namespace: ''
-    - description: Manage DHCP HA Group.
-      name: dhcp_ha_group
+    - description: Manage DHCP Option Space.
+      name: dhcp_option_space
       namespace: ''
-    - description: Get DHCP HA Group information.
-      name: dhcp_ha_group_info
+    - description: Get DHCP Option Space information.
+      name: dhcp_option_space_info
       namespace: ''
     - description: Manage DHCP Server.
       name: dhcp_server
@@ -183,17 +213,8 @@ releases:
     - description: Get DHCP Server information.
       name: dhcp_server_info
       namespace: ''
-    - description: Manage DHCP Fixed Address.
-      name: dhcp_fixed_address
-      namespace: ''
-    - description: Get DHCP Fixed Address information.
-      name: dhcp_fixed_address_info
-      namespace: ''
-    - description: Manage IPAM Federation Federated Realm.
-      name: ipam_federation_federated_realm
-      namespace: ''
-    - description: Get IPAM Federation Federated Realm information.
-      name: ipam_federation_federated_realm_info
+    - description: Manage DNS View Bulk Copy.
+      name: dns_view_bulk_copy
       namespace: ''
     - description: Manage IPAM Federation Federated Block.
       name: ipam_federation_federated_block
@@ -201,25 +222,10 @@ releases:
     - description: Get IPAM Federation Federated Block information.
       name: ipam_federation_federated_block_info
       namespace: ''
-    - description: Manage DNS View Bulk Copy.
-      name: dns_view_bulk_copy
+    - description: Manage IPAM Federation Federated Realm.
+      name: ipam_federation_federated_realm
       namespace: ''
-    - description: Manage Cloud Discovery Providers.
-      name: cloud_discovery_providers
-      namespace: ''
-    - description: Get Cloud Discovery Providers information.
-      name: cloud_discovery_providers_info
-      namespace: ''
-    - description: Manage Anycast Config.
-      name: anycast_config
-      namespace: ''
-    - description: Get Anycast Config information.
-      name: anycast_config_info
-      namespace: ''
-    - description: Manage Anycast Host.
-      name: anycast_host
-      namespace: ''
-    - description: Get Anycast Host information.
-      name: anycast_host_info
+    - description: Get IPAM Federation Federated Realm information.
+      name: ipam_federation_federated_realm_info
       namespace: ''
     release_date: '2025-04-29'
