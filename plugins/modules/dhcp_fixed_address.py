@@ -12,10 +12,10 @@ DOCUMENTATION = r"""
 module: dhcp_fixed_address
 short_description: Manage a Fixed Address
 description:
-    - Manage a Fixed Address
+    - Manages a Fixed Address.
     - The Fixed Address object reserves an address for a specific client.
     - It must have a _match_type_ and a valid corresponding _match_value_ so that it can match that client.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

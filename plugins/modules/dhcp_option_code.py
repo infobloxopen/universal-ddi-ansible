@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_code
-short_description: Manages Option Codes
+short_description: Manages a DHCP Option Code.
 description:
-    - Manage Option Codes
-version_added: 1.0.0
+    - Manages a DHCP Option Code.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

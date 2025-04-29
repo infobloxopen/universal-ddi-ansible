@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group
-short_description: Manage Option Group
+short_description: Manages a DHCP Option Group.
 description:
-    - Manage Option Group
-version_added: 1.0.0
+    - Manages a DHCP Option Group.
+    - The Option Group object is a named collection of options.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

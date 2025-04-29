@@ -13,7 +13,7 @@ module: dns_view_bulk_copy
 short_description: Copy DNS objects from one view to another
 description:
     - Copy DNS objects from one view to another
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

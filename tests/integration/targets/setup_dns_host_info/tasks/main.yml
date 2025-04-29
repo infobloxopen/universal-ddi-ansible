@@ -1,0 +1,17 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: Retrieve a DNS Host
+      infoblox.universal_ddi.dns_host_info:
+        filters:
+          name: "TF_TEST_HOST_01"
+      register: _dns_host_info
+
+    - name: Retrieve another DNS Host
+      infoblox.universal_ddi.dns_host_info:
+        filters:
+          name: "TF_TEST_HOST_02"
+      register: _dns_host_info2

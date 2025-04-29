@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_space
-short_description: Manage an Option Space
+short_description: Manages a DHCP Option Space.
 description:
-    - Manages a set of DHCP Option Codes by defining its properties, such as code, type, option space, and associated metadata, for DHCP configurations.
-version_added: 1.0.0
+    - Manages a DHCP Option Space.
+    - The Option Space object represents a set of DHCP option codes.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

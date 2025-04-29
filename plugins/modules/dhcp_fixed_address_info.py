@@ -10,12 +10,12 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_fixed_address_info
-short_description: Retrieves Fixed Address
+short_description: Retrieves Fixed Address.
 description:
     - Retrieves information about existing Fixed Addresses
     - The Fixed Address object reserves an address for a specific client. 
     - It must have a _match_type_ and a valid corresponding _match_value_ so that it can match that client.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

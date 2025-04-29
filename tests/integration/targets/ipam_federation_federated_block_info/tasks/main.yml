@@ -19,8 +19,7 @@
 
     - name: Get Information about the Federated Block by ID
       infoblox.universal_ddi.ipam_federation_federated_block_info:
-        filters:
-          id: "{{ federated_block.id }}"
+        id: "{{ federated_block.id }}"
       register: federated_block_info
     - assert:
         that:

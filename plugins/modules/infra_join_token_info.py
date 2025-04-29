@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: infra_join_token_info
-short_description: Manage JoinToken
+short_description: Retrieves Host Activation Join Tokens.
 description:
-    - Manage JoinToken
-version_added: 2.0.0
+    - Retrieves information about existing Host Activation Join Tokens.
+    - A join token is random character string which is used for instant validation of new hosts.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

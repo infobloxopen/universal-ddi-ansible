@@ -14,7 +14,7 @@ short_description: Retrieve an Option Space
 description:
     - Retrieves information about existing DHCP Option Spaces.
     - The Option Space object represents a set of DHCP option codes.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -20,8 +20,7 @@
 
     - name: Get Information about the Federated Realm by ID
       infoblox.universal_ddi.ipam_federation_federated_realm_info:
-        filters:
-          id: "{{ federated_realm.id }}"
+        id: "{{ federated_realm.id }}"
       register: federated_realm_info
     - assert:
         that:

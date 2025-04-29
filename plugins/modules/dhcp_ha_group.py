@@ -14,7 +14,7 @@ short_description: Manages an HA Group.
 description:
     -  Manages an HA Group.
     -  The HA Group object represents on-prem hosts that can serve the same leases for HA.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -141,12 +141,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the Ha Group object
+        - ID of the HA Group object
     type: str
     returned: Always
 item:
     description:
-        - Ha Group object
+        - HA Group object
     type: complex
     returned: Always
     contains:

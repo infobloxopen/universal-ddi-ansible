@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_ha_group_info
-short_description: Retrieves information about existing HA Groups.
+short_description: Retrieves HA Groups.
 description:
-    - Retrieves details of existing High Availability (HA) Groups, including their configuration and status
-version_added: 1.0.0
+    - Retrieves information about existing HA Groups.
+    - The HA Group object represents on-prem hosts that can serve the same leases for HA.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -65,12 +66,12 @@ EXAMPLES = r"""
 RETURN = r"""
 id:
     description:
-        - ID of the Ha Group object
+        - ID of the HA Group object
     type: str
     returned: Always
 objects:
     description:
-        - Ha Group object
+        - HA Group object
     type: list
     elements: dict
     returned: Always

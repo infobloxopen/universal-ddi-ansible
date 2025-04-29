@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_code_info
-short_description: Retrieves Option Codes
+short_description: Retrieves DHCP Option Codes.
 description:
-    - Retrieves information about existing Option Codes.
-version_added: 1.0.0
+    - Retrieves information about existing DHCP Option Codes.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

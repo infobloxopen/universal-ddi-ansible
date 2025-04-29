@@ -1,11 +1,4 @@
 ---
-
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - tsig keys
-# - acl
-
-
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"

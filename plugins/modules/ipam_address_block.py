@@ -14,7 +14,7 @@ short_description: Manages an Address Block
 description:
     - Manages an Address Block.
     - The Address Block object allows a uniform representation of the address space segmentation, supporting functions such as administrative grouping, routing aggregation, delegation etc.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
