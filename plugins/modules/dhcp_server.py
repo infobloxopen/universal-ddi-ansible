@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_server
-short_description: Manages a DHCP Config Profile.
+short_description: Manages a DHCP Config Profile (Server).
 description:
     - Manages a DHCP Config Profile.
     - A Server (DHCP Config Profile) is a named configuration profile that can be shared for specified list of hosts.

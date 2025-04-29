@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_server
-short_description: Manages a DNS Config Profile.
+short_description: Manages a DNS Config Profile (Server).
 description:
     - Manage a DNS Config Profile
     - A Server (DNS Config Profile) is a named configuration profile that can be shared for specified list of hosts.

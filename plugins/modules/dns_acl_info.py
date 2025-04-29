@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_acl_info
-short_description: Retrieves Access Control Lists.
+short_description: Retrieves Access Control Lists (ACLs).
 description:
     - Retrieves information about existing named Access Control Lists.
 version_added: 1.0.0
