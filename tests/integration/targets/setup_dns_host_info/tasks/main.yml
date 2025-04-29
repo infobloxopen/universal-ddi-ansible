@@ -4,11 +4,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random Host name to avoid conflicts
-    - ansible.builtin.set_fact:
-        display_name: "test-host-{{ 999999 | random | string }}"
-        serial_number: "serial{{ 999999 | random | string }}"
-
     - name: Retrieve a DNS Host
       infoblox.universal_ddi.dns_host_info:
         filters:
