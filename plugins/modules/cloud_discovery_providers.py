@@ -13,7 +13,7 @@ module: cloud_discovery_providers
 short_description: Manage Cloud Discovery Providers
 description:
     - Manage Cloud Discovery Providers
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

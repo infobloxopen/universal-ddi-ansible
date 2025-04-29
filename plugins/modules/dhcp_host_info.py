@@ -14,7 +14,7 @@ short_description: Retrieves DHCP Hosts
 description:
     - Retrieves information about existing DHCP Hosts.
     - A DHCP Host object associates a DHCP Config Profile with an on-prem host.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

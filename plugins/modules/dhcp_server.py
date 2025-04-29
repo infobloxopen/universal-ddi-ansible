@@ -10,11 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_server
-short_description: Manages a DHCP Server.
+short_description: Manages a DHCP Config Profile (Server).
 description:
-    - Manages a DHCP Server.
-    - A DHCP Server is a named configuration profile that can be shared for specified list of hosts.
-version_added: 1.0.0
+    - Manages a DHCP Config Profile.
+    - A Server (DHCP Config Profile) is a named configuration profile that can be shared for specified list of hosts.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -1010,7 +1010,7 @@ EXAMPLES = r"""
 
     - name: Create a DHCP server with additional fields
       infoblox.universal_ddi.dhcp_server:
-        name: "test-dhcp-server"
+        name: "example-dhcp-server"
         comment: "example-comment"
         profile_type: "server"
         ddns_ttl_percent: 50

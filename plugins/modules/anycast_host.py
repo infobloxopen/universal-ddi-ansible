@@ -13,7 +13,7 @@ module: anycast_host
 short_description: Manage Anycast Host
 description:
     - Manages Anycast Host Configurations
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

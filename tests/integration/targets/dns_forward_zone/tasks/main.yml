@@ -1,10 +1,4 @@
 ---
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - Forward Zone with Hosts
-# - Forward Zone with Internal Forwarders
-# - Forward Zone with NSGs
--
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -247,6 +241,66 @@
           - forward_zone_info.objects | length == 1
           - forward_zone_info.objects[0].forward_only == false
 
+    - name: Create a Forward Zone with Hosts
+      infoblox.universal_ddi.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        view: "{{ _view.id }}"
+        hosts:
+          - "{{ _dns_host_info.objects[0].id }}"
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone
+      infoblox.universal_ddi.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+          view: "{{ _view.id }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone_info is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].hosts[0] == _dns_host_info.objects[0].id
+
+    - name: Create a Forward Zone with Internal Forwarders
+      infoblox.universal_ddi.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        view: "{{ _view.id }}"
+        internal_forwarders:
+          - "{{ _dns_host_info2.objects[0].id }}"
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone
+      infoblox.universal_ddi.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+          view: "{{ _view.id }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone_info is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].internal_forwarders[0] == _dns_host_info2.objects[0].id
+
+    - name: Create a Forward Zone with NSGs
+      infoblox.universal_ddi.dns_forward_zone:
+        fqdn: "{{ fqdn }}"
+        view: "{{ _view.id }}"
+        nsgs:
+          - "{{ _forward_nsg.id }}"
+        state: present
+      register: forward_zone
+    - name: Get Information about the Forward Zone
+      infoblox.universal_ddi.dns_forward_zone_info:
+        filters:
+          fqdn: "{{ fqdn }}"
+          view: "{{ _view.id }}"
+      register: forward_zone_info
+    - assert:
+        that:
+          - forward_zone_info is not failed
+          - forward_zone_info.objects | length == 1
+          - forward_zone_info.objects[0].nsgs[0] == _forward_nsg.id
+
   always:
     # Cleanup if the test fails
     - name: "Delete The Forward Zone"
@@ -255,6 +309,11 @@
         view: "{{ _view.id }}"
         state: absent
       ignore_errors: true
+
+    - name: "Delete Forward NSG"
+      ansible.builtin.include_role:
+        name: setup_dns_forward_nsg
+        tasks_from: cleanup.yml
 
     - name: "Delete the View"
       ansible.builtin.include_role:

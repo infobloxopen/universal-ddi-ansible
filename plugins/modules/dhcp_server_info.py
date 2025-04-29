@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_server_info
-short_description: Retrieves DHCP Server
+short_description: Retrieves DHCP Config Profiles.
 description:
-    - Retrieves information about existing DHCP Servers(DHCP Config Profile).
-version_added: 1.0.0
+    - Retrieves information about existing DHCP Config Profiles.
+    - A Server (DHCP Config Profile) is a named configuration profile that can be shared for specified list of hosts.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -14,7 +14,7 @@ short_description: Retrieves Federated Realms
 description:
     - Retrieves information about existing Federated Realms.
     - The Federated Realm object is a unique set of federated blocks per realm.
-version_added: 1.0.0
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

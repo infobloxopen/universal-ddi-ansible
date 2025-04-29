@@ -12,8 +12,8 @@ DOCUMENTATION = r"""
 module: infra_service_info
 short_description: Retrieve Infrastructure Services
 description:
-    - Retrieve Infrastructure Services
-version_added: 2.0.0
+    - Retrieves information about existing Infrastructure Services
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

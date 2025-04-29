@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_auth_zone_info
-short_description: Manage AuthZone
+short_description: Retrieves Authoritative DNS Zones.
 description:
-    - Manage AuthZone
-version_added: 2.0.0
+    - Retrieves information about existing Authoritative DNS Zones.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

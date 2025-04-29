@@ -1,8 +1,4 @@
 ---
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - Next Available Address in Range
-
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -237,6 +233,23 @@
       infoblox.universal_ddi.ipam_address:
         space: "{{ _ip_space.id }}"
         next_available_id: "{{ _address_block.id }}"
+        state: "present"
+      register: next_available_address
+    - name: Get information about the Address
+      infoblox.universal_ddi.ipam_address_info:
+        id: "{{ next_available_address.id }}"
+      register: address_info
+    - assert:
+        that:
+          - next_available_address is changed
+          - next_available_address is not failed
+          - address_info.objects | length == 1
+          - address_info.objects[0].id == next_available_address.id
+
+    - name: Create a Next Available Address in Range
+      infoblox.universal_ddi.ipam_address:
+        space: "{{ _ip_space.id }}"
+        next_available_id: "{{ _range.id }}"
         state: "present"
       register: next_available_address
     - name: Get information about the Address

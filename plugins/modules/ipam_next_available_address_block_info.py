@@ -13,7 +13,7 @@ module: ipam_next_available_address_block_info
 short_description: Retrieves the Next Available Address Block
 description:
     - This module retrieves the next available subnet within a specified address block based on the provided CIDR or tag filters.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

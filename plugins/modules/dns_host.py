@@ -10,12 +10,12 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_host
-short_description: Manages DNS Hosts
+short_description: Manages DNS Hosts.
 description:
     - Manages DNS Hosts.
     - A DNS Host object associates a DNS Config Profile with an on-prem host.
     - This resource represents an existing backend object that cannot be created or deleted through API calls. Instead, it can only be updated.
-version_added: 2.0.0
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
@@ -83,7 +83,7 @@ EXAMPLES = r"""
     - name: Retrieve Infra Host Information (required as parent)
       infoblox.universal_ddi.infra_host_info:
         filters:
-          display_name: "test_infra_host"
+          display_name: "example_infra_host"
 
     - name: Create a DNS Server (required as parent)
       infoblox.universal_ddi.dns_server:
