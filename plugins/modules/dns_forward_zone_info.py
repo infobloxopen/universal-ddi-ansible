@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_zone_info
-short_description: Manage ForwardZone
+short_description: Retrieves Forward DNS Zones.
 description:
-    - Manage ForwardZone
-version_added: 2.0.0
+    - Retrieves information about existing Forward DNS Zones.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

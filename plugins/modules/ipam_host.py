@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: ipam_host
-short_description: Manage IPAM host
+short_description: Manages an IPAM Host.
 description:
-    - Manage IPAM host
-version_added: 2.0.0
+    - Manages an IPAM Host.
+    - The IPAM host object represents any network connected equipment that is assigned one or more IP Addresses.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

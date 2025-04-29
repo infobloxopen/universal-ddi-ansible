@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_delegation
-short_description: Manage Delegation
+short_description: Manages a zone delegation.
 description:
-    - Manage Delegation
-version_added: 2.0.0
+    - Manages a zone delegation.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

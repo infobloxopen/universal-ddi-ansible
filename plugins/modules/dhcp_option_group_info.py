@@ -10,10 +10,11 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dhcp_option_group_info
-short_description: Retrieves Option Groups
+short_description: Retrieves DHCP Option Groups.
 description:
-    - Retrieves information about existing Option Groups.
-version_added: 1.0.0
+    - Retrieves information about existing DHCP Option Groups.
+    - The Option Group object is a named collection of options.
+version_added: 1.1.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

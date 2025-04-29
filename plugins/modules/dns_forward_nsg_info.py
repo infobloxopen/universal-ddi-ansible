@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_nsg_info
-short_description: Retrieve Forward NSG
+short_description: Retrieves Forward DNS Server Groups.
 description:
-    - Manage Forward NSG
-version_added: 2.0.0
+    - Retrieves information about existing Forward DNS Server Groups.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_delegation_info
-short_description: Manage Delegation
+short_description: Retrieves zone delegations.
 description:
-    - Manage Delegation
-version_added: 2.0.0
+    - Retrieves information about existing zone delegations.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

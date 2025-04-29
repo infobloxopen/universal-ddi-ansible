@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_zone
-short_description: Manage ForwardZone
+short_description: Manages a forwarding zone
 description:
-    - Manage ForwardZone
-version_added: 2.0.0
+    - Manages a forwarding zone
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

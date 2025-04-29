@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_acl_info
-short_description: "Manages a named Access Control List (ACL)"
+short_description: Retrieves Access Control Lists (ACLs).
 description:
-    - "Manages a named Access Control List (ACL)"
-version_added: 2.0.0
+    - Retrieves information about existing named Access Control Lists.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

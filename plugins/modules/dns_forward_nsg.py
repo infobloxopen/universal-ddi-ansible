@@ -10,10 +10,10 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dns_forward_nsg
-short_description: Manage Forward NSG
+short_description: Manages a Forward DNS Server Group for forward zones.
 description:
-    - Manage Forward NSG
-version_added: 2.0.0
+    - Manages a Forward DNS Server Group for forward zones.
+version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
