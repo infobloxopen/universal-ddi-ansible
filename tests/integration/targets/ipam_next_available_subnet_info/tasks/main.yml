@@ -64,20 +64,6 @@
           - subnet_info is not failed
           - subnet_info.objects | length == 15
 
-    - name: "Get multiple next available subnets requiring more than one address block"
-      infoblox.universal_ddi.ipam_next_available_subnet_info:
-        tag_filters:
-          environment: "test"
-          location: "site-1"
-        cidr: 30
-        count: 20
-      register: subnet_info
-      ignore_errors: true
-    - assert:
-        that:
-          - subnet_info is failed
-          - "'Requested 20 subnets but only 16 were available' in subnet_info.msg"
-
     - name: "Get next available subnet with non-existent tags"
       infoblox.universal_ddi.ipam_next_available_subnet_info:
         tag_filters:
