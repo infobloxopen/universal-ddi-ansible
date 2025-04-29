@@ -1,9 +1,4 @@
 ---
-
-#TODO: add tests
-# The following require additional plugins to be supported.
-# - internal_secondaries
-
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -140,6 +135,24 @@
           - auth_nsg_info.objects[0].external_primaries[0].address == "1.1.1.1"
           - auth_nsg_info.objects[0].external_primaries[0].fqdn == "a.com."
           - auth_nsg_info.objects[0].external_primaries[0].type == "primary"
+
+    - name: Create an Auth NSG with Internal Secondaries
+      infoblox.universal_ddi.dns_auth_nsg:
+        name: "{{ auth_nsg_name }}"
+        internal_secondaries:
+          - host: "{{ _dns_host_info.objects[0].id }}"
+        state: present
+      register: auth_nsg
+    - name: Get Information about the Auth NSG
+      infoblox.universal_ddi.dns_auth_nsg_info:
+        filters:
+          name: "{{ auth_nsg_name }}"
+      register: auth_nsg_info
+    - assert:
+        that:
+          - auth_nsg is not failed
+          - auth_nsg_info.objects | length == 1
+          - auth_nsg_info.objects[0].internal_secondaries[0].host == _dns_host_info.objects[0].id
 
     - name: Create an Auth NSG with tags
       infoblox.universal_ddi.dns_auth_nsg:
