@@ -779,7 +779,7 @@ EXAMPLES = r"""
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
         state: "present"
-    
+
     - name: Create a Option Space ( required as parent for DHCP Option Code )
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
@@ -800,7 +800,7 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_subnet:
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
-        tags: 
+        tags:
           location: "site1"
         state: "present"
         dhcp_options:

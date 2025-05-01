@@ -766,7 +766,7 @@ EXAMPLES = r"""
         cidr: 20
         next_available_id: "{{ address_block.id }}"
         state: "present"
-    
+
     - name: Create a Option Space ( required as parent for DHCP Option Code )
       infoblox.universal_ddi.dhcp_option_space:
         name: "example-option-space"
