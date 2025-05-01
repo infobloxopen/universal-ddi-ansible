@@ -77,7 +77,7 @@ EXAMPLES = r"""
 
   - name: Create a host with Additional Fields
     infoblox.universal_ddi.infra_host:
-      name: "example_host"
+      display_name: "example_host"
       description: "Example Infra Host"
       maintenance_mode: enabled
       state: "present"

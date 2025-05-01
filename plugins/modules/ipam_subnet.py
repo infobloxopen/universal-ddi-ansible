@@ -779,6 +779,13 @@ EXAMPLES = r"""
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
         state: "present"
+    
+    - name: Create a Option Space ( required as parent for DHCP Option Code )
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "example-option-space"
+        protocol: "ip4"
+        state: present
+      register: option_space
 
     - name: Create a DHCP Option Code ( required as parent for DHCP Options)
       infoblox.universal_ddi.dhcp_option_code:
@@ -792,11 +799,10 @@ EXAMPLES = r"""
     - name: "Create a subnet with Additional Fields"
       infoblox.universal_ddi.ipam_subnet:
         address: "10.0.0.0/24"
-        space: "{{ ip_space_id }}"
-        tags: [location: "site1" ]
+        space: "{{ ip_space.id }}"
+        tags: 
+          location: "site1"
         state: "present"
-        dhcp_config:
-            abandoned_reclaim_time: 3600
         dhcp_options:
           - type: "option"
             option_code: "{{ option_code.id }}"
@@ -805,7 +811,6 @@ EXAMPLES = r"""
             dhcp_config:
                 lease_time:
                     action: override
-
                 # The API currently requires all fields inside the inheritance config to be explicitly provided,
                 # or it fails with error 'The value of an inheritance action field is not valid'.
                 abandoned_reclaim_time:

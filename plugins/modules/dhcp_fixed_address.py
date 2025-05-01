@@ -220,8 +220,15 @@ EXAMPLES = r"""
         match_value: "00:00:00:00:00:00"
         ip_space: "{{ ip_space.id }}"
         state: "present"
+    
+    - name: Create a Option Space ( required as parent for Option Code )
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "example-option-space"
+        protocol: "ip4"
+        state: present
+      register: option_space
         
-    - name: Create a DHCP Option Code ( required as parent for DHCP Options)
+    - name: Create a DHCP Option Code ( required as parent for DHCP Options )
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "option_code_name"
@@ -253,7 +260,7 @@ EXAMPLES = r"""
 
     - name: Create a Next Available Fixed Address
       infoblox.universal_ddi.dhcp_fixed_address:
-        next_available_ip: "{{ subnet.id }}"
+        next_available_id: "{{ subnet.id }}"
         name: "example_fixed_address_ansible"
         match_type: "mac"
         match_value: "00:00:00:00:00:01"

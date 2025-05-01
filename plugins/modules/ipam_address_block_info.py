@@ -58,14 +58,6 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: "Create an Address Block"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "10.0.0.0/16"
-        space: "{{ ip_space.id }}"
-        tags:
-          location: "site-1"
-        state: "present"
-
     - name: Get Address Block information by ID
       infoblox.universal_ddi.ipam_address_block_info:
         id: "{{ address_block.id }}"

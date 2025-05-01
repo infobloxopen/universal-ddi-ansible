@@ -65,16 +65,18 @@ EXAMPLES = r"""
   - name: Get Subnet information by filters (e.g. address)
     infoblox.universal_ddi.ipam_subnet_info:
       filters:
-        address: "10.0.0.0/24"
+        address: "10.0.0.0"
+        space: "{{ _ip_space.id }}"
+        cidr: 24
 
   - name: Get Subnet information by raw filter query
     infoblox.universal_ddi.ipam_subnet_info:
-      filter_query: "address=='10.0.0.0/24'"
+      filter_query: "address=='10.0.0.0' and space=='{{ _ip_space.id }}' and cidr==24"
 
-  # - name: Get Subnet information by tag filters
-  #   infoblox.universal_ddi.ipam_subnet_info:
-  #     tag_filters:
-  #       location: "site-1"
+  - name: Get Subnet information by tag filters
+    infoblox.universal_ddi.ipam_subnet_info:
+      tag_filters:
+        location: "site-1"
 """
 
 RETURN = r"""

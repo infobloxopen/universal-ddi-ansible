@@ -42,20 +42,20 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: "Create an IP space"
+    - name: "Create an IP space (required as parent)"
       infoblox.universal_ddi.ipam_ip_space:
           name: "example_ip_space"
           state: "present"
       register: ip_space
 
-    - name: "Create an Address Block"
+    - name: "Create an Address Block (required as parent)"
       infoblox.universal_ddi.ipam_address_block:
         address: "10.0.0.0/16"
         space: "{{ ip_space.id }}"
         state: "present"
       register: address_block
 
-    - name: "Create an Address Block with tags"
+    - name: "Create an Address Block with tags (required as parent)"
       infoblox.universal_ddi.ipam_address_block:
         address: "192.168.0.0/16"
         space: "{{ ip_space.id }}"

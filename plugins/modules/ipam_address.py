@@ -114,14 +114,14 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_address:
         address: "10.0.0.3"
         comment: "example comment"
-        space: "{{ _ip_space.id }}"
+        space: "{{ ip_space.id }}"
         tags:
             "location": "site 1"
         state: "present"
 
     - name: Create a Next Available Address in subnet
       infoblox.universal_ddi.ipam_address:
-        space: "{{ _ip_space.id }}"
+        space: "{{ ip_space.id }}"
         next_available_id: "{{ subnet.id }}"
         state: "present"
 

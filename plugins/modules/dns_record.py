@@ -321,13 +321,13 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Create a View (required as parent)
       infoblox.universal_ddi.dns_view:
-        name: "{{ dns_view_name }}"
+        name: "dns-view"
         state: present
       register: _view 
         
     - name: Create an Auth Zone in the View (required as parent) 
       infoblox.universal_ddi.dns_auth_zone:
-        fqdn: "example_zone"
+        fqdn: "example_zone."
         primary_type: "cloud"
         view: "{{ _view.id }}"
         state: "present"
@@ -431,10 +431,18 @@ EXAMPLES = r"""
         type: "NS"
         state: "present"
     
+    - name: Create Reverse Mapping Zone ( Required as a parent for PTR record )
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: "0.0.40.in-addr.arpa."
+        primary_type: cloud
+        view: "{{ _view.id }}"
+        state: present
+      register: rmz
+    
     - name: Create a PTR Record in an Auth Zone
       infoblox.universal_ddi.dns_record:
         zone: "{{ rmz.id }}" 
-        name_in_zone: "1.0.0" # Note: 10.in-addr.arpa is the reverse mapping zone 
+        name_in_zone: "245"
         rdata:
           dname: "ptr.example.com."
         type: "PTR"

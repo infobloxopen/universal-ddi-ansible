@@ -77,28 +77,35 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-- name: Create an Auth Zone (Delegation requires a parent zone)
-  infoblox.universal_ddi.dns_auth_zone:
-    fqdn: example_zone
-    primary_type: cloud
-    state: present
-
-- name: Create a Delegation
-  infoblox.universal_ddi.dns_delegation:
-    fqdn: delegation.example_zone.
-    view: default
-    delegation_servers:
-      - fqdn: ns1.example.com.
-        address: 12.0.0.0
-    state: present
-    tags:
-      location: my-location
-
-- name: Delete the DNS Delegation
-  infoblox.universal_ddi.dns_delegation:
-    fqdn: delegation.example_zone.
-    view: default
-    state: absent
+    - name: Create a View (required as parent)
+      infoblox.universal_ddi.dns_view:
+        name: "dns-view"
+        state: present
+      register: view
+    
+    - name: Create an Auth Zone (Delegation requires a parent zone)
+      infoblox.universal_ddi.dns_auth_zone:
+        fqdn: example_zone
+        primary_type: cloud
+        view: "{{ view.id }}"
+        state: present
+    
+    - name: Create a Delegation
+      infoblox.universal_ddi.dns_delegation:
+        fqdn: delegation.example_zone.
+        view: "{{ view.id }}"
+        delegation_servers:
+          - fqdn: ns1.example.com.
+            address: 12.0.0.0
+        state: present
+        tags:
+          location: my-location
+    
+    - name: Delete the DNS Delegation
+      infoblox.universal_ddi.dns_delegation:
+        fqdn: delegation.example_zone.
+        view: "{{ view.id }}"
+        state: absent
 """  # noqa: E501
 
 RETURN = r"""
