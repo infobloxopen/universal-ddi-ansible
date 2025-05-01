@@ -55,11 +55,6 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dns_delegation_info:
         filters:
           fqdn: "delegation.example_zone."
-          
-    - name: Get Delegation information by filters (e.g. fqdn)
-      infoblox.universal_ddi.dns_delegation_info:
-        filters:
-          fqdn: "delegation.example_zone."
 
     - name: Get Delegation information by raw filter query
       infoblox.universal_ddi.dns_delegation_info:

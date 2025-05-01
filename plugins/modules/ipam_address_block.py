@@ -751,14 +751,14 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_ip_space:
         name: "my-ip-space"
         state: "present"
-        register: ip_space
+      register: ip_space
 
     - name: "Create an address block"
       infoblox.universal_ddi.ipam_address_block:
         address: "10.0.0.0/16"
         space: "{{ ip_space.id }}"
         state: "present"
-        register: address_block
+      register: address_block
 
     - name: "Create Next Available Address Block"
       infoblox.universal_ddi.ipam_address_block:
@@ -767,7 +767,14 @@ EXAMPLES = r"""
         next_available_id: "{{ address_block.id }}"
         state: "present"
 
-    - name: Create a DHCP Option Code ( required as parent for DHCP Options)
+    - name: Create a Option Space ( required as parent for DHCP Option Code )
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "example-option-space"
+        protocol: "ip4"
+        state: present
+      register: option_space
+
+    - name: Create a DHCP Option Code ( required as parent for DHCP Options )
       infoblox.universal_ddi.dhcp_option_code:
         code: 234
         name: "option_code_name"

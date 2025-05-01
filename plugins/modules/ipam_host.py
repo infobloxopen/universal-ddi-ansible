@@ -103,12 +103,14 @@ EXAMPLES = r"""
       infoblox.universal_ddi.ipam_ip_space:
         name: "example_ip_space"
         state: "present"
+      register: ip_space
 
     - name: "Create a Subnet (required as parent)"
       infoblox.universal_ddi.ipam_subnet:
         address: "10.0.0.0/24"
         space: "{{ ip_space.id }}"
         state: "present"
+      register: subnet
 
     - name: "Create a Host"
       infoblox.universal_ddi.ipam_host:

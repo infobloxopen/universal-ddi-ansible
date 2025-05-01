@@ -76,6 +76,7 @@ EXAMPLES = r"""
   - name: Create a host
     infoblox.universal_ddi.infra_host:
       display_name: "example_host"
+      serial_number: "serial123456"
       state: "present"
     register: infra_host
 

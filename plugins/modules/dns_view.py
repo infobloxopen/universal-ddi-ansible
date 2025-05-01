@@ -1211,7 +1211,6 @@ EXAMPLES = r"""
         - access: "allow"
           element: "ip"
           address: "192.168.11.11"
-          notify: true
       state: "present"
       tags:
         location: "my-location"
