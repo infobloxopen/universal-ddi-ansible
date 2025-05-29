@@ -114,7 +114,7 @@
         that:
           - next_available_address_block_info is failed
           - "'Requested 20 address blocks but only 16 were available' in next_available_address_block_info.msg"
-    
+
     - name: Retrieve Next available address block with CIDR greater than the parent block.
       infoblox.universal_ddi.ipam_next_available_address_block_info:
         tag_filters:
@@ -130,14 +130,13 @@
           - "\"No address blocks available with the given tags and CIDR.\" in next_available_address_block_info.msg"
 
     - name: "Get next available address block with valid tags after searching all the available address blocks with valid tags"
-      infoblox.universal_ddi.ipam_next_available_subnet_info:
+      infoblox.universal_ddi.ipam_next_available_address_block_info:
         tag_filters:
           environment: "test-2"
           location: "site-2"
         cidr: 27
         count: 8
       register: address_block_info
-
     - assert:
         that:
           - address_block_info is not failed
