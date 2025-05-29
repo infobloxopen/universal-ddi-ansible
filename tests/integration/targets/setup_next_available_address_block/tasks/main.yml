@@ -24,7 +24,7 @@
         state: "present"
       register: small_tagged_address_block_2
 
-        # Creating address blocks to test the continuity of the next available subnet search to other address blocks if the current has a larger CIDR than the requested one.
+    # Creating address blocks to test the continuity of the next available subnet search to other address blocks if the current has a larger CIDR than the requested one.
     - name: "Create Address Block 1"
       infoblox.universal_ddi.ipam_address_block:
         address: "10.0.0.0/28"
