@@ -23,3 +23,40 @@
           location: "site-2"
         state: "present"
       register: small_tagged_address_block_2
+
+        # Creating address blocks to test the continuity of the next available subnet search to other address blocks if the current has a larger CIDR than the requested one.
+    - name: "Create Address Block 1"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/28"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test-2"
+          location: "site-2"
+        state: "present"
+
+    - name: "Create Address Block 2"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "20.0.0.0/25"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test-2"
+          location: "site-2"
+        state: "present"
+
+    - name: "Create Address Block 3"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "30.0.0.0/27"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test-2"
+          location: "site-2"
+        state: "present"
+
+    - name: "Create Address Block 4"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "40.0.0.0/15"
+        space: "{{ _ip_space.id }}"
+        tags:
+          environment: "test-2"
+          location: "site-2"
+        state: "present"

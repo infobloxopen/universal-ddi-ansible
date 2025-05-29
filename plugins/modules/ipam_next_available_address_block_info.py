@@ -206,6 +206,10 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
                     break
 
                 remaining_count = count - len(find_results)
+
+                if ab.cidr >= self.params["cidr"]:
+                    continue
+
                 find_result = self.find_address_block(id=ab.id, count=remaining_count)
 
                 if isinstance(find_result, int):
