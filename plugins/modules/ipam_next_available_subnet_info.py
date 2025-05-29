@@ -209,6 +209,7 @@ class NextAvailableSubnetInfoModule(UniversalDDIAnsibleModule):
 
                 remaining_count = count - len(find_results)
 
+                # Skip address blocks where parent CIDR is equal to or larger than the requested one and continue searching other valid address blocks
                 if ab.cidr >= self.params["cidr"]:
                     continue
 
