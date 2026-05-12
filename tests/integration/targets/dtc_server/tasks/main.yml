@@ -1,0 +1,381 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random DTC Server name to avoid conflicts
+    - ansible.builtin.set_fact:
+        dtc_server_name: "test-dtc-server-{{ 999999 | random | string }}"
+
+    - name: Create a DTC Server (check mode)
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.0.0.25"
+        state: present
+      check_mode: true
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server is changed
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 0
+
+    - name: Create a DTC Server
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.0.0.25"
+        state: present
+      register: dtc_server
+    - name: Get information about the Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects[0].address == "10.0.0.25"
+
+    - name: Create a DTC Server (idempotent)
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.0.0.25"
+        state: present
+      register: dtc_server
+    - assert:
+        that:
+          - dtc_server is not changed
+          - dtc_server is not failed
+
+    - name: Delete the DTC Server (check mode)
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        state: absent
+      check_mode: true
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server is changed
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+
+    - name: Delete the DTC Server
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        state: absent
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+            name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 0
+
+    - name: Delete the DTC Server (idempotent)
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        state: absent
+      register: dtc_server
+    - assert:
+        that:
+          - dtc_server is not changed
+          - dtc_server is not failed
+
+    - name: Create a DTC server with endpoint type as FQDN
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        fqdn: "dtc-server.example.com."
+        endpoint_type: "fqdn"
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+          filters:
+            name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects[0].endpoint_type == "fqdn"
+          - dtc_server_info.objects[0].fqdn == "dtc-server.example.com."
+
+    - name: Create a DTC server with endpoint type as address
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.0"
+        endpoint_type: "address"
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+          filters:
+              name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects[0].endpoint_type == "address"
+          - dtc_server_info.objects[0].address == "10.10.0.0"
+
+
+    - name: Create a DTC Server with auto_create_response_records for IPv4 address
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.0"
+        auto_create_response_records: true
+        state: present
+      register: dtc_server
+    - name: Get information about the Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].auto_create_response_records == true
+          # Record assertions
+          - dtc_server_info.objects[0].records is defined
+          - dtc_server_info.objects[0].records | length == 1
+          - dtc_server_info.objects[0].records[0].type == "A"
+          - dtc_server_info.objects[0].records[0].rdata.address == "10.10.0.0"
+          - dtc_server_info.objects[0].records[0].dns_rdata == "10.10.0.0"
+
+    - name: Create a DTC Server with auto_create_response_records for IPv6 address
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "2001:db8::1"
+        auto_create_response_records: true
+        state: present
+      register: dtc_server
+    - name: Get information about the Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].auto_create_response_records == true
+          # Record assertions
+          - dtc_server_info.objects[0].records is defined
+          - dtc_server_info.objects[0].records | length == 1
+          - dtc_server_info.objects[0].records[0].type == "AAAA"
+          - dtc_server_info.objects[0].records[0].rdata.address == "2001:db8::1"
+          - dtc_server_info.objects[0].records[0].dns_rdata == "2001:db8::1"
+
+    - name: Create a DTC Server with auto_create_response_records for endpoint type as FQDN
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        fqdn: "dtc-server-test.example.com."
+        endpoint_type: "fqdn"
+        auto_create_response_records: true
+        state: present
+      register: dtc_server
+    - name: Get information about the Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].auto_create_response_records == true
+          # Record assertions
+          - dtc_server_info.objects[0].records is defined
+          - dtc_server_info.objects[0].records | length == 1
+          - dtc_server_info.objects[0].records[0].type == "CNAME"
+          - dtc_server_info.objects[0].records[0].rdata.cname == "dtc-server-test.example.com."
+          - dtc_server_info.objects[0].records[0].dns_rdata == "dtc-server-test.example.com."
+
+    - name: Create a DTC Server with auto_create_response_records set to false
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        fqdn: "dtc-server-test.example.com."
+        endpoint_type: "fqdn"
+        auto_create_response_records: false
+        state: present
+      register: dtc_server
+    - name: Get information about the Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].auto_create_response_records == false
+
+    - name: Create a DTC Server with comment
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.0"
+        comment: "sample comment"
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].comment == "sample comment"
+
+    - name: Create a DTC Server with disabled
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.0"
+        disabled: true
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].disabled == true
+
+    - name: Create a DTC Server with Tags
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.25"
+        tags:
+          environment: "stage"
+          location: "site-1"
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].tags is defined
+          - dtc_server_info.objects[0].tags.location == "site-1"
+          - dtc_server_info.objects[0].tags.Environment == "stage"
+
+    - name: Create a DTC Server with record types A, AAAA, SRV, HTTPS and SVCB
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.10.0.25"
+        records:
+          - type: "A"
+            rdata:
+              address: "10.10.0.25"
+          - type: "AAAA"
+            rdata:
+              address: "2001:db8::1"
+          - type: "SRV"
+            rdata:
+              port: 443
+              priority: 10
+              weight: 5
+              target: "srv.example.com."
+          - type: "HTTPS"
+            rdata:
+              target: "https.example.com."
+          - type: "SVCB"
+            rdata:
+              target: "svcb.example.com."
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].records is defined
+          - dtc_server_info.objects[0].records | length == 5
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','A') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','A') | list)[0].rdata.address == "10.10.0.25"
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','AAAA') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','AAAA') | list)[0].rdata.address == "2001:db8::1"
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','SRV') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','SRV') | list)[0].rdata.port == 443
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','HTTPS') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','HTTPS') | list)[0].rdata.target == "https.example.com."
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','SVCB') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','SVCB') | list)[0].rdata.target == "svcb.example.com."
+
+    - name: Create a DTC Server with CNAME record type
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        fqdn: "cname.example.com."
+        endpoint_type: "fqdn"
+        records:
+          - type: "CNAME"
+            rdata:
+              cname: "dtc-server.example.com."
+        state: present
+      register: dtc_server
+    - name: Get information about the DTC Server
+      infoblox.universal_ddi.dtc_server_info:
+        filters:
+          name: "{{ dtc_server_name }}"
+      register: dtc_server_info
+    - assert:
+        that:
+          - dtc_server_info is not failed
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].records is defined
+          - dtc_server_info.objects[0].records | length == 1
+          - dtc_server_info.objects[0].records | selectattr('type','equalto','CNAME') | list | length == 1
+          - (dtc_server_info.objects[0].records | selectattr('type','equalto','CNAME') | list)[0].rdata.cname == "dtc-server.example.com."
+
+  always:
+    - name: Delete DTC Server
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server_name }}"
+        address: "10.0.0.25"
+        state: "absent"
+      ignore_errors: true
