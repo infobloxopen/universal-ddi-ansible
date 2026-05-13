@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         # TODO : Add devel to the ansible matrix
-        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20']
+        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20', 'stable-2.21' ]
         python: [ '3.10', '3.11', '3.12', '3.13' ]
         exclude:
           - ansible: 'stable-2.16'
@@ -25,8 +25,14 @@ jobs:
             python: '3.11'
           - ansible: 'stable-2.20'
             python: '3.10'
+          - ansible: 'stable-2.21'
+            python: '3.11'
+          - ansible: 'stable-2.21'
+            python: '3.10'
         include:
             - ansible: 'stable-2.20'
+              python: '3.14'
+            - ansible: 'stable-2.21'
               python: '3.14'
 
     steps:
