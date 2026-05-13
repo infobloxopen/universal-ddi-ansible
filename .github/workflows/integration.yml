@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: '3.12'
 
-      - uses: ansible-community/ansible-test-gh-action@v1.15.0
+      - uses: ansible-community/ansible-test-gh-action@v1.17.0
         with:
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: 'stable-2.20'
