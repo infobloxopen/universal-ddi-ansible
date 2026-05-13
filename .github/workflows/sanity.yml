@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'devel' ]
+        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20', 'devel' ]
         python: [ '3.10', '3.11', '3.12', '3.13' ]
         exclude:
           - ansible: 'stable-2.16'
@@ -20,12 +20,18 @@ jobs:
             python: '3.10'
           - ansible: 'stable-2.19'
             python: '3.10'
+          - ansible: 'stable-2.20'
+            python: '3.11'
+          - ansible: 'stable-2.20'
+            python: '3.10'
           - ansible: 'devel'
             python: '3.10'
           - ansible: 'devel'
             python: '3.11'
         include:
             - ansible: 'devel'
+              python: '3.14'
+            - ansible: 'stable-2.20'
               python: '3.14'
 
     steps:
@@ -34,7 +40,12 @@ jobs:
         with:
           path: infoblox.universal_ddi
 
-      - uses: ansible-community/ansible-test-gh-action@v1.15.0
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: ansible-community/ansible-test-gh-action@v1.17.0
         with:
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: ${{ matrix.ansible }}
