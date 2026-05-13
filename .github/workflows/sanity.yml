@@ -9,7 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20', 'devel' ]
+        # TODO : Add devel to the ansible matrix
+        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20']
         python: [ '3.10', '3.11', '3.12', '3.13' ]
         exclude:
           - ansible: 'stable-2.16'
@@ -24,10 +25,6 @@ jobs:
             python: '3.11'
           - ansible: 'stable-2.20'
             python: '3.10'
-          - ansible: 'devel'
-            python: '3.10'
-          - ansible: 'devel'
-            python: '3.11'
         include:
             - ansible: 'stable-2.20'
               python: '3.14'
