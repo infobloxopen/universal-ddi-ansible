@@ -23,9 +23,14 @@ jobs:
           echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
           echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
 
-      - uses: ansible-community/ansible-test-gh-action@v1.15.0
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: ansible-community/ansible-test-gh-action@v1.17.0
         with:
           collection-src-directory: infoblox.universal_ddi
-          ansible-core-version: 'stable-2.15'
-          target-python-version: '3.11'
+          ansible-core-version: 'stable-2.20'
+          target-python-version: '3.12'
           testing-type: integration
