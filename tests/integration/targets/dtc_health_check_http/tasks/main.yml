@@ -1,0 +1,288 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a random Health_check name to avoid conflicts
+    - ansible.builtin.set_fact:
+        health_check_http_name: "test-health_check_http_name-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    # Create in check mode (should show changed, but not actually create)
+    - name: Create HTTP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      check_mode: true
+      register: health_check_http_check_mode
+    - name: Get HTTP Health Check information by name (after check mode create)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info_after_check_create
+    - assert:
+        that:
+          - health_check_http_check_mode.changed
+          - health_check_http_info_after_check_create is not failed
+          - health_check_http_info_after_check_create.objects | length == 0
+
+    # Basic Test for HTTP Health Check
+    - name: Create a HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_http
+
+    - name: Get HTTP Health Check information by ID
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        id: "{{ health_check_http.id }}"
+      register: health_check_http_info
+
+    # Idempotency check (should not change)
+    - name: Create HTTP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_http_idempotent
+    - assert:
+        that:
+          - not health_check_http_idempotent.changed
+          - health_check_http_idempotent.failed is not defined or not health_check_http_idempotent.failed
+
+    # Delete in check mode (should show changed, but not actually delete)
+    - name: Delete HTTP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      check_mode: true
+      register: health_check_http_delete_check
+    - name: Get HTTP Health Check information by name (after check mode delete)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info_after_check_delete
+    - assert:
+        that:
+          - health_check_http_delete_check.changed
+          - health_check_http_info_after_check_delete is not failed
+          - health_check_http_info_after_check_delete.objects | length == 1
+
+    # Delete for real
+    - name: Delete HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      register: health_check_http_delete
+    - name: Get HTTP Health Check information by name (after delete)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info_after_delete
+    - assert:
+        that:
+          - health_check_http_delete.changed
+          - health_check_http_info_after_delete is not failed
+          - health_check_http_info_after_delete.objects | length == 0
+
+    # Idempotency check for absent state
+    - name: Delete HTTP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      register: health_check_http_delete_idempotent
+    - assert:
+        that:
+          - not health_check_http_delete_idempotent.changed
+          - health_check_http_delete_idempotent.failed is not defined or not health_check_http_delete_idempotent.failed
+
+    # Create HTTP Health Check with comment
+    - name: Create HTTP Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        comment: "Test Comment"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (comment)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].comment == "Test Comment"
+
+    - name: Create HTTP Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        tags:
+          test_tag: "tag_value"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (tags)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].tags.test_tag == "tag_value"
+
+    - name: Create HTTP Health Check with disabled true
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        disabled: true
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (disabled)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].disabled == true
+
+    - name: Create HTTP Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        interval: 20
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (interval)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].interval == 20
+
+    - name: Create HTTP Health Check with port
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 8080
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (port)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].port == 8080
+
+    - name: Create HTTP Health Check with retry_down
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        retry_down: 2
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (retry_down)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].retry_down == 2
+
+    - name: Create HTTP Health Check with retry_up
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        retry_up: 3
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (retry_up)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].retry_up == 3
+
+    - name: Create HTTP Health Check with timeout
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        timeout: 10
+        interval: 20
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+    - name: Get HTTP Health Check information by name (timeout)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].timeout == 10
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete HTTP Health Check"
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      ignore_errors: true
