@@ -243,6 +243,11 @@ options:
                     - "For B(TXT) record, the semantics of the text depends on the domain where it is found."
                 type: str
                 required: true
+            target_name:
+                description:
+                    - "For B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
+                type: str
+                required: true
             type:
                 description: 
                     - "For B(Generic record), the following types are supported:"
@@ -456,6 +461,14 @@ EXAMPLES = r"""
         rdata:
           target_name: "svc.example.com."
         type: "SVCB"
+        state: "present"
+
+    - name: Create a HTTPS Record in an Auth Zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "https.example.com."
+        type: "HTTPS"
         state: "present"
 
     - name: Create a TXT Record in an Auth Zone
@@ -777,6 +790,11 @@ item:
                 text:
                     description:
                         - "For B(TXT) record, the semantics of the text depends on the domain where it is found."
+                    type: str
+                    returned: Always
+                target_name:
+                    description:
+                        - "For B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
                     type: str
                     returned: Always
                 type:
