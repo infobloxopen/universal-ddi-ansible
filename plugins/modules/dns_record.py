@@ -841,32 +841,32 @@ item:
                     - "Record was created automatically based on the DTC configuration. Always extends the I(SYSTEM) bit. Valid only for I(IBMETA) record type with I(LBDN) subtype."
                   type: str
                   returned: Always
-                STATIC, SYSTEM:
+                STATIC_SYSTEM:
                   description: 
                     - "Record was created manually by API call but it is obfuscated by record generated based on name server assignment."
                   type: str
                   returned: Always
-                DYNAMIC, SYSTEM:
+                DYNAMIC_SYSTEM:
                   description: 
                     - "Record was created dynamically by DDNS but it is obfuscated by record generated based on name server assignment."
                   type: str
                   returned: Always
-                DELEGATED, SYSTEM:
+                DELEGATED_SYSTEM:
                   description: 
                     - "Record was created automatically based on delegation servers assignment. I(SYSTEM) will always accompany I(DELEGATED)."
                   type: str
                   returned: Always
-                DTC, SYSTEM:
+                DTC_SYSTEM:
                   description: 
                     - "Record was created automatically based on the DTC configuration. I(SYSTEM) will always accompany I(DTC)."
                   type: str
                   returned: Always
-                STATIC, SYSTEM, DELEGATED:
+                STATIC_SYSTEM_DELEGATED:
                   description: 
                     - "Record was created manually by API call but it is obfuscated by record generated based on name server assignment as a result of creating a delegation."
                   type: str
                   returned: Always
-                DYNAMIC, SYSTEM, DELEGATED:
+                DYNAMIC_SYSTEM_DELEGATED:
                   description: 
                     - "Record was created dynamically by DDNS but it is obfuscated by record generated based on name server assignment as a result of creating a delegation."
                   type: str
