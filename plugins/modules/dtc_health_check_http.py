@@ -137,6 +137,37 @@ extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
 
+EXAMPLES = r""" 
+    - name: Create an HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "example_http_health_check"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: http_health_check
+        
+    - name: Create an HTTP Health Check with additional parameters
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "example_http_health_check"
+        port: 8080
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        interval: 15
+        retry_down: 2
+        retry_up: 2
+        timeout: 10
+        disabled: false
+        tags:
+            location: "site-1"
+        state: "present"
+        
+    - name: Delete HealthCheckHttp
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "example.com"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: absent
+"""
+
 RETURN = r"""
 id:
     description:
@@ -290,7 +321,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import HTTPHealthCheck, HealthCheckHttpApi
+    from dtc import HealthCheckHttpApi, HTTPHealthCheck
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -403,7 +434,9 @@ class HealthCheckHttpModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -419,29 +452,39 @@ def main():
         check_response_body_regex=dict(type="str"),
         check_response_header=dict(type="bool"),
         check_response_header_negative=dict(type="bool"),
-        check_response_header_regexes=dict(type="list", elements="dict", options=dict(
-            header=dict(type="str"),
-            regex=dict(type="str"),
-        )),
+        check_response_header_regexes=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                header=dict(type="str"),
+                regex=dict(type="str"),
+            ),
+        ),
         codes=dict(type="str"),
         comment=dict(type="str"),
         disabled=dict(type="bool"),
         https=dict(type="bool"),
         interval=dict(type="int"),
-        metadata=dict(type="dict", options=dict(
-            used_by=dict(type="list", elements="dict", options=dict(
-                details=dict(type="dict"),
-                display_name=dict(type="str"),
-            )),
-        )),
-        name=dict(type="str"),
-        port=dict(type="int"),
-        request=dict(type="str"),
+        metadata=dict(
+            type="dict",
+            options=dict(
+                used_by=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        details=dict(type="dict"),
+                        display_name=dict(type="str"),
+                    ),
+                ),
+            ),
+        ),
+        name=dict(type="str", required=True),
+        port=dict(type="int", required=True),
+        request=dict(type="str", required=True),
         retry_down=dict(type="int"),
         retry_up=dict(type="int"),
         tags=dict(type="dict"),
         timeout=dict(type="int"),
-
     )
 
     module = HealthCheckHttpModule(
