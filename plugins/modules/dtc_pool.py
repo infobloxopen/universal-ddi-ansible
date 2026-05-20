@@ -7,8 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from random import choices
-
 DOCUMENTATION = r"""
 ---
 module: dtc_pool
@@ -64,33 +62,10 @@ options:
                     action:
                         description:
                             - "The inheritance setting for a field."
-                            - "Valid values are:"
-                            - "* I(inherit): Use the inherited value."
-                            - "* I(override): Use the value set in the object."
-                            - "Defaults to I(inherit)."
-                        type: str
-                    source:
-                        description:
-                            - "The resource identifier."
-                        type: str
-    metadata:
-        description:
-            - "Output only. B(Pool) metadata. Defaults to empty object and should be explicitly requested using field selection."
-        type: dict
-        suboptions:
-            used_by:
-                description:
-                    - "List of structs representing a limited view on configuration objects that use a resource the metadata is provided for."
-                type: list
-                elements: dict
-                suboptions:
-                    details:
-                        description:
-                            - "Structured data consisting of additional details of the configuration resource."
-                        type: dict
-                    display_name:
-                        description:
-                            - "Display name of the configuration resource."
+                        choices:
+                            - inherit
+                            - override
+                        default: inherit
                         type: str
     method:
         description:
@@ -99,12 +74,17 @@ options:
             - "* I(round_robin) If the I(round_robin) load balancing method is selected, BloxOne DDI adjusts the response to a query in a sequential and circular manner, directing clients to pools."
             - "* I(ratio) If I(ratio) load balancing method is selected, BloxOne DDI adjusts the response to a query so that clients are directed to pool using weighted round robin, a load-balancing pattern in which requests are distributed among several resources based on weight assigned to each resource. The distribution of responses over time will be equal for all available pools but the sequence of the responses won't be guaranteed. When equal weights are assigned for resources (pools) it effectively leads to basic round robin which directs clients to pools in sequential and circular manner."
             - "* I(global_availability) If I(global_availability) load balancing method is selected clients are directed to the first server that is up in the I(servers) list."
-            - "Defaults to I(round_robin)."
+        choices:
+            - round_robin
+            - ratio
+            - global_availability
         type: str
+        required: true
     name:
         description:
             - "Display name of B(Pool)."
         type: str
+        required: true
     pool_availability:
         description:
             - "Optional. Pool Availability setting defines how B(Pool) health is calculated."
@@ -112,7 +92,11 @@ options:
             - "* I(all) If I(all) availability selected then B(Pool) is treated healthy when all pool's servers are healthy."
             - "* I(quorum) If I(quorum) availability selected then B(Pool) is treated healthy when at least N pool's servers are healthy. N is configurable via the value from I(pool_servers_quorum) setting."
             - "* I(any) If I(any) availability selected then B(Pool) is treated healthy when at least one pool's server is healthy."
-            - "Defaults to I(any)."
+        choices:
+            - all
+            - quorum
+            - any
+        default: any
         type: str
     pool_servers_quorum:
         description:
@@ -125,8 +109,12 @@ options:
             - "* I(all) If I(all) availability selected then B(Server) is treated healthy when all pool's health checks are positive."
             - "* I(quorum) If I(quorum) availability selected then B(Server) is treated healthy when at least N pool's health checks are positive. N is configurable via the value from I(server_health_checks_quorum) setting."
             - "* I(any) If I(any) availability selected then B(Server) is treated healthy when at least one pool's health check is positive"
-            - "Defaults to I(all)."
+        choices:
+            - all
+            - quorum
+            - any
         type: str
+        default: all
     server_health_checks_quorum:
         description:
             - "Server Health Checks Quorum defines a minimal number of pool's positive health checks required for treating B(Server) as healthy when Server Availability is set to I(quorum)."
@@ -160,6 +148,42 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+    - name: "Create a DTC Server (required as parent)"
+      infoblox.universal_ddi.dtc_server:
+        name: "example_dtc_server"
+        address: "10.0.0.0"
+        state: present
+      register: dtc_server
+    
+    - name: "Create a DTC Pool"
+      infoblox.universal_ddi.dtc_pool:
+        name: "example_dtc_pool"
+        method: "round_robin"  
+        state: present 
+      register: dtc_pool
+    
+    - name: "Create a DTC Pool with Additional Fields"
+      infoblox.universal_ddi.dtc_pool:
+        name: "example_dtc_pool2"
+        method: "ratio" 
+        comment: "Example DTC Pool"
+        servers:
+            server_id: "{{ dtc_server.id }}"
+            weight: 10
+        pool_availability: "quorum"
+        pool_servers_quorum: 5
+        server_availability: "quorum"
+        server_health_checks_quorum: 5
+        tags:
+            location: "site-1"
+        ttl: 4800
+        state: present
+    
+    - name: "Delete a DTC Pool"
+      infoblox.universal_ddi.dtc_pool:
+        name: "example_dtc_pool"
+        method: "round_robin"
+        state: absent
 
 """  # noqa: E501
 
@@ -487,13 +511,6 @@ def main():
         inheritance_sources=dict(type="dict", options=dict(
             ttl=dict(type="dict", options=dict(
                 action=dict(type="str", choices=["inherit", "override"], default="inherit"),
-                source=dict(type="str"),
-            )),
-        )),
-        metadata=dict(type="dict", options=dict(
-            used_by=dict(type="list", elements="dict", options=dict(
-                details=dict(type="dict"),
-                display_name=dict(type="str"),
             )),
         )),
         method=dict(type="str", required=True, choices=["round_robin", "ratio", "global_availability"]),
@@ -504,7 +521,7 @@ def main():
         server_health_checks_quorum=dict(type="int"),
         servers=dict(type="list", elements="dict", options=dict(
             server_id=dict(type="str"),
-            weight=dict(type="int", min=1, max=65535),
+            weight=dict(type="int"),
         )),
         tags=dict(type="dict"),
         ttl=dict(type="int"),

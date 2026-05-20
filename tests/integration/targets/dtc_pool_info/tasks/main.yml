@@ -18,6 +18,16 @@
         state: "present"
       register: dtc_pool
 
+    - name: Get information about the DTC Pool by ID
+      infoblox.universal_ddi.dtc_pool_info:
+          id: "{{ dtc_pool.id }}"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].name == dtc_pool_name
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+          -
     - name: Get information about the DTC Pool by filters (name)
       infoblox.universal_ddi.dtc_pool_info:
         filters:
@@ -29,17 +39,7 @@
           - dtc_pool_info.objects[0].name == dtc_pool_name
           - dtc_pool_info.objects[0].id == dtc_pool.id
 
-    - name: Get information about the DTC Pool by filters (Id)
-      infoblox.universal_ddi.dtc_pool_info:
-          id: "{{ dtc_pool.id }}"
-      register: dtc_pool_info
-    - assert:
-        that:
-          - dtc_pool_info.objects | length == 1
-          - dtc_pool_info.objects[0].name == dtc_pool_name
-          - dtc_pool_info.objects[0].id == dtc_pool.id
-
-    - name: Get information about the DTC Pool by filter query
+    - name: Get information about the DTC Pool by raw filter query
       infoblox.universal_ddi.dtc_pool_info:
         filter_query: "name=='{{ dtc_pool_name }}'"
       register: dtc_pool_info
@@ -60,7 +60,7 @@
           - dtc_pool_info.objects[0].id == dtc_pool.id
           - dtc_pool_info.objects[0].tags.location == tag_value
 
-    - name: Get information about the DTC Pool with tag filter query
+    - name: Get information about the DTC Pool by raw tag filter query
       infoblox.universal_ddi.dtc_pool_info:
         tag_filter_query: "location=='{{ tag_value }}'"
       register: dtc_pool_info
