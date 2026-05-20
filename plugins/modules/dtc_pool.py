@@ -492,7 +492,9 @@ class PoolModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -505,27 +507,40 @@ def main():
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
         disabled=dict(type="bool"),
-        health_checks=dict(type="list", elements="dict", options=dict(
-            health_check_id=dict(type="str"),
-        )),
-        inheritance_sources=dict(type="dict", options=dict(
-            ttl=dict(type="dict", options=dict(
-                action=dict(type="str", choices=["inherit", "override"], default="inherit"),
-            )),
-        )),
+        health_checks=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                health_check_id=dict(type="str"),
+            ),
+        ),
+        inheritance_sources=dict(
+            type="dict",
+            options=dict(
+                ttl=dict(
+                    type="dict",
+                    options=dict(
+                        action=dict(type="str", choices=["inherit", "override"], default="inherit"),
+                    ),
+                ),
+            ),
+        ),
         method=dict(type="str", required=True, choices=["round_robin", "ratio", "global_availability"]),
         name=dict(type="str", required=True),
         pool_availability=dict(type="str", choices=["all", "quorum", "any"], default="any"),
         pool_servers_quorum=dict(type="int"),
         server_availability=dict(type="str", choices=["all", "quorum", "any"], default="all"),
         server_health_checks_quorum=dict(type="int"),
-        servers=dict(type="list", elements="dict", options=dict(
-            server_id=dict(type="str"),
-            weight=dict(type="int"),
-        )),
+        servers=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                server_id=dict(type="str"),
+                weight=dict(type="int"),
+            ),
+        ),
         tags=dict(type="dict"),
         ttl=dict(type="int"),
-
     )
 
     module = PoolModule(
