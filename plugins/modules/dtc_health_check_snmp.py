@@ -376,7 +376,7 @@ EXAMPLES = r"""
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import SNMPHealthCheck, HealthCheckSnmpApi
+    from dtc import HealthCheckSnmpApi, SNMPHealthCheck
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
