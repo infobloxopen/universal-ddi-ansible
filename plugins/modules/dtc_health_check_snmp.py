@@ -489,7 +489,9 @@ class HealthCheckSnmpModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -500,26 +502,37 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        check_list=dict(type="list", elements="dict", options=dict(
-            comment=dict(type="str"),
-            max_value=dict(type="str"),
-            name=dict(type="str"),
-            operator=dict(type="str"),
-            type=dict(type="str"),
-            value=dict(type="str"),
-        )),
+        check_list=dict(
+            type="list",
+            elements="dict",
+            options=dict(
+                comment=dict(type="str"),
+                max_value=dict(type="str"),
+                name=dict(type="str"),
+                operator=dict(type="str"),
+                type=dict(type="str"),
+                value=dict(type="str"),
+            ),
+        ),
         comment=dict(type="str"),
         community=dict(type="str"),
         context_engine_id=dict(type="str"),
         context_name=dict(type="str"),
         disabled=dict(type="bool"),
         interval=dict(type="int"),
-        metadata=dict(type="dict", options=dict(
-            used_by=dict(type="list", elements="dict", options=dict(
-                details=dict(type="dict"),
-                display_name=dict(type="str"),
-            )),
-        )),
+        metadata=dict(
+            type="dict",
+            options=dict(
+                used_by=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        details=dict(type="dict"),
+                        display_name=dict(type="str"),
+                    ),
+                ),
+            ),
+        ),
         name=dict(type="str"),
         port=dict(type="int"),
         retry_down=dict(type="int"),
@@ -528,7 +541,6 @@ def main():
         timeout=dict(type="int"),
         user_security_model=dict(type="str"),
         version=dict(type="str"),
-
     )
 
     module = HealthCheckSnmpModule(
