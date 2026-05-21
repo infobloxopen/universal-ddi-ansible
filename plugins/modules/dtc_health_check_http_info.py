@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dtc_health_check_http_info
 short_description: Manage HealthCheckHttp
 description:
-    - Manage HealthCheckHttp
+    - Retrieve information about existing HealthCheckHttp
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
