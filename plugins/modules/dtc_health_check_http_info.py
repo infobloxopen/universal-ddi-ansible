@@ -46,6 +46,35 @@ extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
 
+EXAMPLES = r"""
+    - name: Create HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "test-health_check_http_name"
+        tags:
+          location: "site-1"
+        port: 80
+        request: "POST / HTTP/1.1\\r\\nHost: localhost\\r\\n\\r\\n"
+        state: present
+
+    - name: Get HTTP Health Check information by filters (name)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "test-health_check_http_name"
+
+    - name: Get HTTP Health Check information by filters (id)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          id: "health_check_http_id"
+
+    - name: Get HTTP Health Check information by filter query
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filter_query: "name=='test-health_check_http_name'"
+    
+    - name: Get HTTP Health Check information by tag filters
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        tag_filters:
+          location: "site-1"
+"""  # noqa: E501
 RETURN = r"""
 id:
     description:
