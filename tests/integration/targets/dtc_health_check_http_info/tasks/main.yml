@@ -70,4 +70,3 @@
           location: "{{ tag_value }}"
         state: absent
       ignore_errors: true
-
