@@ -108,14 +108,17 @@ options:
         description:
             - "Display name of B(HTTPHealthCheck)."
         type: str
+        required: true
     port:
         description:
             - "Destination TCP port of B(HTTPHealthCheck)."
         type: int
+        required: true
     request:
         description:
             - "HTTP request in a text format, it consists of HTTP method, request target, HTTP headers, request body."
         type: str
+        required: true
     retry_down:
         description:
             - "Optional. Retry down count. The value determines how many bad health checks in a row must be received by the onprem host from the DTC Server for treating the health check as failed. Defaults to I(1)."
@@ -137,7 +140,7 @@ extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
 
-EXAMPLES = r""" 
+EXAMPLES = r"""
     - name: Create an HTTP Health Check
       infoblox.universal_ddi.dtc_health_check_http:
         name: "example_http_health_check"
@@ -145,7 +148,7 @@ EXAMPLES = r"""
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: http_health_check
-        
+
     - name: Create an HTTP Health Check with additional parameters
       infoblox.universal_ddi.dtc_health_check_http:
         name: "example_http_health_check"
@@ -159,7 +162,7 @@ EXAMPLES = r"""
         tags:
             location: "site-1"
         state: "present"
-        
+
     - name: Delete HealthCheckHttp
       infoblox.universal_ddi.dtc_health_check_http:
         name: "example.com"
