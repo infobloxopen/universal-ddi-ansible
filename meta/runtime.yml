@@ -11,6 +11,7 @@ action_groups:
           - cloud_discovery
           - dhcp
           - anycast
+          - dtc
 
   dns:
     - dns_view
@@ -96,3 +97,7 @@ action_groups:
     - anycast_config_info
     - anycast_host
     - anycast_host_info
+
+  dtc:
+    - dtc_health_check_tcp
+    - dtc_health_check_tcp_info
