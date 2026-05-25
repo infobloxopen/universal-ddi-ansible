@@ -202,7 +202,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import ICMPHealthCheck, HealthCheckIcmpApi
+    from dtc import HealthCheckIcmpApi, ICMPHealthCheck
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -315,7 +315,9 @@ class HealthCheckIcmpModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -329,18 +331,24 @@ def main():
         comment=dict(type="str"),
         disabled=dict(type="bool"),
         interval=dict(type="int"),
-        metadata=dict(type="dict", options=dict(
-            used_by=dict(type="list", elements="dict", options=dict(
-                details=dict(type="dict"),
-                display_name=dict(type="str"),
-            )),
-        )),
+        metadata=dict(
+            type="dict",
+            options=dict(
+                used_by=dict(
+                    type="list",
+                    elements="dict",
+                    options=dict(
+                        details=dict(type="dict"),
+                        display_name=dict(type="str"),
+                    ),
+                ),
+            ),
+        ),
         name=dict(type="str", required=True),
         retry_down=dict(type="int"),
         retry_up=dict(type="int"),
         tags=dict(type="dict"),
         timeout=dict(type="int"),
-
     )
 
     module = HealthCheckIcmpModule(
