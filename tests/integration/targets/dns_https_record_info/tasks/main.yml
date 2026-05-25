@@ -46,19 +46,21 @@
     - name: Get HTTPS Record information by raw filter query
       infoblox.universal_ddi.dns_record_info:
         filter_query: "name_in_zone=='{{ record_name }}' and zone=='{{ _auth_zone.id }}' and type=='HTTPS'"
+      register: https_record_info_raw
     - assert:
         that:
-          - https_record_info.objects | length == 1
-          - https_record_info.objects[0].id == https_record.id
+          - https_record_info_raw.objects | length == 1
+          - https_record_info_raw.objects[0].id == https_record.id
 
     - name: Get HTTPS Record information by tag filters
       infoblox.universal_ddi.dns_record_info:
         tag_filters:
           location: "{{ tag_value }}"
+      register: https_record_info_tag
     - assert:
         that:
-          - https_record_info.objects | length == 1
-          - https_record_info.objects[0].id == https_record.id
+          - https_record_info_tag.objects | length == 1
+          - https_record_info_tag.objects[0].id == https_record.id
 
   always:
     # Cleanup if the test fails
