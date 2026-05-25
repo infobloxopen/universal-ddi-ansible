@@ -245,7 +245,7 @@ options:
                 required: true
             target_name:
                 description:
-                    - "For B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
+                    - "Alias target name in FQDN format."
                 type: str
                 required: true
             type:
