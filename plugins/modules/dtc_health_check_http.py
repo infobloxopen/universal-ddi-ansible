@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_http
-short_description: Manage HealthCheckHttp
+short_description: Manages DTC HTTP health checks
 description:
-    - Manage HealthCheckHttp
+    - Manages DTC HTTP health checks
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -34,23 +34,28 @@ options:
         description:
             - "Optional. Flag which enables checking of the HTTP response body content. Defaults to I(false)."
         type: bool
+        default: false
     check_response_body_negative:
         description:
             - "Optional. Flag which changes the meaning of the regex match result. If set to I(true), the response is valid if regular expression matches not found. Defaults to I(false)."
             - "The flag is currently not supported."
         type: bool
+        default: false
     check_response_body_regex:
         description:
             - "Optional. Regular expression to search for a string in the HTTP response body. Error if empty while I(check_response_body) is I(true). Defaults to empty."
         type: str
+        default: ""
     check_response_header:
         description:
             - "Optional. Flag which enables checking of the HTTP response header(s) content. Defaults to I(false)."
         type: bool
+        default: false
     check_response_header_negative:
         description:
             - "Optional. Flag which changes the meaning of the header regexes match result. If set to I(true), neither expression matches must be found in their respective headers for the headers to be considered valid. Defaults to I(false)."
         type: bool
+        default: false
     check_response_header_regexes:
         description:
             - "Optional. List of (header, regular expression) pairs. All expression matches must be found in their respective headers for the headers to be considered valid. Error if empty while I(check_response_header) is I(true). Defaults to empty."
@@ -65,6 +70,7 @@ options:
                 description:
                     - "Regular expression to match against HTTP header value."
                 type: str
+        default: []
     codes:
         description:
             - "Optional. Response Status Codes meaning the health check is successful. If empty, any code means success. Individual codes and code ranges are supported, ex. \"102,105-107,109-110,120\"."
@@ -77,33 +83,17 @@ options:
         description:
             - "Optional. Flag which enables/disables B(HTTPHealthCheck). Defaults to I(false)."
         type: bool
+        default: false
     https:
         description:
             - "Optional. Flag which enables Hypertext Transfer Protocol Secure (HTTPS) in a health check. Defaults to I(false)."
         type: bool
+        default: false
     interval:
         description:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
         type: int
-    metadata:
-        description:
-            - "Output only. B(HTTPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
-        type: dict
-        suboptions:
-            used_by:
-                description:
-                    - "List of structs representing a limited view on configuration objects that use a resource the metadata is provided for."
-                type: list
-                elements: dict
-                suboptions:
-                    details:
-                        description:
-                            - "Structured data consisting of additional details of the configuration resource."
-                        type: dict
-                    display_name:
-                        description:
-                            - "Display name of the configuration resource."
-                        type: str
+        default: 15
     name:
         description:
             - "Display name of B(HTTPHealthCheck)."
@@ -123,10 +113,12 @@ options:
         description:
             - "Optional. Retry down count. The value determines how many bad health checks in a row must be received by the onprem host from the DTC Server for treating the health check as failed. Defaults to I(1)."
         type: int
+        default: 1
     retry_up:
         description:
             - "Optional. Retry up count. The value determines how many good health checks in a row must be received by the onprem host from the DTC Server for treating the health check as successful. Defaults to I(1)."
         type: int
+        default: 1
     tags:
         description:
             - "Optional. The tags for B(HTTPHealthCheck) in JSON format."
@@ -135,6 +127,7 @@ options:
         description:
             - "Optional. Timeout value in seconds. The health check waits for the specified number of seconds after sending a request. If it does not receive a response within the number of seconds, then the health check is considered as failed. Defaults to I(10)."
         type: int
+        default: 10
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -165,7 +158,7 @@ EXAMPLES = r"""
 
     - name: Delete HealthCheckHttp
       infoblox.universal_ddi.dtc_health_check_http:
-        name: "example.com"
+        name: "example_http_health_check"
         port: 80
         request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: absent
@@ -365,7 +358,7 @@ class HealthCheckHttpModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = HealthCheckHttpApi(self.client).read(self.params["id"], inherit="full")
+                resp = HealthCheckHttpApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -450,11 +443,11 @@ def main():
     module_args = dict(
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
-        check_response_body=dict(type="bool"),
-        check_response_body_negative=dict(type="bool"),
-        check_response_body_regex=dict(type="str"),
-        check_response_header=dict(type="bool"),
-        check_response_header_negative=dict(type="bool"),
+        check_response_body=dict(type="bool", default=False),
+        check_response_body_negative=dict(type="bool", default=False),
+        check_response_body_regex=dict(type="str", default=""),
+        check_response_header=dict(type="bool", default=False),
+        check_response_header_negative=dict(type="bool", default=False),
         check_response_header_regexes=dict(
             type="list",
             elements="dict",
@@ -462,32 +455,20 @@ def main():
                 header=dict(type="str"),
                 regex=dict(type="str"),
             ),
+            default=[],
         ),
         codes=dict(type="str"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
-        https=dict(type="bool"),
-        interval=dict(type="int"),
-        metadata=dict(
-            type="dict",
-            options=dict(
-                used_by=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        details=dict(type="dict"),
-                        display_name=dict(type="str"),
-                    ),
-                ),
-            ),
-        ),
+        disabled=dict(type="bool", default=False),
+        https=dict(type="bool", default=False),
+        interval=dict(type="int", default=15),
         name=dict(type="str", required=True),
         port=dict(type="int", required=True),
         request=dict(type="str", required=True),
-        retry_down=dict(type="int"),
-        retry_up=dict(type="int"),
+        retry_down=dict(type="int", default=1),
+        retry_up=dict(type="int", default=1),
         tags=dict(type="dict"),
-        timeout=dict(type="int"),
+        timeout=dict(type="int", default=10),
     )
 
     module = HealthCheckHttpModule(

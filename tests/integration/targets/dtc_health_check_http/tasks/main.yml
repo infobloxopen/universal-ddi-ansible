@@ -5,34 +5,29 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Create a random Health_check name to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_http_name: "test-health_check_http_name-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
-    # Create in check mode (should show changed, but not actually create)
     - name: Create HTTP Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
         port: 80
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
-        tags:
-          location: "{{ tag_value }}"
         state: present
       check_mode: true
-      register: health_check_http_check_mode
-    - name: Get HTTP Health Check information by name (after check mode create)
+      register: health_check_http
+    - name: Get HTTP Health Check information
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
-      register: health_check_http_info_after_check_create
+      register: health_check_http_info
     - assert:
         that:
-          - health_check_http_check_mode.changed
-          - health_check_http_info_after_check_create is not failed
-          - health_check_http_info_after_check_create.objects | length == 0
+          - health_check_http is changed
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 0
 
-    # Basic Test for HTTP Health Check
     - name: Create a HTTP Health Check
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -42,13 +37,18 @@
           location: "{{ tag_value }}"
         state: present
       register: health_check_http
-
     - name: Get HTTP Health Check information by ID
       infoblox.universal_ddi.dtc_health_check_http_info:
-        id: "{{ health_check_http.id }}"
+        filters:
+          name: "{{ health_check_http_name }}"
       register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+          - health_check_http_info.objects[0].tags.location == tag_value
 
-    # Idempotency check (should not change)
     - name: Create HTTP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -57,13 +57,12 @@
         tags:
           location: "{{ tag_value }}"
         state: present
-      register: health_check_http_idempotent
+      register: health_check_http
     - assert:
         that:
-          - not health_check_http_idempotent.changed
-          - health_check_http_idempotent.failed is not defined or not health_check_http_idempotent.failed
+          - health_check_http is not changed
+          - health_check_http is not failed
 
-    # Delete in check mode (should show changed, but not actually delete)
     - name: Delete HTTP Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -73,19 +72,18 @@
           location: "{{ tag_value }}"
         state: absent
       check_mode: true
-      register: health_check_http_delete_check
-    - name: Get HTTP Health Check information by name (after check mode delete)
+      register: health_check_http
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
-      register: health_check_http_info_after_check_delete
+      register: health_check_http_info
     - assert:
         that:
-          - health_check_http_delete_check.changed
-          - health_check_http_info_after_check_delete is not failed
-          - health_check_http_info_after_check_delete.objects | length == 1
+          - health_check_http.changed
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
 
-    # Delete for real
     - name: Delete HTTP Health Check
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -94,19 +92,18 @@
         tags:
           location: "{{ tag_value }}"
         state: absent
-      register: health_check_http_delete
-    - name: Get HTTP Health Check information by name (after delete)
+      register: health_check_http
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
-      register: health_check_http_info_after_delete
+      register: health_check_http_info
     - assert:
         that:
-          - health_check_http_delete.changed
-          - health_check_http_info_after_delete is not failed
-          - health_check_http_info_after_delete.objects | length == 0
+          - health_check_http.changed
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 0
 
-    # Idempotency check for absent state
     - name: Delete HTTP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -115,13 +112,12 @@
         tags:
           location: "{{ tag_value }}"
         state: absent
-      register: health_check_http_delete_idempotent
+      register: health_check_http
     - assert:
         that:
-          - not health_check_http_delete_idempotent.changed
-          - health_check_http_delete_idempotent.failed is not defined or not health_check_http_delete_idempotent.failed
+          - not health_check_http is changed
+          - health_check_http.failed is not defined or not health_check_http is failed
 
-    # Create HTTP Health Check with comment
     - name: Create HTTP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -130,7 +126,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (comment)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -150,7 +146,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (tags)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -169,7 +165,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (disabled)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -188,7 +184,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (interval)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -206,7 +202,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (port)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -225,7 +221,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (retry_down)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -244,7 +240,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (retry_up)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -264,7 +260,7 @@
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
         state: present
       register: health_check_http
-    - name: Get HTTP Health Check information by name (timeout)
+    - name: Get HTTP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
           name: "{{ health_check_http_name }}"
@@ -275,7 +271,6 @@
           - health_check_http_info.objects | length == 1
           - health_check_http_info.objects[0].timeout == 10
 
-          # Create HTTP Health Check with codes
           - name: Create HTTP Health Check with codes
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -284,7 +279,7 @@
               codes: "200,202"
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (codes)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -293,7 +288,6 @@
               that:
                 - health_check_http_info.objects[0].codes == "200,202"
 
-          # Create HTTP Health Check with check_response_body
           - name: Create HTTP Health Check with check_response_body
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -302,7 +296,7 @@
               check_response_body: true
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_body)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -311,7 +305,6 @@
               that:
                 - health_check_http_info.objects[0].check_response_body is true
 
-          # Create HTTP Health Check with check_response_body_negative
           - name: Create HTTP Health Check with check_response_body_negative
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -320,7 +313,7 @@
               check_response_body_negative: false
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_body_negative)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -329,7 +322,6 @@
               that:
                 - health_check_http_info.objects[0].check_response_body_negative is false
 
-          # Create HTTP Health Check with check_response_body_regex
           - name: Create HTTP Health Check with check_response_body_regex
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -338,7 +330,7 @@
               check_response_body_regex: "OK"
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_body_regex)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -347,7 +339,6 @@
               that:
                 - health_check_http_info.objects[0].check_response_body_regex == "OK"
 
-          # Create HTTP Health Check with check_response_header
           - name: Create HTTP Health Check with check_response_header
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -356,7 +347,7 @@
               check_response_header: true
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_header)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -365,7 +356,6 @@
               that:
                 - health_check_http_info.objects[0].check_response_header is true
 
-          # Create HTTP Health Check with check_response_header_negative
           - name: Create HTTP Health Check with check_response_header_negative
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -374,7 +364,7 @@
               check_response_header_negative: false
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_header_negative)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -383,7 +373,6 @@
               that:
                 - health_check_http_info.objects[0].check_response_header_negative is false
 
-          # Create HTTP Health Check with check_response_header_regexes
           - name: Create HTTP Health Check with check_response_header_regexes
             infoblox.universal_ddi.dtc_health_check_http:
               name: "{{ health_check_http_name }}"
@@ -394,7 +383,7 @@
                   regex: "application/json"
               state: present
             register: health_check_http
-          - name: Get HTTP Health Check information by name (check_response_header_regexes)
+          - name: Get HTTP Health Check information by name
             infoblox.universal_ddi.dtc_health_check_http_info:
               filters:
                 name: "{{ health_check_http_name }}"
@@ -404,7 +393,6 @@
                 - health_check_http_info.objects[0].check_response_header_regexes[0].header == "Content-Type"
                 - health_check_http_info.objects[0].check_response_header_regexes[0].regex == "application/json"
   always:
-    # Cleanup if the test fails
     - name: "Delete HTTP Health Check"
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"

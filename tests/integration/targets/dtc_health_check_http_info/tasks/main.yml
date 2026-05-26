@@ -4,12 +4,10 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random HTTP Health Check name and tag to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_http_name: "test-health_check_http_name-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
-    # Basic Test for HTTP Health Check
     - name: Create HTTP Health Check
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
@@ -59,8 +57,17 @@
           - health_check_http_info.objects | length == 1
           - health_check_http_info.objects[0].id == health_check_http.id
 
+    - name: Get HTTP Health Check information by tag filter query
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+          - health_check_http_info.objects[0].tags.location == tag_value
+
   always:
-    # Cleanup if the test fails
     - name: "Delete HTTP Health Check"
       infoblox.universal_ddi.dtc_health_check_http:
         name: "{{ health_check_http_name }}"
