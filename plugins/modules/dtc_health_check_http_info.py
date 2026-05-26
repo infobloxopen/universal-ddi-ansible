@@ -66,6 +66,7 @@ EXAMPLES = r"""
         tag_filters:
           location: "site-1"
 """  # noqa: E501
+
 RETURN = r"""
 id:
     description:
