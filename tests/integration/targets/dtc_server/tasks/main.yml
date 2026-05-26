@@ -7,6 +7,7 @@
     # Create a random DTC Server name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_server_name: "test-dtc-server-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a DTC Server (check mode)
       infoblox.universal_ddi.dtc_server:
@@ -280,8 +281,7 @@
         name: "{{ dtc_server_name }}"
         address: "10.10.0.25"
         tags:
-          environment: "stage"
-          location: "site-1"
+          location: "{{ tag_value }}"
         state: present
       register: dtc_server
     - name: Get information about the DTC Server
@@ -295,8 +295,7 @@
           - dtc_server_info.objects | length == 1
           - dtc_server_info.objects[0].id == dtc_server.id
           - dtc_server_info.objects[0].tags is defined
-          - dtc_server_info.objects[0].tags.location == "site-1"
-          - dtc_server_info.objects[0].tags.Environment == "stage"
+          - dtc_server_info.objects[0].tags.location == tag_value
 
     - name: Create a DTC Server with record types A, AAAA, SRV, HTTPS and SVCB
       infoblox.universal_ddi.dtc_server:

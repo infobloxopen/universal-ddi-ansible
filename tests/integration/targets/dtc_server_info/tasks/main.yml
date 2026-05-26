@@ -25,9 +25,9 @@
       register: dtc_server_info
     - assert:
         that:
-        - dtc_server_info.objects | length == 1
-        - dtc_server_info.objects[0].name == dtc_server_name
-        - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects[0].id == dtc_server.id
 
     - name: Get information about the DTC Server by filters (Id)
       infoblox.universal_ddi.dtc_server_info:
@@ -36,9 +36,9 @@
       register: dtc_server_info
     - assert:
         that:
-        - dtc_server_info.objects | length == 1
-        - dtc_server_info.objects[0].name == dtc_server_name
-        - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects[0].id == dtc_server.id
 
     - name: Get information about the DTC Server by filter query
       infoblox.universal_ddi.dtc_server_info:
@@ -46,9 +46,9 @@
       register: dtc_server_info
     - assert:
         that:
-        - dtc_server_info.objects | length == 1
-        - dtc_server_info.objects[0].id == dtc_server.id
-        - dtc_server_info.objects[0].name == dtc_server_name
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].name == dtc_server_name
 
     - name: Get information about the DTC Server by tag filters
       infoblox.universal_ddi.dtc_server_info:
@@ -57,9 +57,9 @@
       register: dtc_server_info
     - assert:
         that:
-        - dtc_server_info.objects | length == 1
-        - dtc_server_info.objects[0].id == dtc_server.id
-        - dtc_server_info.objects[0].tags.location == tag_value
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].tags.location == tag_value
 
     - name: Get information about the DTC Server with tag filter query
       infoblox.universal_ddi.dtc_server_info:
@@ -67,9 +67,9 @@
       register: dtc_server_info
     - assert:
         that:
-        - dtc_server_info.objects | length == 1
-        - dtc_server_info.objects[0].id == dtc_server.id
-        - dtc_server_info.objects[0].tags.location == tag_value
+          - dtc_server_info.objects | length == 1
+          - dtc_server_info.objects[0].id == dtc_server.id
+          - dtc_server_info.objects[0].tags.location == tag_value
 
   always:
     - name: Delete DTC Server

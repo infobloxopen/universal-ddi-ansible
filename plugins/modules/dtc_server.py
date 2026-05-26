@@ -55,6 +55,10 @@ options:
             - "* address"
             - "* fqdn"
             - "Defaults to B(address)."
+        choices:
+            - address
+            - fqdn
+        default: address
         type: str
     fqdn:
         description:
@@ -86,6 +90,13 @@ options:
                     - "* I(SRV) (I(TYPE33))"
                     - "* I(SVCB) (I(TYPE64))"
                 type: str
+                choices:
+                    - A
+                    - AAAA
+                    - CNAME
+                    - HTTPS
+                    - SRV
+                    - SVCB
     tags:
         description:
             - "Optional. The tags for B(Server) in JSON format."
@@ -171,6 +182,9 @@ item:
                 - "* address"
                 - "* fqdn"
                 - "Defaults to B(address)."
+            choices:
+                - address
+                - fqdn
             type: str
             returned: Always
         fqdn:
@@ -243,6 +257,13 @@ item:
                         - "* I(HTTPS) (I(TYPE65))"
                         - "* I(SRV) (I(TYPE33))"
                         - "* I(SVCB) (I(TYPE64))"
+                    choices:
+                        - A
+                        - AAAA
+                        - CNAME
+                        - HTTPS
+                        - SRV
+                        - SVCB
                     type: str
                     returned: Always
         tags:
@@ -385,7 +406,7 @@ def main():
         auto_create_response_records=dict(type="bool"),
         comment=dict(type="str"),
         disabled=dict(type="bool"),
-        endpoint_type=dict(type="str"),
+        endpoint_type=dict(type="str", choices=["address", "fqdn"], default="address"),
         fqdn=dict(type="str"),
         name=dict(type="str", required=True),
         records=dict(
@@ -393,7 +414,7 @@ def main():
             elements="dict",
             options=dict(
                 rdata=dict(type="dict"),
-                type=dict(type="str"),
+                type=dict(type="str", choices=["A", "AAAA", "CNAME", "HTTPS", "SRV", "SVCB"]),
             ),
         ),
         tags=dict(type="dict"),
