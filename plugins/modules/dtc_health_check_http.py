@@ -156,7 +156,7 @@ EXAMPLES = r"""
             location: "site-1"
         state: "present"
 
-    - name: Delete HealthCheckHttp
+    - name: Delete HTTP Health Check
       infoblox.universal_ddi.dtc_health_check_http:
         name: "example_http_health_check"
         port: 80
