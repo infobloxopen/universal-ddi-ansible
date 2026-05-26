@@ -47,7 +47,6 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-
     - name: Get HTTP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
