@@ -275,6 +275,134 @@
           - health_check_http_info.objects | length == 1
           - health_check_http_info.objects[0].timeout == 10
 
+          # Create HTTP Health Check with codes
+          - name: Create HTTP Health Check with codes
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              codes: "200,202"
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (codes)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].codes == "200,202"
+
+          # Create HTTP Health Check with check_response_body
+          - name: Create HTTP Health Check with check_response_body
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_body: true
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_body)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_body is true
+
+          # Create HTTP Health Check with check_response_body_negative
+          - name: Create HTTP Health Check with check_response_body_negative
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_body_negative: false
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_body_negative)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_body_negative is false
+
+          # Create HTTP Health Check with check_response_body_regex
+          - name: Create HTTP Health Check with check_response_body_regex
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_body_regex: "OK"
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_body_regex)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_body_regex == "OK"
+
+          # Create HTTP Health Check with check_response_header
+          - name: Create HTTP Health Check with check_response_header
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_header: true
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_header)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_header is true
+
+          # Create HTTP Health Check with check_response_header_negative
+          - name: Create HTTP Health Check with check_response_header_negative
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_header_negative: false
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_header_negative)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_header_negative is false
+
+          # Create HTTP Health Check with check_response_header_regexes
+          - name: Create HTTP Health Check with check_response_header_regexes
+            infoblox.universal_ddi.dtc_health_check_http:
+              name: "{{ health_check_http_name }}"
+              port: 80
+              request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+              check_response_header_regexes:
+                - header: "Content-Type"
+                  regex: "application/json"
+              state: present
+            register: health_check_http
+          - name: Get HTTP Health Check information by name (check_response_header_regexes)
+            infoblox.universal_ddi.dtc_health_check_http_info:
+              filters:
+                name: "{{ health_check_http_name }}"
+            register: health_check_http_info
+          - assert:
+              that:
+                - health_check_http_info.objects[0].check_response_header_regexes[0].header == "Content-Type"
+                - health_check_http_info.objects[0].check_response_header_regexes[0].regex == "application/json"
   always:
     # Cleanup if the test fails
     - name: "Delete HTTP Health Check"
