@@ -369,7 +369,7 @@
     - assert:
         that:
           - a_record2 is failed
-          - "a_record2.msg == 'missing required arguments: zone'"
+          - a_record2.msg == 'missing required arguments: zone'
 
   always:
      - name: "Delete the A Record"
