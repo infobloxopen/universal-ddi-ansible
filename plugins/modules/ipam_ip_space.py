@@ -573,6 +573,19 @@ options:
                                     - override
                                 default: inherit
                                 type: str
+                    authoritative_dhcp:
+                        description:
+                            - "The inheritance configuration for I(authoritative_dhcp) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
+                                choices:
+                                    - inherit
+                                    - override
+                                default: inherit
+                                type: str
                     echo_client_id:
                         description:
                             - "The inheritance configuration for I(echo_client_id) field from I(DHCPConfig) object."
@@ -607,6 +620,32 @@ options:
                             action:
                                 description:
                                     - "The inheritance setting."
+                                choices:
+                                    - inherit
+                                    - override
+                                default: inherit
+                                type: str
+                    hold_reclaimed_time:
+                        description:
+                            - "The inheritance configuration for I(hold_reclaimed_time) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
+                                choices:
+                                    - inherit
+                                    - override
+                                default: inherit
+                                type: str
+                    hold_reclaimed_time_v6:
+                        description:
+                            - "The inheritance configuration for I(hold_reclaimed_time_v6) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
                                 choices:
                                     - inherit
                                     - override
@@ -2851,6 +2890,12 @@ def main():
                                 action=dict(type="str", choices=["inherit", "override"], default="inherit"),
                             ),
                         ),
+                        authoritative_dhcp=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str", choices=["inherit", "override"], default="inherit"),
+                            ),
+                        ),
                         echo_client_id=dict(
                             type="dict",
                             options=dict(
@@ -2864,6 +2909,18 @@ def main():
                             ),
                         ),
                         filters_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str", choices=["inherit", "override"], default="inherit"),
+                            ),
+                        ),
+                        hold_reclaimed_time=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str", choices=["inherit", "override"], default="inherit"),
+                            ),
+                        ),
+                        hold_reclaimed_time_v6=dict(
                             type="dict",
                             options=dict(
                                 action=dict(type="str", choices=["inherit", "override"], default="inherit"),
