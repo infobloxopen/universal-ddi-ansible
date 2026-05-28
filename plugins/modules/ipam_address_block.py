@@ -524,6 +524,19 @@ options:
                                     - "* I(override): Use the value set in the object."
                                     - "Defaults to I(inherit)."
                                 type: str
+                    authoritative_dhcp:
+                        description:
+                            - "The inheritance configuration for I(authoritative_dhcp) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
+                                    - "Valid values are:"
+                                    - "* I(inherit): Use the inherited value."
+                                    - "* I(override): Use the value set in the object."
+                                    - "Defaults to I(inherit)."
+                                type: str
                     echo_client_id:
                         description:
                             - "The inheritance configuration for I(echo_client_id) field from I(DHCPConfig) object."
@@ -573,6 +586,32 @@ options:
                                     - "The resource identifier."
                                 type: list
                                 elements: str
+                    hold_reclaimed_time:
+                        description:
+                            - "The inheritance configuration for I(hold_reclaimed_time) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
+                                    - "Valid values are:"
+                                    - "* I(inherit): Use the inherited value."
+                                    - "* I(override): Use the value set in the object."
+                                    - "Defaults to I(inherit)."
+                                type: str
+                    hold_reclaimed_time_v6:
+                        description:
+                            - "The inheritance configuration for I(hold_reclaimed_time_v6) field from I(DHCPConfig) object."
+                        type: dict
+                        suboptions:
+                            action:
+                                description:
+                                    - "The inheritance setting for a field."
+                                    - "Valid values are:"
+                                    - "* I(inherit): Use the inherited value."
+                                    - "* I(override): Use the value set in the object."
+                                    - "Defaults to I(inherit)."
+                                type: str
                     ignore_client_uid:
                         description:
                             - "The inheritance configuration for I(ignore_client_uid) field from I(DHCPConfig) object."
@@ -2707,6 +2746,12 @@ def main():
                                 action=dict(type="str"),
                             ),
                         ),
+                        authoritative_dhcp=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
                         echo_client_id=dict(
                             type="dict",
                             options=dict(
@@ -2725,6 +2770,18 @@ def main():
                             options=dict(
                                 action=dict(type="str"),
                                 value=dict(type="list", elements="str"),
+                            ),
+                        ),
+                        hold_reclaimed_time=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
+                            ),
+                        ),
+                        hold_reclaimed_time_v6=dict(
+                            type="dict",
+                            options=dict(
+                                action=dict(type="str"),
                             ),
                         ),
                         ignore_client_uid=dict(
