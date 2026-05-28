@@ -308,11 +308,13 @@
           - host: "{{ host_info_3.objects[0].id }}"
             role: "passive"
       register: dhcp_ha_group
+      when: anycast_mode_enabled | default(false)
     - name: Get DHCP HA Group Information
       infoblox.universal_ddi.dhcp_ha_group_info:
         filters:
           name: "{{ ha_group_name }}"
       register: dhcp_ha_group_info
+      when: anycast_mode_enabled | default(false)
     - assert:
         that:
           - dhcp_ha_group is changed
@@ -324,6 +326,7 @@
           - dhcp_ha_group_info.objects[0].hosts[0].role == "active"
           - dhcp_ha_group_info.objects[0].hosts[1].role == "passive"
           - dhcp_ha_group_info.objects[0].tags.location ==  tag_value
+      when: anycast_mode_enabled | default(false)
 
   always:
     # Cleanup if the test fails

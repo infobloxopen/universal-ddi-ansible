@@ -33,7 +33,7 @@ options:
         type: str
         choices:
             - DNS
-            - DHCP
+            - NTP
             - DFP
         required: false
     tag_filters:
@@ -175,7 +175,7 @@ objects:
             returned: Always
         service:
             description: 
-                - "The type of the Service used in anycast configuration, supports (dns, dhcp, dfp)."
+                - "The type of the Service used in anycast configuration, supports (dns, ntp, dfp)."
             type: str
             returned: Always
         tags:
@@ -265,7 +265,7 @@ def main():
     module_args = dict(
         id=dict(type="int", required=False),
         name=dict(type="str", required=False),
-        service=dict(type="str", required=False, choices=["DNS", "DHCP", "DFP"]),
+        service=dict(type="str", required=False, choices=["DNS", "NTP", "DFP"]),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

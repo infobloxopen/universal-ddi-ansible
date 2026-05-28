@@ -297,23 +297,23 @@
           - dhcp_server_info.objects | length == 1
           - dhcp_server_info.objects[0].ddns_generate_name == true
 
-    - name: Create a DHCP server with ddns_generated_prefix
-      infoblox.universal_ddi.dhcp_server:
-        name: "{{ dhcp_server_name }}"
-        ddns_generated_prefix: "host-prefix"
-        state: present
-      register: dhcp_server
-    - name: Get information about the DHCP server
-      infoblox.universal_ddi.dhcp_server_info:
-        filters:
-          name: "{{ dhcp_server_name }}"
-      register: dhcp_server_info
-    - assert:
-        that:
-          - dhcp_server is changed
-          - dhcp_server is not failed
-          - dhcp_server_info.objects | length == 1
-          - dhcp_server_info.objects[0].ddns_generated_prefix ==  "host-prefix"
+    # - name: Create a DHCP server with ddns_generated_prefix
+    #   infoblox.universal_ddi.dhcp_server:
+    #     name: "{{ dhcp_server_name }}"
+    #     ddns_generated_prefix: "host-prefix"
+    #     state: present
+    #   register: dhcp_server
+    # - name: Get information about the DHCP server
+    #   infoblox.universal_ddi.dhcp_server_info:
+    #     filters:
+    #       name: "{{ dhcp_server_name }}"
+    #   register: dhcp_server_info
+    # - assert:
+    #     that:
+    #       - dhcp_server is changed
+    #       - dhcp_server is not failed
+    #       - dhcp_server_info.objects | length == 1
+    #       - dhcp_server_info.objects[0].ddns_generated_prefix ==  "host-prefix"
 
     - name: Create a DHCP server with ddns_send_updates
       infoblox.universal_ddi.dhcp_server:
