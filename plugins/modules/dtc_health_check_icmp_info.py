@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_icmp_info
-short_description: Manage HealthCheckIcmp
+short_description: Retrieves DTC ICMP Health Checks
 description:
-    - Manage HealthCheckIcmp
+    - Retrieve information about existing DTC ICMP Health Checks.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -47,26 +47,19 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create ICMP Health Check
-      infoblox.universal_ddi.dtc_health_check_icmp:
-        name: "test-health_check_icmp_name"
-        tags:
-          location: "site-1"
-        state: present
-
     - name: Get ICMP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_icmp_info:
         filters:
-          name: "test-health_check_icmp_name"
+          name: "example_icmp_health_check"
 
     - name: Get ICMP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_icmp_info:
         filters:
-          id: "health_check_icmp_id"
+          id: "{{ icmp_health_check.id }}"
 
     - name: Get ICMP Health Check information by filter query
       infoblox.universal_ddi.dtc_health_check_icmp_info:
-        filter_query: "name=='test-health_check_icmp_name'"
+        filter_query: "name=='example_icmp_health_check'"
 
     - name: Get ICMP Health Check information by tag filters
       infoblox.universal_ddi.dtc_health_check_icmp_info:

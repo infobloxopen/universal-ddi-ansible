@@ -57,6 +57,16 @@
           - health_check_icmp_info.objects | length == 1
           - health_check_icmp_info.objects[0].id == health_check_icmp.id
 
+    - name: Get ICMP Health Check information by tag filter query
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].id == health_check_icmp.id
+          - health_check_icmp_info.objects[0].tags.location == tag_value
+
   always:
     # Cleanup if the test fails
     - name: "Delete ICMP Health Check"
