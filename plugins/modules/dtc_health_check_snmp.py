@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_snmp
-short_description: Manage HealthCheckSnmp
+short_description: Manages a DTC SNMP Health Check
 description:
-    - Manage HealthCheckSnmp
+    - Manages a DTC SNMP Health Check
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -153,6 +153,10 @@ options:
             - "* v2c - version 2 community"
             - "* v3  - version 3"
         type: str
+        choices:
+          -  v1
+          -  v2c
+          -  v3
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -331,7 +335,7 @@ item:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create SNMP Health Check with v2c
+    - name: Create SNMP Health Check
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "example-snmp-health-check"
         version: "v2c"
@@ -386,7 +390,7 @@ class HealthCheckSnmpModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(HealthCheckSnmpModule, self).__init__(*args, **kwargs)
 
-        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
+        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id", "metadata"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = SNMPHealthCheck.from_dict(self._payload_params)
         self._existing = None
@@ -519,7 +523,7 @@ def main():
         context_engine_id=dict(type="str"),
         context_name=dict(type="str"),
         disabled=dict(type="bool"),
-        interval=dict(type="int"),
+        interval=dict(type="int", default=15),
         metadata=dict(
             type="dict",
             options=dict(
@@ -533,7 +537,7 @@ def main():
                 ),
             ),
         ),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         port=dict(type="int"),
         retry_down=dict(type="int"),
         retry_up=dict(type="int"),

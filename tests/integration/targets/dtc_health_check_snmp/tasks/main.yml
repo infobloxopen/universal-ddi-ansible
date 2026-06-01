@@ -5,7 +5,7 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Create random names to avoid conflicts
+    # Create random SNMP Health Check names to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_name: "test-snmp-hc-{{ 999999 | random | string }}"
         health_check_name_v3: "test-snmp-hc-v3-{{ 999999 | random | string }}"
@@ -20,12 +20,12 @@
         community: "public"
         state: present
       check_mode: true
-      register: health_check
+      register: health_check_snmp
     - name: Get Information about the SNMP Health Check
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:
           name: "{{ health_check_name }}"
-      register: health_check_info
+      register: health_check_snmp_info
     - assert:
         that:
           - health_check is changed
@@ -76,7 +76,7 @@
     # =========================================
     # Test: Update SNMP Health Check with comment
     # =========================================
-    - name: Update SNMP Health Check with comment
+    - name: Create SNMP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_name }}"
         version: "v2c"
@@ -116,7 +116,7 @@
     - assert:
         that:
           - health_check is changed
-          - health_check is not failed
+          - health_check_info is not failed
           - health_check_info.objects[0].tags.location == "datacenter1"
           - health_check_info.objects[0].tags.team == "network"
 

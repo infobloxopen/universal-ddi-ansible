@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_snmp_info
-short_description: Retrieve HealthCheckSnmp
+short_description: Retrieves DTC SNMP Health Checks
 description:
-    - Retrieve HealthCheckSnmp
+    - Retrieve information about existing DTC SNMP Health Checks.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -232,7 +232,7 @@ objects:
 EXAMPLES = r"""
     - name: Get SNMP Health Check by ID
       infoblox.universal_ddi.dtc_health_check_snmp_info:
-        id: "{{ health_check_id }}"
+        id: "{{ health_check_snmp.id }}"
 
     - name: Get SNMP Health Check by filters (name)
       infoblox.universal_ddi.dtc_health_check_snmp_info:
@@ -272,7 +272,7 @@ class HealthCheckSnmpInfoModule(UniversalDDIAnsibleModule):
             resp = HealthCheckSnmpApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:
