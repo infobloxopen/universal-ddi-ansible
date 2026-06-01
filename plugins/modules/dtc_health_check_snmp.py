@@ -77,8 +77,7 @@ options:
         type: str
     community:
         description:
-            - "Optional. SNMP community string used for authentication. Mandatory for B(v1) and B(v2c) versions, ignored for B(v3)."
-            - "Defaults to B(public)."
+            - "SNMP community string used for authentication. Required for B(v1) and B(v2c) versions, ignored for B(v3)."
         type: str
     context_engine_id:
         description:
@@ -99,25 +98,6 @@ options:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
         type: int
         default: 15
-    metadata:
-        description:
-            - "Output only. B(SNMPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
-        type: dict
-        suboptions:
-            used_by:
-                description:
-                    - "List of structs representing a limited view on configuration objects that use a resource the metadata is provided for."
-                type: list
-                elements: dict
-                suboptions:
-                    details:
-                        description:
-                            - "Structured data consisting of additional details of the configuration resource."
-                        type: dict
-                    display_name:
-                        description:
-                            - "Display name of the configuration resource."
-                        type: str
     name:
         description:
             - "Display name of B(SNMPHealthCheck)."
@@ -526,19 +506,6 @@ def main():
         context_name=dict(type="str"),
         disabled=dict(type="bool"),
         interval=dict(type="int", default=15),
-        metadata=dict(
-            type="dict",
-            options=dict(
-                used_by=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        details=dict(type="dict"),
-                        display_name=dict(type="str"),
-                    ),
-                ),
-            ),
-        ),
         name=dict(type="str", required=True),
         port=dict(type="int"),
         retry_down=dict(type="int"),
@@ -556,6 +523,7 @@ def main():
             ("state", "present", ["name", "version"]),
             ("version", "v1", ["community"]),
             ("version", "v2c", ["community"]),
+            ("version", "v3", ["user_security_model"]),
         ],
     )
 
