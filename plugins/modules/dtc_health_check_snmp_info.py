@@ -31,16 +31,6 @@ options:
             - Filter query to filter objects
         type: str
         required: false
-    inherit:
-        description:
-            - Return inheritance information
-        type: str
-        required: false
-        choices:
-            - full
-            - partial
-            - none
-        default: full
     tag_filters:
         description:
             - Filter dict to filter objects by tags
@@ -55,6 +45,26 @@ options:
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
+
+EXAMPLES = r"""
+    - name: Get SNMP Health Check by ID
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        id: "{{ health_check_snmp.id }}"
+
+    - name: Get SNMP Health Check by filters (name)
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "example-snmp-health-check"
+
+    - name: Get SNMP Health Check by filter query
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filter_query: "name=='example-snmp-health-check'"
+
+    - name: Get SNMP Health Check by tag filters
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        tag_filters:
+          environment: "production"
+"""
 
 RETURN = r"""
 id:
@@ -229,29 +239,6 @@ objects:
             returned: Always
 """  # noqa: E501
 
-EXAMPLES = r"""
-    - name: Get SNMP Health Check by ID
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        id: "{{ health_check_snmp.id }}"
-
-    - name: Get SNMP Health Check by filters (name)
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        filters:
-          name: "example-snmp-health-check"
-
-    - name: Get SNMP Health Check by filter query
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        filter_query: "name=='example-snmp-health-check'"
-
-    - name: Get SNMP Health Check by tag filters
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        tag_filters:
-          environment: "production"
-
-    - name: Get all SNMP Health Checks
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-"""
-
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
@@ -336,7 +323,6 @@ def main():
         id=dict(type="str", required=False),
         filters=dict(type="dict", required=False),
         filter_query=dict(type="str", required=False),
-        inherit=dict(type="str", required=False, choices=["full", "partial", "none"], default="full"),
         tag_filters=dict(type="dict", required=False),
         tag_filter_query=dict(type="str", required=False),
     )

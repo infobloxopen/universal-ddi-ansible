@@ -129,7 +129,7 @@ options:
         type: str
     version:
         description:
-            - "SNMP version."
+            - "SNMP version. Required when I(state=present)."
             - "Allowed values:"
             - "* v1  - version 1"
             - "* v2c - version 2 community"
@@ -143,6 +143,50 @@ options:
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
 """  # noqa: E501
+
+EXAMPLES = r"""
+    - name: Create SNMP Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "example-snmp-health-check"
+        version: "v2c"
+        community: "public"
+        state: present
+      register: health_check_snmp
+
+    - name: Create SNMP Health Check with additional fields
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "example-snmp-health-check"
+        version: "v2c"
+        community: "public"
+        comment: "Production SNMP health check"
+        port: 161
+        interval: 30
+        timeout: 15
+        retry_up: 3
+        retry_down: 2
+        tags:
+          environment: "production"
+        state: present
+
+    - name: Create SNMP Health Check with check_list
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "example-snmp-health-check"
+        version: "v2c"
+        community: "public"
+        check_list:
+          - name: "1.3.6.1.2.1.1.3.0"
+            type: "integer"
+            operator: "geq"
+            value: "100"
+        state: present
+
+    - name: Delete SNMP Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "example-snmp-health-check"
+        version: "v2c"
+        community: "public"
+        state: absent
+"""
 
 RETURN = r"""
 id:
@@ -315,49 +359,6 @@ item:
             type: str
             returned: Always
 """  # noqa: E501
-
-EXAMPLES = r"""
-    - name: Create SNMP Health Check
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "example-snmp-health-check"
-        version: "v2c"
-        community: "public"
-        state: present
-
-    - name: Create SNMP Health Check with additional fields
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "example-snmp-health-check"
-        version: "v2c"
-        community: "public"
-        comment: "Production SNMP health check"
-        port: 161
-        interval: 30
-        timeout: 15
-        retry_up: 3
-        retry_down: 2
-        tags:
-          environment: "production"
-        state: present
-
-    - name: Create SNMP Health Check with check_list
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "example-snmp-health-check"
-        version: "v2c"
-        community: "public"
-        check_list:
-          - name: "1.3.6.1.2.1.1.3.0"
-            type: "integer"
-            operator: "geq"
-            value: "100"
-        state: present
-
-    - name: Delete SNMP Health Check
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "example-snmp-health-check"
-        version: "v2c"
-        community: "public"
-        state: absent
-"""
 
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
