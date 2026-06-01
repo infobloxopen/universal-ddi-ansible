@@ -98,6 +98,7 @@ options:
         description:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
         type: int
+        default: 15
     metadata:
         description:
             - "Output only. B(SNMPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
@@ -121,6 +122,7 @@ options:
         description:
             - "Display name of B(SNMPHealthCheck)."
         type: str
+        required: true
     port:
         description:
             - "Optional. Destination UDP port of B(SNMPHealthCheck). Defaults to I(161)."
@@ -544,7 +546,7 @@ def main():
         tags=dict(type="dict"),
         timeout=dict(type="int"),
         user_security_model=dict(type="str"),
-        version=dict(type="str"),
+        version=dict(type="str", choices=["v1", "v2c", "v3"]),
     )
 
     module = HealthCheckSnmpModule(
