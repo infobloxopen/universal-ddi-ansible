@@ -101,3 +101,5 @@ action_groups:
   dtc:
     - dtc_health_check_snmp
     - dtc_health_check_snmp_info
+    - dtc_snmp_user_security_model
+    - dtc_snmp_user_security_model_info

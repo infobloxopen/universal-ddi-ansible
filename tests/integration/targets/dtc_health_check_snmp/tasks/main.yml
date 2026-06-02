@@ -5,10 +5,15 @@
       portal_key: "{{ portal_key }}"
 
   block:
+
     # Create random SNMP Health Check names to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_name: "test-snmp-hc-{{ 999999 | random | string }}"
         health_check_name_v3: "test-snmp-hc-v3-{{ 999999 | random | string }}"
+
+    # Setup SNMP USM for v3 testing
+    - ansible.builtin.include_role:
+        name: setup_snmp_usm
 
     # Test: Create SNMP Health Check (check mode)
     - name: Create a SNMP Health Check (check mode)
@@ -427,6 +432,218 @@
           - health_check_info.objects | length == 1
           - health_check_info.objects[0].id == health_check.id
 
+    # ==================== SNMP v3 Tests ====================
+
+    # Test: Create SNMP v3 Health Check (check mode)
+    - name: Create a SNMP v3 Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: present
+      check_mode: true
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3_info is not failed
+          - health_check_v3_info.objects | length == 0
+
+    # Test: Create SNMP v3 Health Check
+    - name: Create a SNMP v3 Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3 is not failed
+          - health_check_v3_info is not failed
+          - health_check_v3_info.objects | length == 1
+          - health_check_v3_info.objects[0].id == health_check_v3.id
+          - health_check_v3_info.objects[0].version == "v3"
+
+    # Test: Create SNMP v3 Health Check (idempotent)
+    - name: Create a SNMP v3 Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: present
+      register: health_check_v3
+    - assert:
+        that:
+          - health_check_v3 is not changed
+          - health_check_v3 is not failed
+
+    # Test: Update SNMP v3 Health Check with comment
+    - name: Update SNMP v3 Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        comment: "Test SNMP v3 Health Check"
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3 is not failed
+          - health_check_v3_info.objects[0].comment == "Test SNMP v3 Health Check"
+
+    # Test: Update SNMP v3 Health Check with tags
+    - name: Update SNMP v3 Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        tags:
+          environment: "test"
+          protocol: "snmpv3"
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3_info is not failed
+          - health_check_v3_info.objects[0].tags.environment == "test"
+          - health_check_v3_info.objects[0].tags.protocol == "snmpv3"
+
+    # Test: Update SNMP v3 Health Check with interval
+    - name: Update SNMP v3 Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        interval: 30
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3 is not failed
+          - health_check_v3_info.objects[0].interval == 30
+
+    # Test: Update SNMP v3 Health Check with context_engine_id
+    - name: Update SNMP v3 Health Check with context_engine_id
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        context_engine_id: "800000090300001234567890"
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check with context_engine_id
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3 is not failed
+          - health_check_v3_info.objects[0].context_engine_id == "800000090300001234567890"
+
+    # Test: Update SNMP v3 Health Check with context_name
+    - name: Update SNMP v3 Health Check with context_name
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        context_name: "v3-context"
+        state: present
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check with context_name
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3 is not failed
+          - health_check_v3_info.objects[0].context_name == "v3-context"
+
+    # Test: Delete SNMP v3 Health Check (check mode)
+    - name: Delete the SNMP v3 Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: absent
+      check_mode: true
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check (delete check mode)
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3_info is not failed
+          - health_check_v3_info.objects | length == 1
+
+    # Test: Delete SNMP v3 Health Check
+    - name: Delete the SNMP v3 Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: absent
+      register: health_check_v3
+    - name: Get Information about the SNMP v3 Health Check (after delete)
+      infoblox.universal_ddi.dtc_health_check_snmp_info:
+        filters:
+          name: "{{ health_check_name_v3 }}"
+      register: health_check_v3_info
+    - assert:
+        that:
+          - health_check_v3 is changed
+          - health_check_v3_info is not failed
+          - health_check_v3_info.objects | length == 0
+
+    # Test: Delete SNMP v3 Health Check (idempotent)
+    - name: Delete the SNMP v3 Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_name_v3 }}"
+        version: "v3"
+        user_security_model: "{{ _snmp_usm_id }}"
+        state: absent
+      register: health_check_v3
+    - assert:
+        that:
+          - health_check_v3 is not changed
+          - health_check_v3 is not failed
+
   always:
     # Cleanup
     - name: Cleanup SNMP Health Check
@@ -441,6 +658,11 @@
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_name_v3 }}"
         version: "v3"
-        user_security_model: "noAuthNoPriv"
+        user_security_model: "{{ _snmp_usm_id }}"
         state: absent
       ignore_errors: true
+
+    # Cleanup setup role
+    - ansible.builtin.include_role:
+        name: setup_snmp_usm
+        tasks_from: cleanup.yml
