@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_http
-short_description: Manages DTC HTTP health checks
+short_description: Manages a DTC HTTP health checks
 description:
-    - Manages DTC HTTP health checks
+    - Manages a DTC HTTP health checks
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
