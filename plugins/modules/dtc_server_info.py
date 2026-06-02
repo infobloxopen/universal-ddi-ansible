@@ -56,11 +56,6 @@ EXAMPLES = r"""
     filters:
       name: "example_dtc_server"
 
-- name: Get information about the DTC Server by filters (ID)
-  infoblox.universal_ddi.dtc_server_info:
-    filters:
-      id: "dtc_server_id"
-
 - name: Get information about the DTC Server by filter query
   infoblox.universal_ddi.dtc_server_info:
     filter_query: "name=='example_dtc_server'"
@@ -218,7 +213,7 @@ class ServerInfoModule(UniversalDDIAnsibleModule):
             resp = ServerApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:
