@@ -1,0 +1,16 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random DTC LBDN to avoid conflicts
+    - ansible.builtin.set_fact:
+        dtc_policy_name: "test-dtc-lbdn-{{ 999999 | random | string }}.com."
+
+    - name: Create a DTC Policy
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: present
+      register: dtc_policy
