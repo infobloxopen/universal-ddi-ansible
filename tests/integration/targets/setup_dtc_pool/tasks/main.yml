@@ -1,0 +1,32 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+     # Create a random DTC Pool name to avoid conflicts
+    - ansible.builtin.set_fact:
+        dtc_pool_1_name: "dtc_pool_1_name-{{ 999999 | random | string }}"
+        dtc_pool_2_name: "dtc_pool_2_name-{{ 999999 | random | string }}"
+        dtc_pool_3_name: "dtc_pool_3_name-{{ 999999 | random | string }}"
+
+    - name: Create a DTC Pool 1
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_1_name }}"
+        method: "round_robin"
+        state: present
+      register: dtc_pool_1
+
+    - name: Create a DTC Pool 2
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_2_name }}"
+        method: "global_availability"
+        state: present
+      register: dtc_pool_2
+
+    - name: Create a DTC Pool 3
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_3_name }}"
+        method: "global_availability"
+        state: present
+      register: dtc_pool_3
