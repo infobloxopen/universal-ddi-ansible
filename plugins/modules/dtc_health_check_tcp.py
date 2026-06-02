@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_tcp
-short_description: Manage HealthCheckTcp
+short_description: Manages a DTC TCP Health Check
 description:
-    - Manage HealthCheckTcp
+    - Manages a DTC TCP Health Check
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -38,29 +38,12 @@ options:
         description:
             - "Optional. Flag which enables/disables B(TCPHealthCheck). Defaults to I(false)."
         type: bool
+        default: False
     interval:
         description:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
         type: int
-    metadata:
-        description:
-            - "Output only. B(TCPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
-        type: dict
-        suboptions:
-            used_by:
-                description:
-                    - "List of structs representing a limited view on configuration objects that use a resource the metadata is provided for."
-                type: list
-                elements: dict
-                suboptions:
-                    details:
-                        description:
-                            - "Structured data consisting of additional details of the configuration resource."
-                        type: dict
-                    display_name:
-                        description:
-                            - "Display name of the configuration resource."
-                        type: str
+        default: 15
     name:
         description:
             - "Display name of B(TCPHealthCheck)."
@@ -75,10 +58,12 @@ options:
         description:
             - "Optional. Retry down count. The value determines how many bad health checks in a row must be received by the onprem host from the DTC Server for treating the health check as failed. Defaults to I(1)."
         type: int
+        default: 1
     retry_up:
         description:
             - "Optional. Retry up count. The value determines how many good health checks in a row must be received by the onprem host from the DTC Server for treating the health check as successful. Defaults to I(1)."
         type: int
+        default: 1
     tags:
         description:
             - "Optional. The tags for B(TCPHealthCheck) in JSON format."
@@ -87,6 +72,7 @@ options:
         description:
             - "Optional. Timeout value in seconds. The health check waits for the specified number of seconds after sending a request. If it does not receive a response within the number of seconds, then the health check is considered as failed. Defaults to I(10)."
         type: int
+        default: 10
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -98,7 +84,7 @@ EXAMPLES = r"""
         name: "example_tcp_health_check"
         port: 80
         state: present
-      register: tcp_health_check
+      register: health_check_tcp
 
     - name: Create a TCP Health Check with additional parameters
       infoblox.universal_ddi.dtc_health_check_tcp:
@@ -343,27 +329,14 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
-        interval=dict(type="int"),
-        metadata=dict(
-            type="dict",
-            options=dict(
-                used_by=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        details=dict(type="dict"),
-                        display_name=dict(type="str"),
-                    ),
-                ),
-            ),
-        ),
+        disabled=dict(type="bool", default=False),
+        interval=dict(type="int", default=15),
         name=dict(type="str", required=True),
         port=dict(type="int", required=True),
-        retry_down=dict(type="int"),
-        retry_up=dict(type="int"),
+        retry_down=dict(type="int", default=1),
+        retry_up=dict(type="int", default=1),
         tags=dict(type="dict"),
-        timeout=dict(type="int"),
+        timeout=dict(type="int", default=10),
     )
 
     module = HealthCheckTcpModule(

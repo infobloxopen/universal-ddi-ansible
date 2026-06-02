@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_health_check_tcp_info
-short_description: Manage HealthCheckTcp
+short_description: Retrieves DTC TCP Health Checks
 description:
-    - Manage HealthCheckTcp
+    - Retrieve information about existing DTC TCP Health Checks.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -47,27 +47,19 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Create TCP Health Check
-      infoblox.universal_ddi.dtc_health_check_tcp:
-        name: "test-health_check_tcp_name"
-        tags:
-          location: "site-1"
-        port: 80
-        state: present
-    
     - name: Get TCP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
-          name: "test-health_check_tcp_name"
+          name: "example_tcp_health_check"
     
     - name: Get TCP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
-          id: "health_check_tcp_id"
+          id: "{{  health_check_tcp.id  }}"
     
     - name: Get TCP Health Check information by filter query
       infoblox.universal_ddi.dtc_health_check_tcp_info:
-        filter_query: "name=='test-health_check_tcp_name'"
+        filter_query: "name=='example_tcp_health_check'"
     
     - name: Get TCP Health Check information by tag filters
       infoblox.universal_ddi.dtc_health_check_tcp_info:

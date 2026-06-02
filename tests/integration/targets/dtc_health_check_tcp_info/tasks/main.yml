@@ -31,7 +31,6 @@
 
     - name: Get TCP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_tcp_info:
-        filters:
           id: "{{ health_check_tcp.id }}"
       register: health_check_tcp_info
     - assert:
@@ -57,6 +56,16 @@
         that:
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].id == health_check_tcp.id
+
+    - name: Get TCP Health Check information by tag filter query
+      infoblox.universal_ddi.dtc_health_check_tcp_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: health_check_tcp_info
+    - assert:
+        that:
+          - health_check_tcp_info.objects | length == 1
+          - health_check_tcp_info.objects[0].id == health_check_tcp.id
+          - health_check_tcp_info.objects[0].tags.location == tag_value
 
   always:
     # Cleanup if the test fails

@@ -5,7 +5,7 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Create a random Health_check name to avoid conflicts
+    # Create a random TCP Health check name to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_tcp_name: "test-health_check_tcp_name-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
@@ -14,23 +14,20 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: present
       check_mode: true
-      register: health_check_tcp_check_mode
-    - name: Get TCP Health Check information by name (after check mode create)
+      register: health_check_tcp
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
-      register: health_check_tcp_info_after_check_create
+      register: health_check_tcp_info
     - assert:
         that:
-          - health_check_tcp_check_mode.changed
-          - health_check_tcp_info_after_check_create is not failed
-          - health_check_tcp_info_after_check_create.objects | length == 0
+          - health_check_tcp.changed
+          - health_check_tcp_info is not failed
+          - health_check_tcp_info.objects | length == 0
 
-    # Basic Test for TCP Health Check
     - name: Create a TCP Health Check
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -39,13 +36,18 @@
           location: "{{ tag_value }}"
         state: present
       register: health_check_tcp
-
     - name: Get TCP Health Check information by ID
       infoblox.universal_ddi.dtc_health_check_tcp_info:
-        id: "{{ health_check_tcp.id }}"
+        filters:
+          name: "{{ health_check_tcp_name }}"
       register: health_check_tcp_info
+    - assert:
+        that:
+          - health_check_tcp_info is not failed
+          - health_check_tcp_info.objects | length == 1
+          - health_check_tcp_info.objects[0].id == health_check_tcp.id
+          - health_check_tcp_info.objects[0].tags.location == tag_value
 
-    # Idempotency check (should not change)
     - name: Create TCP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -53,13 +55,12 @@
         tags:
           location: "{{ tag_value }}"
         state: present
-      register: health_check_tcp_idempotent
+      register: health_check_tcp
     - assert:
         that:
-          - not health_check_tcp_idempotent.changed
-          - health_check_tcp_idempotent.failed is not defined or not health_check_tcp_idempotent.failed
+          - not health_check_tcp is changed
+          - health_check_tcp.failed is not defined or not health_check_tcp.failed
 
-    # Delete in check mode (should show changed, but not actually delete)
     - name: Delete TCP Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -68,19 +69,18 @@
           location: "{{ tag_value }}"
         state: absent
       check_mode: true
-      register: health_check_tcp_delete_check
-    - name: Get TCP Health Check information by name (after check mode delete)
+      register: health_check_tcp
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
-      register: health_check_tcp_info_after_check_delete
+      register: health_check_tcp_info
     - assert:
         that:
-          - health_check_tcp_delete_check.changed
-          - health_check_tcp_info_after_check_delete is not failed
-          - health_check_tcp_info_after_check_delete.objects | length == 1
+          - health_check_tcp is changed
+          - health_check_tcp_info is not failed
+          - health_check_tcp_info.objects | length == 1
 
-    # Delete for real
     - name: Delete TCP Health Check
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -88,19 +88,18 @@
         tags:
           location: "{{ tag_value }}"
         state: absent
-      register: health_check_tcp_delete
-    - name: Get TCP Health Check information by name (after delete)
+      register: health_check_tcp
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
-      register: health_check_tcp_info_after_delete
+      register: health_check_tcp_info
     - assert:
         that:
-          - health_check_tcp_delete.changed
-          - health_check_tcp_info_after_delete is not failed
-          - health_check_tcp_info_after_delete.objects | length == 0
+          - health_check_tcp.changed
+          - health_check_tcp_info is not failed
+          - health_check_tcp_info.objects | length == 0
 
-    # Idempotency check for absent state
     - name: Delete TCP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -108,13 +107,12 @@
         tags:
           location: "{{ tag_value }}"
         state: absent
-      register: health_check_tcp_delete_idempotent
+      register: health_check_tcp
     - assert:
         that:
-          - not health_check_tcp_delete_idempotent.changed
-          - health_check_tcp_delete_idempotent.failed is not defined or not health_check_tcp_delete_idempotent.failed
+          - not health_check_tcp is changed
+          - health_check_tcp.failed is not defined or not health_check_tcp.failed
 
-    # Create TCP Health Check with comment
     - name: Create TCP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -122,7 +120,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (comment)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -133,7 +131,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].comment == "Test Comment"
 
-    # Create TCP Health Check with tags
     - name: Create TCP Health Check with tags
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -142,7 +139,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (tags)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -153,7 +150,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].tags.test_tag == "tag_value"
 
-    # Create TCP Health Check with disabled true
     - name: Create TCP Health Check with disabled true
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -161,7 +157,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (disabled)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -172,7 +168,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].disabled == true
 
-    # Create TCP Health Check with interval
     - name: Create TCP Health Check with interval
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -180,7 +175,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (interval)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -191,14 +186,13 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].interval == 20
 
-    # Create TCP Health Check with port
     - name: Create TCP Health Check with port
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 8080
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (port)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -209,7 +203,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].port == 8080
 
-    # Create TCP Health Check with retry_down
     - name: Create TCP Health Check with retry_down
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -217,7 +210,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (retry_down)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -228,7 +221,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].retry_down == 2
 
-    # Create TCP Health Check with retry_up
     - name: Create TCP Health Check with retry_up
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -236,7 +228,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (retry_up)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
@@ -247,7 +239,6 @@
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].retry_up == 3
 
-    # Create TCP Health Check with timeout
     - name: Create TCP Health Check with timeout
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
@@ -256,7 +247,7 @@
         port: 80
         state: present
       register: health_check_tcp
-    - name: Get TCP Health Check information by name (timeout)
+    - name: Get TCP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_tcp_info:
         filters:
           name: "{{ health_check_tcp_name }}"
