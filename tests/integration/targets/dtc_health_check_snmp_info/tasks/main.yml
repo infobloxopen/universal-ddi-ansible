@@ -4,7 +4,7 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create random names and tag to avoid conflicts
+    # Create random SNMP Health Check names and tag to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_snmp_name: "test-health-check-snmp-{{ 999999 | random | string }}"
         health_check_snmp_name_2: "test-health-check-snmp-2-{{ 999999 | random | string }}"
