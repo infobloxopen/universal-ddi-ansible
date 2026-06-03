@@ -107,8 +107,8 @@ objects:
                         - "Allowed values:"
                         - "* any - any value must be present"
                         - "* eq  - entry value must be equal to check's B(value)."
-                        - "* leq - entry value must less or equal to check's B(value)."
-                        - "* geq - entry value must be great or equal to check's B(value)."
+                        - "* leq - entry value must be less or equal to check's B(value)."
+                        - "* geq - entry value must be greater or equal to check's B(value)."
                         - "* in  - entry value must be greater or equal than B(value) and less or equal than B(max_value)."
                         - "Operator B(in) is supported only for B(integer) types."
                     type: str

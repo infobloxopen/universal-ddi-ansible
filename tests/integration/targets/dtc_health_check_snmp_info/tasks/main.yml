@@ -21,7 +21,6 @@
         state: present
       register: health_check_snmp
 
-    # Test: Get SNMP Health Check by ID
     - name: Get SNMP Health Check information by ID
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         id: "{{ health_check_snmp.id }}"
@@ -33,7 +32,6 @@
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
           - health_check_snmp_info.objects[0].name == health_check_snmp.object.name
 
-    # Test: Get SNMP Health Check by filters (id)
     - name: Get SNMP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:
@@ -45,7 +43,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
-    # Test: Get SNMP Health Check by filters (name)
     - name: Get SNMP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:
@@ -58,7 +55,6 @@
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
           - health_check_snmp_info.objects[0].name == health_check_snmp_name
 
-    # Test: Get SNMP Health Check by filter_query
     - name: Get SNMP Health Check information by filter_query
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filter_query: "name=='{{ health_check_snmp_name }}'"
@@ -69,7 +65,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
-    # Test: Get SNMP Health Check by tag_filters
     - name: Get SNMP Health Check information by tag_filters
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         tag_filters:
@@ -81,7 +76,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
-    # Test: Get SNMP Health Check by tag_filter_query
     - name: Get SNMP Health Check information by tag_filter_query
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         tag_filter_query: "location=='{{ tag_value }}'"
@@ -92,7 +86,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
-    # Test: Get all SNMP Health Checks (no filters)
     - name: Get all SNMP Health Check information
       infoblox.universal_ddi.dtc_health_check_snmp_info:
       register: health_check_snmp_info
@@ -101,7 +94,6 @@
           - health_check_snmp_info is not failed
           - health_check_snmp_info.objects | length >= 1
 
-    # Test: Get SNMP Health Check with non-existent name
     - name: Get SNMP Health Check information with non-existent name
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:
@@ -112,7 +104,6 @@
           - health_check_snmp_info is not failed
           - health_check_snmp_info.objects | length == 0
 
-    # Test: Create second SNMP Health Check and verify multiple results
     - name: Create second SNMP Health Check
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_snmp_name_2 }}"
@@ -133,7 +124,6 @@
           - health_check_snmp_info is not failed
           - health_check_snmp_info.objects | length == 2
 
-    # Test: Verify returned object fields
     - name: Verify SNMP Health Check object fields
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         id: "{{ health_check_snmp.id }}"
