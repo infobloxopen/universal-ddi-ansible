@@ -158,7 +158,7 @@ EXAMPLES = r"""
         name: "example-snmp-health-check"
         version: "v2c"
         community: "public"
-        comment: "Production SNMP health check"
+        comment: "Example SNMP health check"
         port: 161
         interval: 30
         timeout: 15
