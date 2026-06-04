@@ -19,7 +19,7 @@
 
     - name: Get information about the DTC Pool by ID
       infoblox.universal_ddi.dtc_pool_info:
-          id: "{{ dtc_pool.id }}"
+        id: "{{ dtc_pool.id }}"
       register: dtc_pool_info
     - assert:
         that:
