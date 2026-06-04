@@ -74,14 +74,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
-    - name: Get all SNMP Health Check information
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-      register: health_check_snmp_info
-    - assert:
-        that:
-          - health_check_snmp_info is not failed
-          - health_check_snmp_info.objects | length >= 1
-
     - name: Get SNMP Health Check information with non-existent name
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:

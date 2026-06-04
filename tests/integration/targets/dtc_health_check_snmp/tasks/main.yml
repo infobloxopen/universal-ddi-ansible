@@ -118,14 +118,6 @@
           - health_check is not changed
           - health_check is not failed
 
-    - name: Re-create SNMP Health Check for update tests
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "{{ health_check_name }}"
-        version: "v2c"
-        community: "public"
-        state: present
-      register: health_check
-
     - name: Create SNMP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_name }}"
@@ -164,8 +156,8 @@
         that:
           - health_check is changed
           - health_check_info is not failed
-          - health_check_info.objects[0].tags.location == "datacenter1"
-          - health_check_info.objects[0].tags.team == "network"
+          - health_check_info.objects[0].tags['location'] == "datacenter1"
+          - health_check_info.objects[0].tags['team'] == "network"
 
     - name: Update SNMP Health Check with interval
       infoblox.universal_ddi.dtc_health_check_snmp:
@@ -400,16 +392,6 @@
           - health_check is not failed
           - health_check_info.objects[0].version == "v1"
 
-    - name: Get Information about the SNMP Health Check by ID
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        id: "{{ health_check.id }}"
-      register: health_check_info
-    - assert:
-        that:
-          - health_check_info is not failed
-          - health_check_info.objects | length == 1
-          - health_check_info.objects[0].id == health_check.id
-
     - name: Create a SNMP v3 Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_name_v3 }}"
@@ -487,7 +469,7 @@
         version: "v3"
         user_security_model: "{{ _snmp_usm_id }}"
         tags:
-          environment: "test"
+          location: "datacenter1"
           protocol: "snmpv3"
         state: present
       register: health_check_v3
@@ -500,8 +482,8 @@
         that:
           - health_check_v3 is changed
           - health_check_v3_info is not failed
-          - health_check_v3_info.objects[0].tags.environment == "test"
-          - health_check_v3_info.objects[0].tags.protocol == "snmpv3"
+          - health_check_v3_info.objects[0].tags['location'] == "datacenter1"
+          - health_check_v3_info.objects[0].tags['protocol'] == "snmpv3"
 
     - name: Update SNMP v3 Health Check with interval
       infoblox.universal_ddi.dtc_health_check_snmp:

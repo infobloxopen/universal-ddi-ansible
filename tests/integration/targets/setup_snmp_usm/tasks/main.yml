@@ -1,14 +1,4 @@
 ---
-# Setup role for SNMP User Security Model (USM) for v3 health checks
-#
-# This role creates an SNMP USM configuration for testing
-# dtc_health_check_snmp with SNMP v3.
-#
-# Output facts:
-#   _snmp_usm: The created USM object
-#   _snmp_usm_id: The USM resource ID to use for v3 health checks
-#   _snmp_usm_username: The USM username
-#   _snmp_usm_available: Boolean indicating USM is available for v3 testing
 
 - module_defaults:
     group/infoblox.universal_ddi.all:
