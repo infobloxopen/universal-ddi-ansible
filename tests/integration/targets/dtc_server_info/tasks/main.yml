@@ -4,7 +4,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random View name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_server_name: "test-dtc-server-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
