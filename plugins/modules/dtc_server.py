@@ -7,6 +7,8 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
+from pygments.lexer import default
+
 DOCUMENTATION = r"""
 ---
 module: dtc_server
@@ -48,6 +50,7 @@ options:
             - "Optional. Flag which enables/disables B(Server)."
             - "Defaults to I(false)."
         type: bool
+        default: false
     endpoint_type:
         description:
             - "The endpoint type configured for the B(Server). Can be IP Address or FQDN. The values of both fields B(address) and B(fqdn) are preserved and are not mutually exclusive, and the B(endpoint_type) defines which one to use."
@@ -404,7 +407,7 @@ def main():
         address=dict(type="str"),
         auto_create_response_records=dict(type="bool"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
+        disabled=dict(type="bool", default=False),
         endpoint_type=dict(type="str", choices=["address", "fqdn"], default="address"),
         fqdn=dict(type="str"),
         name=dict(type="str"),

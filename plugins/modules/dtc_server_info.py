@@ -56,7 +56,7 @@ EXAMPLES = r"""
     filters:
       name: "example_dtc_server"
 
-- name: Get information about the DTC Server by filter query
+- name: Get information about the DTC Server by raw filter query
   infoblox.universal_ddi.dtc_server_info:
     filter_query: "name=='example_dtc_server'"
 
@@ -65,7 +65,7 @@ EXAMPLES = r"""
     tag_filters:
       location: "site-1"
 
-- name: Get information about the DTC Server by tag filter query
+- name: Get information about the DTC Server by raw tag filter query
   infoblox.universal_ddi.dtc_server_info:
     tag_filter_query: "location=='site-1'"
 """
