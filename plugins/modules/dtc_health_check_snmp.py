@@ -59,6 +59,12 @@ options:
                     - "* in  - entry value must be greater or equal than B(value) and less or equal than B(max_value)."
                     - "Operator B(in) is supported only for B(integer) types."
                 type: str
+                choices:
+                    - any
+                    - eq
+                    - leq
+                    - geq
+                    - in
             type:
                 description:
                     - "Type defines type of an entry value."
@@ -67,6 +73,9 @@ options:
                     - "* integer"
                     - "String type does not support B(in) operator."
                 type: str
+                choices:
+                    - string
+                    - integer
             value:
                 description:
                     - "Optional. Expected value of an entry to check against. Ignored for B(any) operator."
@@ -496,8 +505,8 @@ def main():
                 comment=dict(type="str"),
                 max_value=dict(type="str"),
                 name=dict(type="str"),
-                operator=dict(type="str"),
-                type=dict(type="str"),
+                operator=dict(type="str", choices=["any", "eq", "leq", "geq", "in"]),
+                type=dict(type="str", choices=["string", "integer"]),
                 value=dict(type="str"),
             ),
         ),

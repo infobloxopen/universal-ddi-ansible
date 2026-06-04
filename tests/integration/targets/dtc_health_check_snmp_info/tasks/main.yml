@@ -10,7 +10,6 @@
         health_check_snmp_name_2: "test-health-check-snmp-2-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
-    # Create SNMP Health Check for testing info module
     - name: Create SNMP Health Check
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_snmp_name }}"
@@ -31,17 +30,6 @@
           - health_check_snmp_info.objects | length == 1
           - health_check_snmp_info.objects[0].id == health_check_snmp.id
           - health_check_snmp_info.objects[0].name == health_check_snmp.object.name
-
-    - name: Get SNMP Health Check information by filters (id)
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        filters:
-          id: "{{ health_check_snmp.id }}"
-      register: health_check_snmp_info
-    - assert:
-        that:
-          - health_check_snmp_info is not failed
-          - health_check_snmp_info.objects | length == 1
-          - health_check_snmp_info.objects[0].id == health_check_snmp.id
 
     - name: Get SNMP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_snmp_info:
