@@ -31,7 +31,7 @@
 
     - name: Get information about the DTC Server by ID
       infoblox.universal_ddi.dtc_server_info:
-          id: "{{ dtc_server.id }}"
+        id: "{{ dtc_server.id }}"
       register: dtc_server_info
     - assert:
         that:
@@ -41,7 +41,7 @@
 
     - name: Get information about the DTC Server by filter query
       infoblox.universal_ddi.dtc_server_info:
-          filter_query: "name=='{{ dtc_server_name }}'"
+        filter_query: "name=='{{ dtc_server_name }}'"
       register: dtc_server_info
     - assert:
         that:

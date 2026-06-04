@@ -4,7 +4,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random DTC Server name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_server_name: "test-dtc-server-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
@@ -82,7 +81,7 @@
     - name: Get information about the DTC Server
       infoblox.universal_ddi.dtc_server_info:
         filters:
-            name: "{{ dtc_server_name }}"
+          name: "{{ dtc_server_name }}"
       register: dtc_server_info
     - assert:
         that:
@@ -108,8 +107,8 @@
       register: dtc_server
     - name: Get information about the DTC Server
       infoblox.universal_ddi.dtc_server_info:
-          filters:
-            name: "{{ dtc_server_name }}"
+        filters:
+          name: "{{ dtc_server_name }}"
       register: dtc_server_info
     - assert:
         that:
@@ -129,8 +128,8 @@
       register: dtc_server
     - name: Get information about the DTC Server
       infoblox.universal_ddi.dtc_server_info:
-          filters:
-              name: "{{ dtc_server_name }}"
+        filters:
+          name: "{{ dtc_server_name }}"
       register: dtc_server_info
     - assert:
         that:
