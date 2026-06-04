@@ -154,7 +154,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import SNMPUserSecurityModel, SnmpUserSecurityApi
+    from dtc import SnmpUserSecurityApi, SNMPUserSecurityModel
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
