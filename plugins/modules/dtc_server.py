@@ -7,8 +7,6 @@ from __future__ import absolute_import, division, print_function
 
 __metaclass__ = type
 
-from pygments.lexer import default
-
 DOCUMENTATION = r"""
 ---
 module: dtc_server
