@@ -267,7 +267,9 @@ class SnmpUserSecurityModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -283,7 +285,6 @@ def main():
         privacy_passphrase=dict(type="str", no_log=True),
         privacy_protocol=dict(type="str"),
         username=dict(type="str"),
-
     )
 
     module = SnmpUserSecurityModule(
