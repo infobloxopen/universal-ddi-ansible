@@ -116,14 +116,17 @@ options:
         description:
             - "Optional. Destination UDP port of B(SNMPHealthCheck). Defaults to I(161)."
         type: int
+        default: 161
     retry_down:
         description:
             - "Optional. Retry down count. The value determines how many bad health checks in a row must be received by the onprem host from the DTC Server for treating the health check as failed. Defaults to I(1)."
         type: int
+        default: 1
     retry_up:
         description:
             - "Optional. Retry up count. The value determines how many good health checks in a row must be received by the onprem host from the DTC Server for treating the health check as successful. Defaults to I(1)."
         type: int
+        default: 1
     tags:
         description:
             - "Optional. The tags for B(SNMPHealthCheck) in JSON format."
@@ -132,6 +135,7 @@ options:
         description:
             - "Optional. Timeout value in seconds. The health check waits for the specified number of seconds after sending a request. If it does not receive a response within the number of seconds, then the health check is considered as failed. Defaults to I(10)."
         type: int
+        default: 10
     user_security_model:
         description:
             - "Resource identifier for the User Security Model (USM) configuration. Required for B(v3) version, ignored for B(v1) and B(v2c)."
