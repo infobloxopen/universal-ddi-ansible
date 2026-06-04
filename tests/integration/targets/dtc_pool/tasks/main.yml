@@ -1,10 +1,10 @@
 ---
+# TODO: Add test case for DTC Pool with health checks
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-       # Create a random DTC Pool name to avoid conflicts
       - ansible.builtin.set_fact:
           dtc_pool_name: "test_dtc_pool-{{ 99999 | random }}"
 
@@ -366,3 +366,16 @@
             - dtc_pool_info is not failed
             - dtc_pool_info.objects | length == 1
             - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "override"
+
+  always:
+    - name: Delete the DTC Pool
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_name }}"
+        method: "round_robin"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete the Server
+      ansible.builtin.include_role:
+        name: setup_dtc_server
+        tasks_from: cleanup.yml

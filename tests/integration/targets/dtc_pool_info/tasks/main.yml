@@ -4,7 +4,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random DTC Pool name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_pool_name: "test-dtc-pool-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
@@ -27,7 +26,7 @@
           - dtc_pool_info.objects | length == 1
           - dtc_pool_info.objects[0].name == dtc_pool_name
           - dtc_pool_info.objects[0].id == dtc_pool.id
-          -
+
     - name: Get information about the DTC Pool by filters (name)
       infoblox.universal_ddi.dtc_pool_info:
         filters:

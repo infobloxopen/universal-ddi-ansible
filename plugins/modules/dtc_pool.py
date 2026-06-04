@@ -39,6 +39,7 @@ options:
             - "Optional. Flag which enables/disables B(Pool)."
             - "Defaults to I(false)."
         type: bool
+        default: false
     health_checks:
         description:
             - "Optional. List of B(HealthCheck) objects IDs assigned to B(Pool)."
@@ -79,12 +80,10 @@ options:
             - ratio
             - global_availability
         type: str
-        required: true
     name:
         description:
             - "Display name of B(Pool)."
         type: str
-        required: true
     pool_availability:
         description:
             - "Optional. Pool Availability setting defines how B(Pool) health is calculated."
@@ -168,8 +167,8 @@ EXAMPLES = r"""
         method: "ratio" 
         comment: "Example DTC Pool"
         servers:
-            server_id: "{{ dtc_server.id }}"
-            weight: 10
+            - server_id: "{{ dtc_server.id }}"
+              weight: 10
         pool_availability: "quorum"
         pool_servers_quorum: 5
         server_availability: "quorum"
@@ -506,7 +505,7 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
+        disabled=dict(type="bool", default=False),
         health_checks=dict(
             type="list",
             elements="dict",
@@ -525,8 +524,8 @@ def main():
                 ),
             ),
         ),
-        method=dict(type="str", required=True, choices=["round_robin", "ratio", "global_availability"]),
-        name=dict(type="str", required=True),
+        method=dict(type="str", choices=["round_robin", "ratio", "global_availability"]),
+        name=dict(type="str"),
         pool_availability=dict(type="str", choices=["all", "quorum", "any"], default="any"),
         pool_servers_quorum=dict(type="int"),
         server_availability=dict(type="str", choices=["all", "quorum", "any"], default="all"),
