@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_policy_info
-short_description: Manage Policy
+short_description: Retrieve DTC Policies
 description:
-    - Manage Policy
+    - Retrieves information about existing DTC Policies.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -116,7 +116,7 @@ objects:
             returned: Always
             contains:
                 ttl:
-                    description: ""
+                    description: "The inheritance configuration specifies how the object inherits the ttl field."
                     type: dict
                     returned: Always
                     contains:
@@ -294,7 +294,7 @@ class PolicyInfoModule(UniversalDDIAnsibleModule):
             resp = PolicyApi(self.client).read(self.params["id"], inherit="full")
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:

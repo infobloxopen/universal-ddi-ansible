@@ -4,7 +4,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-     # Create a random DTC Pool name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_pool_1_name: "dtc_pool_1_name-{{ 999999 | random | string }}"
         dtc_pool_2_name: "dtc_pool_2_name-{{ 999999 | random | string }}"

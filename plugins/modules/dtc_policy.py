@@ -39,6 +39,7 @@ options:
             - "Optional. Flag which enables/disables B(Policy)."
             - "Defaults to I(false)."
         type: bool
+        default: false
     inheritance_sources:
         description:
             - "Optional. The inheritance configuration."
@@ -55,29 +56,6 @@ options:
                             - "* I(inherit): Use the inherited value."
                             - "* I(override): Use the value set in the object."
                             - "Defaults to I(inherit)."
-                        type: str
-                    source:
-                        description:
-                            - "The resource identifier."
-                        type: str
-    metadata:
-        description:
-            - "Output only. B(Policy) metadata. Defaults to empty object and should be explicitly requested using field selection."
-        type: dict
-        suboptions:
-            used_by:
-                description:
-                    - "List of structs representing a limited view on configuration objects that use a resource the metadata is provided for."
-                type: list
-                elements: dict
-                suboptions:
-                    details:
-                        description:
-                            - "Structured data consisting of additional details of the configuration resource."
-                        type: dict
-                    display_name:
-                        description:
-                            - "Display name of the configuration resource."
                         type: str
     method:
         description:
@@ -128,6 +106,10 @@ options:
                     - "- nxdomain"
                     - "Defaults to I(nodata)."
                 type: str
+                choices:
+                    - nodata
+                    - nxdomain
+                default: nodata
             destination:
                 description:
                     - "Destination of B(TopologyRule)."
@@ -136,6 +118,10 @@ options:
                     - "- pool"
                     - "Defaults to I(code)."
                 type: str
+                choices:
+                    - code
+                    - pool
+                default: code
             name:
                 description:
                     - "Display name of B(TopologyRule)."
@@ -152,6 +138,10 @@ options:
                     - "- default"
                     - "Defaults to I(default)."
                 type: str
+                choices:
+                    - subnet
+                    - default
+                default: default
             subnets:
                 description:
                     - "Optional. List of subnets in CIDR format."
@@ -535,7 +525,7 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
+        disabled=dict(type="bool", default=False),
         inheritance_sources=dict(
             type="dict",
             options=dict(
@@ -543,20 +533,6 @@ def main():
                     type="dict",
                     options=dict(
                         action=dict(type="str"),
-                        source=dict(type="str"),
-                    ),
-                ),
-            ),
-        ),
-        metadata=dict(
-            type="dict",
-            options=dict(
-                used_by=dict(
-                    type="list",
-                    elements="dict",
-                    options=dict(
-                        details=dict(type="dict"),
-                        display_name=dict(type="str"),
                     ),
                 ),
             ),
@@ -575,11 +551,11 @@ def main():
             type="list",
             elements="dict",
             options=dict(
-                code=dict(type="str"),
-                destination=dict(type="str"),
+                code=dict(type="str", choices=["nodata", "nxdomain"]),
+                destination=dict(type="str", choices=["code", "pool"]),
                 name=dict(type="str"),
                 pool_id=dict(type="str"),
-                source=dict(type="str"),
+                source=dict(type="str", choices=["subnet", "default"], default="default"),
                 subnets=dict(type="list", elements="str"),
             ),
         ),
@@ -590,7 +566,9 @@ def main():
     module = PolicyModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["name"])],
+        required_if=[
+            ("state", "present", ["name", "method"]),
+        ],
     )
 
     module.run_command()

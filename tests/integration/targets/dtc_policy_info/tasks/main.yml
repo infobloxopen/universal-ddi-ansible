@@ -5,7 +5,6 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Generate random DTC Policy name to avoid conflicts
     - ansible.builtin.set_fact:
         dtc_policy_name: "test-dtc-policy-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
