@@ -50,7 +50,7 @@ EXAMPLES = r"""
     - name: Get HTTP Health Check information by filters (name)
       infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
-          name: "example_http_health_checke"
+          name: "example_http_health_check"
 
     - name: Get HTTP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_http_info:
@@ -58,7 +58,7 @@ EXAMPLES = r"""
 
     - name: Get HTTP Health Check information by filter query
       infoblox.universal_ddi.dtc_health_check_http_info:
-        filter_query: "name=='example_http_health_check"
+        filter_query: "name=='example_http_health_check'"
     
     - name: Get HTTP Health Check information by tag filters
       infoblox.universal_ddi.dtc_health_check_http_info:
@@ -237,7 +237,7 @@ class HealthCheckHttpInfoModule(UniversalDDIAnsibleModule):
             resp = HealthCheckHttpApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:

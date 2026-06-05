@@ -116,7 +116,7 @@
     - assert:
         that:
           - health_check_http is not changed
-          - health_check_http.failed is not defined or not health_check_http is failed
+          - health_check_http is not failed
 
     - name: Create HTTP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_http:
@@ -287,6 +287,8 @@
     - assert:
         that:
           - health_check_http_info.objects[0].codes == "200,202"
+          - health_check_http_info is not failed
+          - health_check_http_info.objects | length == 1
 
     - name: Create HTTP Health Check with check_response_body
       infoblox.universal_ddi.dtc_health_check_http:
@@ -413,6 +415,8 @@
     - assert:
         that:
           - health_check_http_info.objects[0].https is true
+
+
 
   always:
     - name: "Delete HTTP Health Check"
