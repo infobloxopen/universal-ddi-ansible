@@ -109,7 +109,6 @@ options:
                 choices:
                     - nodata
                     - nxdomain
-                default: nodata
             destination:
                 description:
                     - "Destination of B(TopologyRule)."
@@ -121,7 +120,6 @@ options:
                 choices:
                     - code
                     - pool
-                default: code
             name:
                 description:
                     - "Display name of B(TopologyRule)."
