@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_lbdn_info
-short_description: Retrieves an exisitng DTC LBDN
+short_description: Retrieves exisitng DTC LBDNs
 description:
-    - Retrieves information about existing DTC LBDN
+    - Retrieves information about existing DTC LBDNs
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -127,7 +127,7 @@ objects:
             returned: Always
             contains:
                 ttl:
-                    description: ""
+                    description: "The inheritance configuration specifies how the object inherits the ttl field."
                     type: dict
                     returned: Always
                     contains:
@@ -202,7 +202,7 @@ class LbdnInfoModule(UniversalDDIAnsibleModule):
             resp = LbdnApi(self.client).read(self.params["id"], inherit="full")
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:

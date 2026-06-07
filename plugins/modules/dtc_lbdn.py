@@ -54,7 +54,7 @@ options:
         type: dict
         suboptions:
             ttl:
-                description: ""
+                description: "The inheritance configuration specifies how the object inherits the ttl field."
                 type: dict
                 suboptions:
                     action:
@@ -69,7 +69,6 @@ options:
         description:
             - "Name of B(LBDN)."
         type: str
-        required: true
     precedence:
         description:
             - "Optional. Precedence."
@@ -80,13 +79,12 @@ options:
         type: dict
     ttl:
         description:
-            - "Optional. Time to live value (in seconds) to be used for records in DTC response. Unsigned integer, min: 0, max 2147483647 (31-bits per RFC-2181)."
+            - "Optional. Time to live value (in seconds) to be used for records in DTC response. Unsigned integer, min:0, max 2147483647(31-bits per RFC-2181)."
         type: int
     view:
         description:
             - "The resource identifier."
         type: str
-        required: true
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -95,21 +93,21 @@ extends_documentation_fragment:
 EXAMPLES = r"""
     - name: Create a DNS View (required as parent)
       infoblox.universal_ddi.dns_view:
-        name: "{{ view_name }}"
+        name: "example_dns_view"
         state: "present"
       register: view
-      
+
     - name: Create a DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
         name: "example_dtc_lbdn"
-        view: "{{ view_id }}"
+        view: "{{ view.id }}"
         state: "present"
       register: dtc_lbdn
 
     - name: Create a DTC LBDN with Additional Parameters
       infoblox.universal_ddi.dtc_lbdn:
         name: "example_dtc_lbdn"
-        view: "{{ view_id }}"
+        view: "{{ view.id }}"
         comment: "This is a DTC LBDN"
         disabled: false
         ttl: 300
@@ -121,7 +119,7 @@ EXAMPLES = r"""
     - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
         name: "example_dtc_lbdn"
-        view: "{{ view_id }}"
+        view: "{{ view.id }}"
         state: "absent"
 """
 
@@ -175,7 +173,7 @@ item:
             returned: Always
             contains:
                 ttl:
-                    description: ""
+                    description: "The inheritance configuration specifies how the object inherits the ttl field."
                     type: dict
                     returned: Always
                     contains:
@@ -378,11 +376,11 @@ def main():
                 ),
             ),
         ),
-        name=dict(type="str", required=True),
+        name=dict(type="str"),
         precedence=dict(type="int"),
         tags=dict(type="dict"),
         ttl=dict(type="int"),
-        view=dict(type="str", required=True),
+        view=dict(type="str"),
     )
 
     module = LbdnModule(
