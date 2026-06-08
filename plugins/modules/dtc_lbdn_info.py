@@ -217,17 +217,15 @@ class LbdnInfoModule(UniversalDDIAnsibleModule):
             if view and "/" in view:
                 view = view.split("/")[-1]
 
-            filter_str = (
-                    f'name=="{filters["name"]}" '
-                    + f'and view=="{view}"'
-            )
+            filter_str = f'name=="{filters["name"]}" ' + f'and view=="{view}"'
 
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
 
             if "view==" in filter_str and "dns/view/" in filter_str:
                 import re
-                filter_str = re.sub(r'dns/view/([a-f0-9\-]+)', r'\1', filter_str)
+
+                filter_str = re.sub(r"dns/view/([a-f0-9\-]+)", r"\1", filter_str)
 
         tag_filter_str = None
         if self.params["tag_filters"] is not None:
