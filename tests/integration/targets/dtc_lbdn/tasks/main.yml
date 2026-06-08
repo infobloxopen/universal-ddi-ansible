@@ -18,6 +18,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -35,6 +36,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -64,6 +66,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -81,6 +84,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -110,6 +114,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -129,6 +134,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -149,6 +155,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -168,6 +175,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -180,20 +188,21 @@
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
         view: "{{ _view.id }}"
-        precedence: 800
+        precedence: 4700
         state: present
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
           - dtc_lbdn_info is not failed
           - dtc_lbdn_info.objects | length == 1
           - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].precedence == 800
+          - dtc_lbdn_info.objects[0].precedence == 4700
 
     - name: Create a DTC LBDN with DTC Policy association
       infoblox.universal_ddi.dtc_lbdn:
@@ -207,6 +216,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -222,13 +232,14 @@
         inheritance_sources:
           ttl:
             action: override
-        ttl : 4800
+        ttl: 4800
         state: present
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -248,6 +259,7 @@
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
           name: "{{ dtc_ldbn_name }}"
+          view: "{{ _view2.id }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -257,10 +269,17 @@
           - dtc_lbdn_info.objects[0].view== _view2.id
 
   always:
-    - name: Delete the DTC LBDN
+
+    - name: Delete the DTC LBDN from view1
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
         view: "{{ _view.id }}"
+        state: absent
+
+    - name: Delete the DTC LBDN from view2
+      infoblox.universal_ddi.dtc_lbdn:
+        name: "{{ dtc_ldbn_name }}"
+        view: "{{ _view2.id }}"
         state: absent
 
     - ansible.builtin.include_role:

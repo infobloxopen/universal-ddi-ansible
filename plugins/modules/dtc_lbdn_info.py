@@ -10,7 +10,7 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_lbdn_info
-short_description: Retrieves exisitng DTC LBDNs
+short_description: Retrieves existing DTC LBDNs
 description:
     - Retrieves information about existing DTC LBDNs
 version_added: 1.0.0
@@ -209,10 +209,25 @@ class LbdnInfoModule(UniversalDDIAnsibleModule):
             return self.find_by_id()
 
         filter_str = None
+
         if self.params["filters"] is not None:
-            filter_str = " and ".join([f"{k}=='{v}'" for k, v in self.params["filters"].items()])
+            filters = self.params["filters"]
+
+            view = filters.get("view")
+            if view and "/" in view:
+                view = view.split("/")[-1]
+
+            filter_str = (
+                    f'name=="{filters["name"]}" '
+                    + f'and view=="{view}"'
+            )
+
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
+
+            if "view==" in filter_str and "dns/view/" in filter_str:
+                import re
+                filter_str = re.sub(r'dns/view/([a-f0-9\-]+)', r'\1', filter_str)
 
         tag_filter_str = None
         if self.params["tag_filters"] is not None:

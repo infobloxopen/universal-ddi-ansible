@@ -279,8 +279,13 @@ class LbdnModule(UniversalDDIAnsibleModule):
                     return None
                 raise e
         else:
-            filter = f"name=='{self.params['name']}'"
-            resp = LbdnApi(self.client).list(filter=filter, inherit="full")
+            view = self.params.get("view")
+            if view and "/" in view:
+                view = view.split("/")[-1]
+
+            filter_str = f'name=="{self.params["name"]}" and view=="{view}"'
+
+            resp = LbdnApi(self.client).list(filter=filter_str, inherit="full")
 
             # If no results, set results to empty list
             if not resp.results:
