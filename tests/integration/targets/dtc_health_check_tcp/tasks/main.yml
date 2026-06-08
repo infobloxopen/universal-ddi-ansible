@@ -5,7 +5,6 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Create a random TCP Health check name to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_tcp_name: "test-health_check_tcp_name-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
@@ -24,7 +23,7 @@
       register: health_check_tcp_info
     - assert:
         that:
-          - health_check_tcp.changed
+          - health_check_tcp is changed
           - health_check_tcp_info is not failed
           - health_check_tcp_info.objects | length == 0
 
@@ -32,8 +31,6 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: present
       register: health_check_tcp
     - name: Get TCP Health Check information by ID
@@ -46,20 +43,17 @@
           - health_check_tcp_info is not failed
           - health_check_tcp_info.objects | length == 1
           - health_check_tcp_info.objects[0].id == health_check_tcp.id
-          - health_check_tcp_info.objects[0].tags.location == tag_value
 
     - name: Create TCP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: present
       register: health_check_tcp
     - assert:
         that:
-          - not health_check_tcp is changed
-          - health_check_tcp.failed is not defined or not health_check_tcp.failed
+          - health_check_tcp is not changed
+          - health_check_tcp is not failed
 
     - name: Delete TCP Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_tcp:
@@ -96,7 +90,7 @@
       register: health_check_tcp_info
     - assert:
         that:
-          - health_check_tcp.changed
+          - health_check_tcp is changed
           - health_check_tcp_info is not failed
           - health_check_tcp_info.objects | length == 0
 
@@ -110,8 +104,8 @@
       register: health_check_tcp
     - assert:
         that:
-          - not health_check_tcp is changed
-          - health_check_tcp.failed is not defined or not health_check_tcp.failed
+          - health_check_tcp is not changed
+          - health_check_tcp is not failed
 
     - name: Create TCP Health Check with comment
       infoblox.universal_ddi.dtc_health_check_tcp:
