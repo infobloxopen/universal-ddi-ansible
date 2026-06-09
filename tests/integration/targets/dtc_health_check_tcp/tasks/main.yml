@@ -59,8 +59,6 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: absent
       check_mode: true
       register: health_check_tcp
@@ -79,8 +77,6 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: absent
       register: health_check_tcp
     - name: Get TCP Health Check information by name
@@ -98,8 +94,6 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         port: 80
-        tags:
-          location: "{{ tag_value }}"
         state: absent
       register: health_check_tcp
     - assert:
@@ -129,7 +123,7 @@
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "{{ health_check_tcp_name }}"
         tags:
-          test_tag: "tag_value"
+          location: "{{ tag_value }}"
         port: 80
         state: present
       register: health_check_tcp
@@ -142,7 +136,7 @@
         that:
           - health_check_tcp_info is not failed
           - health_check_tcp_info.objects | length == 1
-          - health_check_tcp_info.objects[0].tags.test_tag == "tag_value"
+          - health_check_tcp_info.objects[0].tags.location == tag_value
 
     - name: Create TCP Health Check with disabled true
       infoblox.universal_ddi.dtc_health_check_tcp:

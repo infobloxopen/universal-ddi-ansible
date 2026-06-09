@@ -180,7 +180,7 @@ class HealthCheckTcpInfoModule(UniversalDDIAnsibleModule):
             resp = HealthCheckTcpApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:
