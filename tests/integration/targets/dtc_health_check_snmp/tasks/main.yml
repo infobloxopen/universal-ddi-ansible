@@ -6,7 +6,6 @@
 
   block:
 
-    # Create random SNMP Health Check names to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_name: "test-snmp-hc-{{ 999999 | random | string }}"
         health_check_name_v3: "test-snmp-hc-v3-{{ 999999 | random | string }}"
