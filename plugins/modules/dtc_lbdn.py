@@ -69,6 +69,7 @@ options:
         description:
             - "Name of B(LBDN)."
         type: str
+        required: true
     precedence:
         description:
             - "Optional. Precedence."
@@ -85,6 +86,7 @@ options:
         description:
             - "The resource identifier."
         type: str
+        required: true
 
 extends_documentation_fragment:
     - infoblox.universal_ddi.common
@@ -381,11 +383,11 @@ def main():
                 ),
             ),
         ),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         precedence=dict(type="int"),
         tags=dict(type="dict"),
         ttl=dict(type="int"),
-        view=dict(type="str"),
+        view=dict(type="str", required=True),
     )
 
     module = LbdnModule(
