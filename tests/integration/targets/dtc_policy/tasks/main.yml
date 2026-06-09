@@ -157,7 +157,7 @@
           - dtc_policy_info.objects | length == 1
           - dtc_policy_info.objects[0].ttl == 1200
 
-    - name: Create a DTC Policy with method
+    - name: Create a DTC Policy with method set to global_availability
       infoblox.universal_ddi.dtc_policy:
         name: "{{ dtc_policy_name }}"
         method: "global_availability"
@@ -174,6 +174,24 @@
           - dtc_policy is not failed
           - dtc_policy_info.objects | length == 1
           - dtc_policy_info.objects[0].method == "global_availability"
+
+    - name: Create a DTC Policy with method set to ratio
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "ratio"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].method == "ratio"
 
     - name: Create a DTC Policy with Tags
       infoblox.universal_ddi.dtc_policy:
@@ -223,9 +241,9 @@
         name: "{{ dtc_policy_name }}"
         method: "ratio"
         pools:
-          - pool_id: "{{ dtc_pool_1.id }}"
+          - pool_id: "{{ _dtc_pool_1.id }}"
             weight: 10
-          - pool_id: "{{ dtc_pool_2.id }}"
+          - pool_id: "{{ _dtc_pool_2.id }}"
             weight: 20
         state: present
       register: dtc_policy
@@ -240,9 +258,9 @@
           - dtc_policy is not failed
           - dtc_policy_info.objects | length == 1
           - dtc_policy_info.objects[0].pools | length == 2
-          - dtc_policy_info.objects[0].pools[0].pool_id == dtc_pool_1.id
+          - dtc_policy_info.objects[0].pools[0].pool_id == _dtc_pool_1.id
           - dtc_policy_info.objects[0].pools[0].weight == 10
-          - dtc_policy_info.objects[0].pools[1].pool_id == dtc_pool_2.id
+          - dtc_policy_info.objects[0].pools[1].pool_id == _dtc_pool_2.id
           - dtc_policy_info.objects[0].pools[1].weight == 20
 
     - name: Create a DTC Policy with Rules
@@ -250,7 +268,7 @@
         name: "{{ dtc_policy_name }}"
         method: "ratio"
         pools:
-          - pool_id: "{{ dtc_pool_3.id }}"
+          - pool_id: "{{ _dtc_pool_3.id }}"
             weight: 10
         rules:
           - source: "subnet"
@@ -262,7 +280,7 @@
           - source: "subnet"
             name: "Subnet rule 2"
             destination: "pool"
-            pool_id: "{{ dtc_pool_3.id }}"
+            pool_id: "{{ _dtc_pool_3.id }}"
             subnets:
               - "40.0.0.0/24"
           - source: "default"
@@ -290,7 +308,7 @@
           - dtc_policy_info.objects[0].rules[1].source == "subnet"
           - dtc_policy_info.objects[0].rules[1].name == "Subnet rule 2"
           - dtc_policy_info.objects[0].rules[1].destination == "pool"
-          - dtc_policy_info.objects[0].rules[1].pool_id == dtc_pool_3.id
+          - dtc_policy_info.objects[0].rules[1].pool_id == _dtc_pool_3.id
           - dtc_policy_info.objects[0].rules[1].subnets[0] == "40.0.0.0/24"
           - dtc_policy_info.objects[0].rules[2].source == "default"
           - dtc_policy_info.objects[0].rules[2].name == "Default"

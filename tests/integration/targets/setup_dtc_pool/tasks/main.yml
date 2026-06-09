@@ -14,18 +14,18 @@
         name: "{{ dtc_pool_1_name }}"
         method: "round_robin"
         state: present
-      register: dtc_pool_1
+      register: _dtc_pool_1
 
     - name: Create a DTC Pool 2
       infoblox.universal_ddi.dtc_pool:
         name: "{{ dtc_pool_2_name }}"
         method: "global_availability"
         state: present
-      register: dtc_pool_2
+      register: _dtc_pool_2
 
     - name: Create a DTC Pool 3
       infoblox.universal_ddi.dtc_pool:
         name: "{{ dtc_pool_3_name }}"
         method: "global_availability"
         state: present
-      register: dtc_pool_3
+      register: _dtc_pool_3
