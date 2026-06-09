@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_snmp_user_security_model_info
-short_description: Retrieve SnmpUserSecurity information
+short_description: Retrieves SNMP User Security information
 description:
-    - Retrieve information about SnmpUserSecurity
+    - Retrieve information about existing SNMP User Security
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
