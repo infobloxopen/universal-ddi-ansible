@@ -5,7 +5,6 @@
       portal_url: "{{ portal_url }}"
       portal_key: "{{ portal_key }}"
   block:
-    # Create a random USM username to avoid conflicts
     - ansible.builtin.set_fact:
         _snmp_usm_username: "test-usm-{{ 999999 | random | string }}"
 
