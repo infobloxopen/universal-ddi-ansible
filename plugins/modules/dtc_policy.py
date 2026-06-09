@@ -72,10 +72,12 @@ options:
             - ratio
             - topology
             - global_availability
+        required: true
     name:
         description:
             - "Display name of B(Policy)."
         type: str
+        required: true
     pools:
         description:
             - "Optional. List of B(Pool) objects assigned to B(Policy)."
@@ -535,8 +537,8 @@ def main():
                 ),
             ),
         ),
-        method=dict(type="str", choices=["round_robin", "ratio", "topology", "global_availability"]),
-        name=dict(type="str"),
+        method=dict(type="str", required=True, choices=["round_robin", "ratio", "topology", "global_availability"]),
+        name=dict(type="str", required=True),
         pools=dict(
             type="list",
             elements="dict",
