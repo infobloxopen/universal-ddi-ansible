@@ -80,10 +80,12 @@ options:
             - ratio
             - global_availability
         type: str
+        required: true
     name:
         description:
             - "Display name of B(Pool)."
         type: str
+        required: true
     pool_availability:
         description:
             - "Optional. Pool Availability setting defines how B(Pool) health is calculated."
@@ -524,8 +526,8 @@ def main():
                 ),
             ),
         ),
-        method=dict(type="str", choices=["round_robin", "ratio", "global_availability"]),
-        name=dict(type="str"),
+        method=dict(type="str", required=True, choices=["round_robin", "ratio", "global_availability"]),
+        name=dict(type="str", required=True),
         pool_availability=dict(type="str", choices=["all", "quorum", "any"], default="any"),
         pool_servers_quorum=dict(type="int"),
         server_availability=dict(type="str", choices=["all", "quorum", "any"], default="all"),
