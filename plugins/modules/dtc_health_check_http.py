@@ -474,7 +474,7 @@ def main():
     module = HealthCheckHttpModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["name", "port"])],
+        required_if=[("state", "present", ["name", "port", "request"])],
     )
 
     module.run_command()
