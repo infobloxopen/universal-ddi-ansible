@@ -213,12 +213,12 @@
             name: "{{ dtc_pool_name }}"
         register: dtc_pool_info
       - assert:
-            that:
-              - dtc_pool is changed
-              - dtc_pool_info is not failed
-              - dtc_pool_info.objects | length == 1
-              - dtc_pool_info.objects[0].pool_availability == "quorum"
-              - dtc_pool_info.objects[0].pool_servers_quorum == 1
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].pool_availability == "quorum"
+            - dtc_pool_info.objects[0].pool_servers_quorum == 1
 
       - name: Create a DTC Pool with server availability set to Any
         infoblox.universal_ddi.dtc_pool:
