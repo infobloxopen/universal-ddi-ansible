@@ -5,7 +5,6 @@
       portal_key: "{{ portal_key }}"
 
   block:
-    # Create a random ICMP Health check name to avoid conflicts
     - ansible.builtin.set_fact:
         health_check_icmp_name: "test-health_check_icmp_name-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
@@ -44,7 +43,6 @@
           - health_check_icmp_check_info.objects | length == 1
           - health_check_icmp_check_info.objects[0].name == health_check_icmp_name
 
-
     - name: Create ICMP Health Check (idempotent)
       infoblox.universal_ddi.dtc_health_check_icmp:
         name: "{{ health_check_icmp_name }}"
@@ -54,8 +52,8 @@
       register: health_check_icmp_idempotent
     - assert:
         that:
-          - not health_check_icmp_idempotent.changed
-          - health_check_icmp_idempotent.failed is not defined or not health_check_icmp_idempotent.failed
+          - health_check_icmp_idempotent is not changed
+          - health_check_icmp_idempotent is not failed
 
     - name: Delete ICMP Health Check (check mode)
       infoblox.universal_ddi.dtc_health_check_icmp:
@@ -228,7 +226,6 @@
           - health_check_icmp_info.objects[0].timeout == 10
 
   always:
-    # Cleanup if the test fails
     - name: "Delete ICMP Health Check"
       infoblox.universal_ddi.dtc_health_check_icmp:
         name: "{{ health_check_icmp_name }}"
