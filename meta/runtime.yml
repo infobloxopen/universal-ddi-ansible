@@ -101,3 +101,5 @@ action_groups:
   dtc:
     - dtc_server
     - dtc_server_info
+    - dtc_pool
+    - dtc_pool_info
