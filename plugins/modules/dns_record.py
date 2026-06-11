@@ -465,6 +465,16 @@ EXAMPLES = r"""
           text: "sample text"
         type: "TXT"
         state: "present"  
+    
+    - name: Create an SSHFP Record in an Auth Zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 1
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        state: "present"
              
     - name: Delete the A Record
       infoblox.universal_ddi.dns_record:
