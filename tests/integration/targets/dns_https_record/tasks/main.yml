@@ -52,6 +52,7 @@
         - https_record_info.objects[0].id == https_record.id
         - https_record_info.objects[0].type == "HTTPS"
         - https_record_info.objects[0].zone == https_record.object.zone
+        - https_record_info.objects[0].rdata.target_name == "svc.example.com."
 
     - name: Create a HTTPS Record (idempotent)
       infoblox.universal_ddi.dns_record:

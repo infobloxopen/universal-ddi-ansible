@@ -257,7 +257,7 @@ options:
                 required: true
             target_name:
                 description:
-                    - "Alias target name in FQDN format."
+                    - "For Alias, HTTPS, SVCB records, the target domain name in FQDN format."
                 type: str
                 required: true
             type:
