@@ -256,8 +256,7 @@
           - https_record_info.objects[0].name_in_zone == https_record.object.name_in_zone
           - https_record_info.objects[0].zone == https_record.object.zone
 
-  always:
-    - name: "Delete the HTTPS Record"
+    - name: Delete the HTTPS Record with Name in Zone
       infoblox.universal_ddi.dns_record:
         name_in_zone: "{{ record_name }}"
         zone: "{{ _auth_zone.id }}"
@@ -266,6 +265,103 @@
         type: "HTTPS"
         state: absent
       register: https_record
+
+    - name: Create a HTTPS Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: https_record_ddi_admin
+    - name: Get information about the HTTPS Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_ddi_admin is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record_ddi_admin.id
+          - https_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a HTTPS Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: https_record_global_admin
+    - name: Get information about the HTTPS Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_global_admin is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record_global_admin.id
+          - https_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+  always:
+    - name: "Remove protection from HTTPS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+      ignore_errors: true
+
+    - name: "Delete the HTTPS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+      ignore_errors: true
+
+    - name: "Remove protection from HTTPS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+      ignore_errors: true
+
+    - name: "Delete the HTTPS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+      ignore_errors: true
 
     - name: "Delete the Auth Zone"
       ansible.builtin.include_role:
