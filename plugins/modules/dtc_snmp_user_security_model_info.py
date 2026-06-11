@@ -10,9 +10,9 @@ __metaclass__ = type
 DOCUMENTATION = r"""
 ---
 module: dtc_snmp_user_security_model_info
-short_description: Retrieves SNMP User Security information
+short_description: Retrieves SNMP User Security Models
 description:
-    - Retrieve information about existing SNMP User Security
+    - Retrieve information about existing SNMP User Security Models
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -139,7 +139,7 @@ class SnmpUserSecurityInfoModule(UniversalDDIAnsibleModule):
             resp = SnmpUserSecurityApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
-            return None
+            return []
 
     def find(self):
         if self.params["id"] is not None:
