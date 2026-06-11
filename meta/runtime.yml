@@ -101,4 +101,9 @@ action_groups:
     - anycast_host_info
 
   dtc:
+    - dtc_server
+    - dtc_server_info
+    - dtc_pool
+    - dtc_pool_info
     - dtc_policy
+    - dtc_policy_info
