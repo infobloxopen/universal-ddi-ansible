@@ -102,6 +102,7 @@ options:
         description:
             - "Optional. Flag which enables/disables B(SNMPHealthCheck). Defaults to I(false)."
         type: bool
+        default: False
     interval:
         description:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
@@ -417,7 +418,7 @@ class HealthCheckSnmpModule(UniversalDDIAnsibleModule):
     def find(self):
         if self.params["id"] is not None:
             try:
-                resp = HealthCheckSnmpApi(self.client).read(self.params["id"], inherit="full")
+                resp = HealthCheckSnmpApi(self.client).read(self.params["id"])
                 return resp.result
             except NotFoundException as e:
                 if self.params["state"] == "absent":
@@ -518,7 +519,7 @@ def main():
         community=dict(type="str"),
         context_engine_id=dict(type="str"),
         context_name=dict(type="str"),
-        disabled=dict(type="bool"),
+        disabled=dict(type="bool", default=False),
         interval=dict(type="int", default=15),
         name=dict(type="str", required=True),
         port=dict(type="int", default=161),
