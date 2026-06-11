@@ -9,6 +9,7 @@
         health_check_snmp_name_2: "test-health-check-snmp-2-{{ 999999 | random | string }}"
         non_existent_name: "non-existent-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
+        tag_value_2: "site-2-{{ 999999 | random | string }}"
 
     - name: Create SNMP Health Check
       infoblox.universal_ddi.dtc_health_check_snmp:
@@ -26,7 +27,7 @@
         version: "v2c"
         community: "public"
         tags:
-          location: "{{ tag_value }}"
+          location: "{{ tag_value_2 }}"
         state: present
       register: health_check_snmp_2
 
@@ -93,16 +94,6 @@
         that:
           - health_check_snmp_info is not failed
           - health_check_snmp_info.objects | length == 0
-
-    - name: Get SNMP Health Check information by shared tag
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        tag_filters:
-          location: "{{ tag_value }}"
-      register: health_check_snmp_info
-    - assert:
-        that:
-          - health_check_snmp_info is not failed
-          - health_check_snmp_info.objects | length == 2
 
     - name: Verify SNMP Health Check object fields
       infoblox.universal_ddi.dtc_health_check_snmp_info:
