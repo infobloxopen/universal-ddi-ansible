@@ -1,0 +1,23 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dtc_server1_name: "dtc-server-1-{{ 999999 | random | string }}"
+        dtc_server2_name: "dtc-server-2-{{ 999999 | random | string }}"
+
+    - name: Create a DTC Server 1
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server1_name }}"
+        address: "10.0.0.0"
+        state: present
+      register: _dtc_server1
+
+    - name: Create a DTC Server 2
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server2_name }}"
+        address: "20.0.0.0"
+        state: present
+      register: _dtc_server2
