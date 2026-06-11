@@ -47,21 +47,18 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-- name: Get all SNMP User Security Model objects
-  infoblox.universal_ddi.dtc_snmp_user_security_model_info:
+  - name: Get SNMP User Security Model by ID
+    infoblox.universal_ddi.dtc_snmp_user_security_model_info:
+      id: "{{ usm_id }}"
 
-- name: Get SNMP User Security Model by ID
-  infoblox.universal_ddi.dtc_snmp_user_security_model_info:
-    id: "{{ usm_id }}"
+  - name: Get SNMP User Security Model by filters
+    infoblox.universal_ddi.dtc_snmp_user_security_model_info:
+      filters:
+        username: "snmpuser"
 
-- name: Get SNMP User Security Model by username filter
-  infoblox.universal_ddi.dtc_snmp_user_security_model_info:
-    filters:
-      username: "snmpuser"
-
-- name: Get SNMP User Security Model by filter query
-  infoblox.universal_ddi.dtc_snmp_user_security_model_info:
-    filter_query: "username=='snmpuser'"
+  - name: Get SNMP User Security Model by filter query
+    infoblox.universal_ddi.dtc_snmp_user_security_model_info:
+      filter_query: "username=='snmpuser'"
 """
 
 RETURN = r"""
