@@ -7,6 +7,7 @@
     - ansible.builtin.set_fact:
         health_check_snmp_name: "test-health-check-snmp-{{ 999999 | random | string }}"
         health_check_snmp_name_2: "test-health-check-snmp-2-{{ 999999 | random | string }}"
+        non_existent_name: "non-existent-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create SNMP Health Check
@@ -18,6 +19,16 @@
           location: "{{ tag_value }}"
         state: present
       register: health_check_snmp
+
+    - name: Create second SNMP Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_snmp_name_2 }}"
+        version: "v2c"
+        community: "public"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_snmp_2
 
     - name: Get SNMP Health Check information by ID
       infoblox.universal_ddi.dtc_health_check_snmp_info:
@@ -76,22 +87,12 @@
     - name: Get SNMP Health Check information with non-existent name
       infoblox.universal_ddi.dtc_health_check_snmp_info:
         filters:
-          name: "non-existent-health-check"
+          name: "{{ non_existent_name }}"
       register: health_check_snmp_info
     - assert:
         that:
           - health_check_snmp_info is not failed
           - health_check_snmp_info.objects | length == 0
-
-    - name: Create second SNMP Health Check
-      infoblox.universal_ddi.dtc_health_check_snmp:
-        name: "{{ health_check_snmp_name_2 }}"
-        version: "v2c"
-        community: "public"
-        tags:
-          location: "{{ tag_value }}"
-        state: present
-      register: health_check_snmp_2
 
     - name: Get SNMP Health Check information by shared tag
       infoblox.universal_ddi.dtc_health_check_snmp_info:
