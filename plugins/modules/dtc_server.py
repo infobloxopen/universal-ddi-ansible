@@ -69,6 +69,7 @@ options:
         description:
             - "Display name of B(Server)."
         type: str
+        required: true
     records:
         description:
             - "Optional. List of B(Records) of the B(Server)."
@@ -408,7 +409,7 @@ def main():
         disabled=dict(type="bool", default=False),
         endpoint_type=dict(type="str", choices=["address", "fqdn"], default="address"),
         fqdn=dict(type="str"),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         records=dict(
             type="list",
             elements="dict",
