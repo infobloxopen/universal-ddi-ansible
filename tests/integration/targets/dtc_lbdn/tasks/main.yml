@@ -271,17 +271,16 @@
           - dtc_lbdn_info.objects[0].view== _view2.id
 
   always:
-
-    - ansible.builtin.include_role:
-        name: setup_dtc_policy
-        tasks_from: cleanup.yml
-
     - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
         view: "{{ _view2.id }}"
         state: absent
       ignore_errors: true
+
+    - ansible.builtin.include_role:
+        name: setup_dtc_policy
+        tasks_from: cleanup.yml
 
     - ansible.builtin.include_role:
         name: setup_view

@@ -285,7 +285,7 @@ class LbdnModule(UniversalDDIAnsibleModule):
             if view and "/" in view:
                 view = view.split("/")[-1]
 
-            filter_str = f'name=="{self.params["name"]}" and view=="{view}"'
+            filter_str = f"name=='{self.params['name']}' and view=='{view}'"
 
             resp = LbdnApi(self.client).list(filter=filter_str, inherit="full")
 
