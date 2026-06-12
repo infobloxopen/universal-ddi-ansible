@@ -37,6 +37,16 @@
           - dtc_lbdn_info.objects | length == 1
           - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
 
+    - name: Get DTC LBDN information by filter (only Name)
+      infoblox.universal_ddi.dtc_lbdn_info:
+        filters:
+          name: "{{ dtc_ldbn_name }}"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+
     - name: Get DTC LBDN information by raw filter query
       infoblox.universal_ddi.dtc_lbdn_info:
         filter_query: "name=='{{ dtc_ldbn_name }}' and view=='{{ _view.id }}'"

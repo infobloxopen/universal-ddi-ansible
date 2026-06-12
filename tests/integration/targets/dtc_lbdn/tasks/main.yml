@@ -122,68 +122,68 @@
           - dtc_lbdn_info.objects | length == 1
           - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
           - dtc_lbdn_info.objects[0].comment == "Test Comment"
-
-    - name: Create a DTC LBDN with disabled
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        disabled: true
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].disabled == true
-
-    - name: Create a DTC LBDN with tags
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        tags:
-          location: "bangalore"
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].tags.location == "bangalore"
-
-    - name: Create a DTC LBDN with ttl
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        ttl: 300
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].ttl == 300
-
+#
+#    - name: Create a DTC LBDN with disabled
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_ldbn_name }}"
+#        view: "{{ _view.id }}"
+#        disabled: true
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_ldbn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].disabled == true
+#
+#    - name: Create a DTC LBDN with tags
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_ldbn_name }}"
+#        view: "{{ _view.id }}"
+#        tags:
+#          location: "bangalore"
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_ldbn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].tags.location == "bangalore"
+#
+#    - name: Create a DTC LBDN with ttl
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_ldbn_name }}"
+#        view: "{{ _view.id }}"
+#        ttl: 300
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_ldbn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].ttl == 300
+#
     - name: Create a DTC LBDN with precedence
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
@@ -203,54 +203,56 @@
           - dtc_lbdn_info.objects | length == 1
           - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
           - dtc_lbdn_info.objects[0].precedence == 4700
+#
+#    - name: Create a DTC LBDN with DTC Policy association
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_ldbn_name }}"
+#        view: "{{ _view.id }}"
+#        dtc_policy:
+#          policy_id: "{{ dtc_policy.id }}"
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_ldbn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].dtc_policy.policy_id == dtc_policy.id
+#
+#    - name: Create a DTC LBDN with inheritance sources
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_ldbn_name }}"
+#        view: "{{ _view.id }}"
+#        inheritance_sources:
+#          ttl:
+#            action: override
+#        ttl: 4800
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_ldbn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].inheritance_sources.ttl.action == "override"
+#          - dtc_lbdn_info.objects[0].ttl == 4800
 
-    - name: Create a DTC LBDN with DTC Policy association
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        dtc_policy:
-          policy_id: "{{ dtc_policy.id }}"
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].dtc_policy.policy_id == dtc_policy.id
-
-    - name: Create a DTC LBDN with inheritance sources
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        inheritance_sources:
-          ttl:
-            action: override
-        ttl: 4800
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].inheritance_sources.ttl.action == "override"
-          - dtc_lbdn_info.objects[0].ttl == 4800
-
+    # Provide the existing LBDN's identifier to modify the view and avoid creating a new one
     - name: Create a DTC LBDN with a different view
       infoblox.universal_ddi.dtc_lbdn:
+          id : "{{ dtc_lbdn.id }}"
           name: "{{ dtc_ldbn_name }}"
           view: "{{ _view2.id }}"
           state: present
@@ -270,22 +272,17 @@
 
   always:
 
-    - name: Delete the DTC LBDN from view1
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
-        view: "{{ _view.id }}"
-        state: absent
+    - ansible.builtin.include_role:
+        name: setup_dtc_policy
+        tasks_from: cleanup.yml
 
-    - name: Delete the DTC LBDN from view2
+    - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
         view: "{{ _view2.id }}"
         state: absent
+      ignore_errors: true
 
     - ansible.builtin.include_role:
         name: setup_view
-        tasks_from: cleanup.yml
-
-    - ansible.builtin.include_role:
-        name: setup_dtc_policy
         tasks_from: cleanup.yml

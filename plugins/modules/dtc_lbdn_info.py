@@ -211,13 +211,13 @@ class LbdnInfoModule(UniversalDDIAnsibleModule):
         filter_str = None
 
         if self.params["filters"] is not None:
-            filters = self.params["filters"]
+            filters = dict(self.params["filters"])
 
             view = filters.get("view")
             if view and "/" in view:
-                view = view.split("/")[-1]
+                filters["view"] = view.split("/")[-1]
 
-            filter_str = f'name=="{filters["name"]}" ' + f'and view=="{view}"'
+            filter_str = " and ".join([f"{k}=='{v}'" for k, v in filters.items()])
 
         elif self.params["filter_query"] is not None:
             filter_str = self.params["filter_query"]
