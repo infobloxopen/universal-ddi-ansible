@@ -252,10 +252,10 @@
     # Provide the existing LBDN's identifier to modify the view and avoid creating a new one
     - name: Create a DTC LBDN with a different view
       infoblox.universal_ddi.dtc_lbdn:
-          id : "{{ dtc_lbdn.id }}"
-          name: "{{ dtc_ldbn_name }}"
-          view: "{{ _view2.id }}"
-          state: present
+        id : "{{ dtc_lbdn.id }}"
+        name: "{{ dtc_ldbn_name }}"
+        view: "{{ _view2.id }}"
+        state: present
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
