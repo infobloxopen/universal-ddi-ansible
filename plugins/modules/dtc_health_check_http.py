@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dtc_health_check_http
 short_description: Manages a DTC HTTP health checks
 description:
-    - Manages a DTC HTTP health checks
+    - Manages DTC HTTP health checks.
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -139,7 +139,7 @@ EXAMPLES = r"""
         name: "example_http_health_check"
         port: 80
         request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
-        state: present
+        state: "present"
       register: http_health_check
 
     - name: Create an HTTP Health Check with additional parameters
@@ -161,7 +161,7 @@ EXAMPLES = r"""
         name: "example_http_health_check"
         port: 80
         request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
-        state: absent
+        state: "absent"
 """
 
 RETURN = r"""
@@ -455,7 +455,7 @@ def main():
                 header=dict(type="str"),
                 regex=dict(type="str"),
             ),
-            default=[],
+            default=None,
         ),
         codes=dict(type="str"),
         comment=dict(type="str"),

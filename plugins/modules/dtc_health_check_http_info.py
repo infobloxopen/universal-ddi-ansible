@@ -54,7 +54,7 @@ EXAMPLES = r"""
 
     - name: Get HTTP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_http_info:
-        id: "{{http_health_check.id}}"
+        id: "{{ http_health_check.id }}"
 
     - name: Get HTTP Health Check information by filter query
       infoblox.universal_ddi.dtc_health_check_http_info:
