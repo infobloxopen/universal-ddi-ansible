@@ -376,14 +376,14 @@ EXAMPLES = r"""
         state: "present"
 
     - name: Create an A Record with Record Protection
-        infoblox.universal_ddi.dns_record:
-            zone: "{{ _auth_zone.id }}"
-            name_in_zone: "protected-record"
-            rdata:
-                address: "192.168.20.20"
-            type: "A"
-            configure_record_protection: "DDI Admin"
-            state: "present"
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        name_in_zone: "protected-record"
+        rdata:
+            address: "192.168.20.20"
+        type: "A"
+        configure_record_protection: "DDI Admin"
+        state: "present"
    
     - name: Create an AAAA Record in an Auth Zone
       infoblox.universal_ddi.dns_record:
