@@ -281,9 +281,9 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         auth_passphrase=dict(type="str", no_log=True),
-        auth_protocol=dict(type="str"),
+        auth_protocol=dict(type="str", default="NoAuth"),
         privacy_passphrase=dict(type="str", no_log=True),
-        privacy_protocol=dict(type="str"),
+        privacy_protocol=dict(type="str", default="NoPrivacy"),
         username=dict(type="str"),
     )
 
