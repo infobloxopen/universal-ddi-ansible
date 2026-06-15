@@ -1,0 +1,26 @@
+---
+
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        _snmp_usm_username: "test-usm-{{ 999999 | random | string }}"
+
+    - name: Create SNMP User Security Model
+      infoblox.universal_ddi.dtc_snmp_user_security_model:
+        username: "{{ _snmp_usm_username }}"
+        auth_protocol: "NoAuth"
+        privacy_protocol: "NoPrivacy"
+        state: present
+      register: _snmp_usm
+
+    - name: Set SNMP USM facts
+      ansible.builtin.set_fact:
+        _snmp_usm_id: "{{ _snmp_usm.id }}"
+        _snmp_usm_available: true
+
+    - name: Display SNMP USM status
+      ansible.builtin.debug:
+        msg: "SNMP USM configuration created. USM ID: {{ _snmp_usm_id }}, Username: {{ _snmp_usm_username }}"
