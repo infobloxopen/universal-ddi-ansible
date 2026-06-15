@@ -826,7 +826,7 @@ item:
                     returned: Always
                 target_name:
                     description:
-                        - "For B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
+                        - "For Alias, B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
                     type: str
                     returned: Always
                 type:
