@@ -289,9 +289,9 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].codes == "200,202"
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].codes == "200,202"
 
     - name: Create HTTP Health Check with check_response_body
       infoblox.universal_ddi.dtc_health_check_http:
@@ -309,7 +309,6 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_body is true
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
           - health_check_http_info.objects[0].check_response_body is true
@@ -414,10 +413,10 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_header_regexes[0].header == "Content-Type"
-          - health_check_http_info.objects[0].check_response_header_regexes[0].regex == "application/json"
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].check_response_header_regexes[0].header == "Content-Type"
+          - health_check_http_info.objects[0].check_response_header_regexes[0].regex == "application/json"
 
     - name: Create HTTP Health Check with https flag
       infoblox.universal_ddi.dtc_health_check_http:
