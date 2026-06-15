@@ -70,6 +70,7 @@ options:
                 description:
                     - "Regular expression to match against HTTP header value."
                 type: str
+        default: []
     codes:
         description:
             - "Optional. Response Status Codes meaning the health check is successful. If empty, any code means success. Individual codes and code ranges are supported, ex. \"102,105-107,109-110,120\"."
@@ -454,7 +455,7 @@ def main():
                 header=dict(type="str"),
                 regex=dict(type="str"),
             ),
-            default=None,
+            default=[],
         ),
         codes=dict(type="str"),
         comment=dict(type="str"),
