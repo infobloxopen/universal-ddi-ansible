@@ -603,8 +603,6 @@
     - name: Cleanup SNMP Health Check v3
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ snmp_health_check_name_v3 }}"
-        version: "v3"
-        user_security_model: "{{ _snmp_usm_id }}"
         state: absent
       ignore_errors: true
 
