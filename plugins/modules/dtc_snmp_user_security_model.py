@@ -43,6 +43,7 @@ options:
             - "* SHA"
             - "Defaults to B(NoAuth)."
         type: str
+        default: NoAuth
     privacy_passphrase:
         description:
             - "User passphrase for privacy. Ignored for B(NoPrivacy), otherwise mandatory."
@@ -56,6 +57,7 @@ options:
             - "* AES"
             - "Defaults to B(NoPrivacy)."
         type: str
+        default: NoPrivacy
     username:
         description:
             - "User name with which to associate security information."
