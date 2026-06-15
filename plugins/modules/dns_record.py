@@ -1019,6 +1019,11 @@ class RecordModule(UniversalDDIAnsibleModule):
     def payload(self):
         return self._payload
 
+    @staticmethod
+    def _normalize_protection_level(level):
+        # API may return None for unprotected records while module input uses "None".
+        return None if level in (None, "None", "") else level
+
     def payload_changed(self):
         if self.existing is None:
             # if existing is None, then it is a create operation
@@ -1054,11 +1059,12 @@ class RecordModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 0:
                 return None
 
-    def configure_record_protection(self):
+    def configure_record_protection(self, record=None):
         protection = self.params.get("configure_record_protection")
-        zone_id = self.existing.zone if self.existing is not None else self.params.get("zone")
-        rname = self.existing.name_in_zone if self.existing is not None else self.payload.name_in_zone
-        rtype = self.existing.type if self.existing is not None else self.payload.type
+        current = record if record is not None else self.existing
+        zone_id = current.zone if current is not None else self.params.get("zone")
+        rname = current.name_in_zone if current is not None else self.payload.name_in_zone
+        rtype = current.type if current is not None else self.payload.type
         payload = {"zone_id": zone_id, "protected_records": [{"rname": rname, "level": protection, "rtype": rtype}]}
 
         if protection is not None:
@@ -1069,9 +1075,11 @@ class RecordModule(UniversalDDIAnsibleModule):
         if self.check_mode:
             return None
         resp = RecordApi(self.client).create(body=self.payload, inherit="full")
-        if self.params.get("configure_record_protection") is not None:
-            self.existing = resp.result
-            self.configure_record_protection()
+        desired_protection = self._normalize_protection_level(self.params.get("configure_record_protection"))
+        if desired_protection is not None:
+            self.configure_record_protection(record=resp.result)
+            # Re-read so returned object includes any protection updates.
+            resp = RecordApi(self.client).read(resp.result.id, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
@@ -1083,6 +1091,8 @@ class RecordModule(UniversalDDIAnsibleModule):
             # Check if protection actually needs changing
             current_protection = self.existing.protection.level if self.existing.protection else None
             desired_protection = self.params.get("configure_record_protection")
+            current_protection = self._normalize_protection_level(current_protection)
+            desired_protection = self._normalize_protection_level(desired_protection)
             if current_protection != desired_protection:
                 self.configure_record_protection()
                 protection_changed = True
