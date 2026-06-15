@@ -360,7 +360,7 @@ item:
             returned: Always
         user_security_model:
             description:
-                - "The resource identifier."
+                - "The resource identifier ."
             type: str
             returned: Always
         version:
