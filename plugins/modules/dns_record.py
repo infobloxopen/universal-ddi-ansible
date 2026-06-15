@@ -1166,7 +1166,7 @@ def main():
         ),
         name_in_zone=dict(type="str", default=""),
         options=dict(type="dict"),
-        configure_record_protection=dict(type="str", choices=["DDI Admin", "Global Admin", "None", None], default=None),
+        configure_record_protection=dict(type="str", choices=["DDI Admin", "Global Admin", "None"], default=None),
         rdata=dict(type="dict", required=True),
         tags=dict(type="dict"),
         ttl=dict(type="int"),
