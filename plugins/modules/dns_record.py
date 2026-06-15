@@ -577,12 +577,13 @@ item:
         protection:
             description:
                 - "Protection configuration containing user group with protected access."
-        type: dict
-        returned: Always
-        contains:
-            level:
-                description: "The protection level of the DNS resource record."
-                type: str
+            type: dict
+            returned: Always
+            contains:
+                level:
+                    description: "The protection level of the DNS resource record."
+                    type: str
+                    returned: Always
         id:
             description:
                 - "The resource identifier."
