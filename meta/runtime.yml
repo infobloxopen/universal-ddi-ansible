@@ -35,6 +35,8 @@ action_groups:
     - dns_host
     - dns_host_info
     - dns_view_bulk_copy
+    - dtc_lbdn
+    - dtc_lbdn_info
 
   ipam:
     - ipam_ip_space
