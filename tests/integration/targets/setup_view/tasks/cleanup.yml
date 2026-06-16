@@ -9,9 +9,3 @@
         name: "{{ dns_view_name }}"
         state: absent
       ignore_errors: true
-
-    - name: "Delete the second DNS View"
-      infoblox.universal_ddi.dns_view:
-        name: "{{ dns_view_name_2 }}"
-        state: absent
-      ignore_errors: true
