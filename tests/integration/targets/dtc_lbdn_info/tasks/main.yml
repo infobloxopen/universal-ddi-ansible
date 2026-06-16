@@ -5,12 +5,12 @@
       portal_key: "{{ portal_key }}"
   block:
     - ansible.builtin.set_fact:
-        dtc_ldbn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
+        dtc_lbdn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
         tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create a DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         tags:
           location: "{{ tag_value }}"
@@ -29,7 +29,7 @@
     - name: Get DTC LBDN information by filters (Name and View)
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -40,7 +40,7 @@
     - name: Get DTC LBDN information by filter (only Name)
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -49,7 +49,7 @@
 
     - name: Get DTC LBDN information by raw filter query
       infoblox.universal_ddi.dtc_lbdn_info:
-        filter_query: "name=='{{ dtc_ldbn_name }}' and view=='{{ _view.id }}'"
+        filter_query: "name=='{{ dtc_lbdn_name }}' and view=='{{ _view.id }}'"
       register: dtc_lbdn_info
     - assert:
         that:
@@ -70,7 +70,7 @@
   always:
     - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: absent
       ignore_errors: true

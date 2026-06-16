@@ -5,7 +5,7 @@
       portal_key: "{{ portal_key }}"
   block:
     - ansible.builtin.set_fact:
-        dtc_ldbn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
+        dtc_lbdn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
         dns_view_name_2: "my-test-view-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
@@ -17,7 +17,7 @@
 
     - name: Create a DTC LBDN (check mode)
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: present
       check_mode: true
@@ -25,7 +25,7 @@
     - name: Get DTC LBDN Information by Name
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -36,14 +36,14 @@
 
     - name: Create a DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: present
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -54,7 +54,7 @@
 
     - name: Create a DTC LBDN (idempotent)
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: present
       register: dtc_lbdn
@@ -65,7 +65,7 @@
 
     - name: Delete the DTC LBDN (check mode)
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: absent
       check_mode: true
@@ -73,7 +73,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -84,14 +84,14 @@
 
     - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: absent
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -102,7 +102,7 @@
 
     - name: Delete a DTC LBDN (idempotent)
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         state: absent
       register: dtc_lbdn
@@ -113,7 +113,7 @@
 
     - name: Create a DTC LBDN with comment
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         comment: "Test Comment"
         state: present
@@ -121,7 +121,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -133,7 +133,7 @@
 
     - name: Create a DTC LBDN with disabled
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         disabled: true
         state: present
@@ -141,7 +141,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -153,7 +153,7 @@
 
     - name: Create a DTC LBDN with tags
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         tags:
           location: "{{ tag_value }}"
@@ -162,7 +162,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -174,7 +174,7 @@
 
     - name: Create a DTC LBDN with ttl
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         ttl: 300
         state: present
@@ -182,7 +182,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -194,7 +194,7 @@
 
     - name: Create a DTC LBDN with precedence
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         precedence: 4700
         state: present
@@ -202,7 +202,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -214,7 +214,7 @@
 
     - name: Create a DTC LBDN with DTC Policy association
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         dtc_policy:
           policy_id: "{{ dtc_policy.id }}"
@@ -223,7 +223,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -235,7 +235,7 @@
 
     - name: Create a DTC LBDN with inheritance sources
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view.id }}"
         inheritance_sources:
           ttl:
@@ -246,7 +246,7 @@
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -261,14 +261,14 @@
     - name: Create a DTC LBDN with a different view
       infoblox.universal_ddi.dtc_lbdn:
         id: "{{ dtc_lbdn.id }}"
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view2.id }}"
         state: present
       register: dtc_lbdn
     - name: Get DTC LBDN Information
       infoblox.universal_ddi.dtc_lbdn_info:
         filters:
-          name: "{{ dtc_ldbn_name }}"
+          name: "{{ dtc_lbdn_name }}"
           view: "{{ _view2.id }}"
       register: dtc_lbdn_info
     - assert:
@@ -281,7 +281,7 @@
   always:
     - name: Delete the DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_ldbn_name }}"
+        name: "{{ dtc_lbdn_name }}"
         view: "{{ _view2.id }}"
         state: absent
       ignore_errors: true
