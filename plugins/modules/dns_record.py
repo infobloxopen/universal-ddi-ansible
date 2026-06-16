@@ -494,7 +494,7 @@ EXAMPLES = r"""
         zone: "{{ _auth_zone.id }}"
         rdata:
           algorithm: 2
-          fingerprint_type: 1
+          fingerprint_type: 2
           fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
         type: "SSHFP"
         state: "present"

@@ -27,7 +27,6 @@
       infoblox.universal_ddi.dns_record_info:
         id: "{{ sshfp_record.id }}"
       register: sshfp_record_info
-
     - assert:
         that:
           - sshfp_record_info.objects | length == 1
@@ -39,7 +38,6 @@
           zone: "{{ _auth_zone.id }}"
           type: "SSHFP"
       register: sshfp_record_info
-
     - assert:
         that:
           - sshfp_record_info.objects | length == 1
@@ -49,7 +47,6 @@
       infoblox.universal_ddi.dns_record_info:
         filter_query: "name_in_zone=='{{ record_name }}' and zone=='{{ _auth_zone.id }}' and type=='SSHFP'"
       register: sshfp_record_info
-
     - assert:
         that:
           - sshfp_record_info.objects | length == 1
@@ -60,7 +57,6 @@
         tag_filters:
           location: "{{ tag_value }}"
       register: sshfp_record_info
-
     - assert:
         that:
           - sshfp_record_info.objects | length == 1
