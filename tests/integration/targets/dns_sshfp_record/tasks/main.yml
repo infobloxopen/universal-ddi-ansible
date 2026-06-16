@@ -328,9 +328,9 @@
         name_in_zone: "{{ record_name }}"
         zone: "{{ _auth_zone.id }}"
         rdata:
-          algorithm: 2
-          fingerprint_type: 2
-          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+          algorithm: 4
+          fingerprint_type: 1
+          fingerprint: "fedcbafedcbafedcbafedcbafedcbafedcbafedc"
         type: "SSHFP"
         state: absent
       ignore_errors: true
