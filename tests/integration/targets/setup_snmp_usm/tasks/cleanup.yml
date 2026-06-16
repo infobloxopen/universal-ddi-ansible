@@ -1,0 +1,20 @@
+---
+# Cleanup for SNMP User Security Model (USM) setup role
+
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: Delete SNMP User Security Model
+      infoblox.universal_ddi.dtc_snmp_user_security_model:
+        username: "{{ _snmp_usm_username }}"
+        state: absent
+      ignore_errors: true
+      when: _snmp_usm_username is defined
+
+    - name: Reset SNMP USM facts
+      ansible.builtin.set_fact:
+        _snmp_usm_id: ""
+        _snmp_usm_username: ""
+        _snmp_usm_available: false
