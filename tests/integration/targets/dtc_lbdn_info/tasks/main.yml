@@ -6,14 +6,7 @@
   block:
     - ansible.builtin.set_fact:
         dtc_ldbn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
-        dns_view_name_2: "my-test-view-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
-
-    - name: Create a DNS View
-      infoblox.universal_ddi.dns_view:
-        name: "{{ dns_view_name_2 }}"
-        state: present
-      register: _view2
 
     - name: Create a DTC LBDN
       infoblox.universal_ddi.dtc_lbdn:
@@ -79,12 +72,6 @@
       infoblox.universal_ddi.dtc_lbdn:
         name: "{{ dtc_ldbn_name }}"
         view: "{{ _view.id }}"
-        state: absent
-      ignore_errors: true
-
-    - name: Delete the DNS View
-      infoblox.universal_ddi.dns_view:
-        name: "{{ dns_view_name_2 }}"
         state: absent
       ignore_errors: true
 

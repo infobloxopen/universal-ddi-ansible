@@ -291,6 +291,7 @@
         name: "{{ dns_view_name_2 }}"
         state: absent
       ignore_errors: true
+      when: _view2 is defined
 
     - ansible.builtin.include_role:
         name: setup_dtc_policy
