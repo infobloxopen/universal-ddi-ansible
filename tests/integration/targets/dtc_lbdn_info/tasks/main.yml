@@ -74,3 +74,8 @@
         view: "{{ _view.id }}"
         state: absent
       ignore_errors: true
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml
