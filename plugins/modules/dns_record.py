@@ -274,7 +274,17 @@ options:
                     - "Defaults to none."
                     - "B(Required only for few types.)"
                 type: str
-                required: false                            
+                required: false   
+            target_name: 
+                description:
+                    - "For B(ALIAS record), the fully qualified domain name of the target to resolve."
+                type: str
+                required: true
+            target_type:
+                description:
+                    - "For B(ALIAS record), the type of DNS resource record to resolve for the target domain (e.g., A, AAAA, CAA, MX, NAPTR, PTR, SPF, SRV, TXT)."
+                type: str
+                required: true
         type: dict
         required: true
     tags:
@@ -292,6 +302,7 @@ options:
           - V(Value      | Numeric Type  |   Description)
           - V(A          |       1       |   Address record)
           - V(AAAA       |      28       |   IPv6 Address record)
+          - V(ALIAS      |   65432       |   A non-standard DNS record that provides CNAME-like functionality at the zone apex by resolving to the target’s actual records (e.g., A, AAAA, CAA, MX, NAPTR, PTR, SPF, SRV, TXT))
           - V(CAA        |     257       |   Certification Authority Authorization record)
           - V(CNAME      |       5       |   Canonical Name record)
           - V(DNAME      |      39       |   Delegation Name record)
@@ -464,8 +475,17 @@ EXAMPLES = r"""
         rdata:
           text: "sample text"
         type: "TXT"
-        state: "present"  
-             
+        state: "present"
+    
+    - name: Create an ALIAS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: "present"
+
     - name: Delete the A Record
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"
@@ -810,7 +830,17 @@ item:
                         - "Defaults to none."
                         - "B(Required only for few types.)"
                     type: str
-                    returned: Always           
+                    returned: Always
+                target_name: 
+                    description:
+                        - "For B(ALIAS record), the fully qualified domain name of the target to resolve."
+                    type: str
+                    returned: Always
+                target_type:
+                    description:
+                        - "For B(ALIAS record), the type of DNS resource record to resolve for the target domain (e.g., A, AAAA, CAA, MX, NAPTR, PTR, SPF, SRV, TXT)."
+                    type: str
+                    returned: Always    
             type: dict
         source:
             description:
@@ -897,6 +927,7 @@ item:
               - V(Value      | Numeric Type  |   Description)
               - V(A          |       1       |   Address record)
               - V(AAAA       |      28       |   IPv6 Address record)
+              - V(ALIAS      |   65432       |   A non-standard DNS record that provides CNAME-like functionality at the zone apex by resolving to the target’s actual records (e.g., A, AAAA, CAA, MX, NAPTR, PTR, SPF, SRV, TXT))
               - V(CAA        |     257       |   Certification Authority Authorization record)
               - V(CNAME      |       5       |   Canonical Name record)
               - V(DNAME      |      39       |   Delegation Name record)

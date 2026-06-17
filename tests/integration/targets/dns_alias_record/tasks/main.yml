@@ -1,0 +1,447 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        record_name: "test-alias-record-{{ 999999 | random | string }}"
+        target_name: "cdn.example.com."
+
+    - name: Create an ALIAS Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: present
+      check_mode: true
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record is changed
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 0
+
+    - name: Create an ALIAS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record is changed
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_name == target_name
+          - alias_record_info.objects[0].rdata.target_type == "A"
+          - alias_record_info.objects[0].type == "ALIAS"
+          - alias_record_info.objects[0].zone == alias_record.object.zone
+
+    - name: Create an ALIAS Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - assert:
+        that:
+          - alias_record is not changed
+          - alias_record is not failed
+
+    - name: Delete the ALIAS Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: absent
+      check_mode: true
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record is changed
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+
+    - name: Delete the ALIAS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: absent
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 0
+
+    - name: Delete the ALIAS Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: absent
+      register: alias_record
+    - assert:
+        that:
+          - alias_record is not changed
+          - alias_record is not failed
+
+    - name: Create an ALIAS Record with comment
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        comment: "This is a test ALIAS Record"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].comment == "This is a test ALIAS Record"
+
+    - name: Create an ALIAS Record with TTL
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        ttl: 3600
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].ttl == 3600
+
+    - name: Create an ALIAS Record with Disabled
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        disabled: true
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].disabled == true
+
+    - name: Create an ALIAS Record with Tags
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        tags:
+          location: "site-1"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].tags.location == "site-1"
+
+    - name: Create an ALIAS Record with Inheritance Sources
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        type: "ALIAS"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        inheritance_sources:
+          ttl:
+            action: "inherit"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].inheritance_sources.ttl.action == "inherit"
+
+    - name: Update the target_name of the ALIAS Record to AAAA
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "AAAA"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "AAAA"
+
+    - name: Update the target_name of the ALIAS Record to MX
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "MX"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "MX"
+
+    - name: Update the target_name of the ALIAS Record to NAPTR
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "NAPTR"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "NAPTR"
+
+    - name: Update the target_name of the ALIAS Record to PTR
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "PTR"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "PTR"
+
+    - name: Update the target_name of the ALIAS Record to SRV
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "SRV"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "SRV"
+
+    - name: Update the target_name of the ALIAS Record to TXT
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "TXT"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_type == "TXT"
+
+    - name: Update the target_name of the ALIAS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "new-cdn.example.com."
+          target_type: "TXT"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].rdata.target_name == "new-cdn.example.com."
+
+    - name: Create an ALIAS Record with Name in Zone and Zone
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: present
+      register: alias_record
+    - name: Get Information about the ALIAS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "{{ record_name }}"
+          zone: "{{ _auth_zone.id }}"
+          type: "ALIAS"
+      register: alias_record_info
+    - assert:
+        that:
+          - alias_record_info is not failed
+          - alias_record_info.objects | length == 1
+          - alias_record_info.objects[0].id == alias_record.id
+          - alias_record_info.objects[0].name_in_zone == alias_record.object.name_in_zone
+          - alias_record_info.objects[0].zone == alias_record.object.zone
+
+  always:
+    - name: Delete the ALIAS Record
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "{{ target_name }}"
+          target_type: "A"
+        type: "ALIAS"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete the Auth Zone
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml
