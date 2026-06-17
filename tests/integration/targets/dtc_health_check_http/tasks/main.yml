@@ -330,9 +330,9 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_body_negative is false
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].check_response_body_negative is false
 
     - name: Create HTTP Health Check with check_response_body_regex
       infoblox.universal_ddi.dtc_health_check_http:
@@ -349,9 +349,9 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_body_regex == "OK"
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].check_response_body_regex == "OK"
 
     - name: Create HTTP Health Check with check_response_header
       infoblox.universal_ddi.dtc_health_check_http:
@@ -371,11 +371,11 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_header is true
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
           - health_check_http_info.objects[0].check_response_header_regexes is defined
           - health_check_http_info.objects[0].check_response_header_regexes | length > 0
+          - health_check_http_info.objects[0].check_response_header is true
 
     - name: Create HTTP Health Check with check_response_header_negative
       infoblox.universal_ddi.dtc_health_check_http:
@@ -392,9 +392,9 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].check_response_header_negative is false
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].check_response_header_negative is false
 
     - name: Create HTTP Health Check with check_response_header_regexes
       infoblox.universal_ddi.dtc_health_check_http:
@@ -433,9 +433,9 @@
       register: health_check_http_info
     - assert:
         that:
-          - health_check_http_info.objects[0].https is true
           - health_check_http_info is not failed
           - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].https is true
 
   always:
     - name: "Delete HTTP Health Check"
