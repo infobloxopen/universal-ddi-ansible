@@ -29,7 +29,7 @@
 
     - name: Get TCP Health Check information by filters (id)
       infoblox.universal_ddi.dtc_health_check_tcp_info:
-          id: "{{ health_check_tcp.id }}"
+        id: "{{ health_check_tcp.id }}"
       register: health_check_tcp_info
     - assert:
         that:
