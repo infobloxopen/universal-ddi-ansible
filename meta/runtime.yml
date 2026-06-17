@@ -101,6 +101,8 @@ action_groups:
     - anycast_host_info
 
   dtc:
+    - dtc_health_check_tcp
+    - dtc_health_check_tcp_info
     - dtc_server
     - dtc_server_info
     - dtc_pool
