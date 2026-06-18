@@ -102,6 +102,28 @@ options:
                     - "For B(AAAA) Record, the IPv6 address of the host."
                 type: str
                 required: true
+            algorithm:
+                description:
+                    - "For B(SSHFP) Record, an unsigned 8-bit integer which specifies the algorithm of the public key. Defined values are as follows."
+                    - "1 - RSA"
+                    - "2 - DSA"
+                    - "3 - ECDSA"
+                    - "4 - Ed25519"
+                    - "6 - Ed448"
+                type: int
+                required: true
+            fingerprint_type:
+                description:
+                    - "For B(SSHFP) Record, an unsigned 8-bit integer which specifies the message-digest algorithm used to calculate the fingerprint. Defined values are as follows."
+                    - "1 - SHA-1 (40 hex characters)"
+                    - "2 - SHA-256 (64 hex characters)"
+                type: int
+                required: true
+            fingerprint:
+                description:
+                    - "For B(SSHFP) Record, a hexadecimal-encoded string representing the fingerprint of the public key. The length depends on the fingerprint_type: SHA-1 requires exactly 40 hex characters; SHA-256 requires exactly 64 hex characters."
+                type: str
+                required: true
             flags:
                 description: 
                     - "For B(CAA) record, it is an unsigned 8-bit integer which specifies the CAA record flags. RFC 6844 defines one (highest) bit in flag octet, remaining bits are deferred for future use. This bit is referenced as Critical. When the bit is set (flag value == 128), issuers must not issue certificates in case CAA records contain unknown property tags."
@@ -319,6 +341,7 @@ options:
           - V(NS         |       2       |   Name Server record)
           - V(PTR        |      12       |   Pointer record)
           - V(SOA        |       6       |   Start of Authority record)
+          - V(SSHFP      |      44       |   SSH Public Key Fingerprint record)
           - V(SRV        |      33       |   Service record)
           - V(SVCB       |      64       |   Service Binding Record)
           - V(TXT        |      16       |   Text record)
@@ -500,7 +523,17 @@ EXAMPLES = r"""
           text: "sample text"
         type: "TXT"
         state: "present"  
-             
+
+    - name: Create an SSHFP Record in an Auth Zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        state: "present"
+   
     - name: Delete the A Record
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"
@@ -671,6 +704,28 @@ item:
                     description: 
                         - "For B(A) Record, the IPv4 address of the host."
                         - "For B(AAAA) Record, the IPv6 address of the host."
+                    type: str
+                    returned: Always
+                algorithm:
+                    description:
+                        - "For B(SSHFP) Record, an unsigned 8-bit integer which specifies the algorithm of the public key. Defined values are as follows."
+                        - "1 - RSA"
+                        - "2 - DSA"
+                        - "3 - ECDSA"
+                        - "4 - Ed25519"
+                        - "6 - Ed448"
+                    type: int
+                    returned: Always
+                fingerprint_type:
+                    description:
+                        - "For B(SSHFP) Record, an unsigned 8-bit integer which specifies the message-digest algorithm used to calculate the fingerprint. Defined values are as follows."
+                        - "1 - SHA-1 (40 hex characters)"
+                        - "2 - SHA-256 (64 hex characters)"
+                    type: int
+                    returned: Always
+                fingerprint:
+                    description:
+                        - "For B(SSHFP) Record, a hexadecimal-encoded string representing the fingerprint of the public key. The length depends on the fingerprint_type: SHA-1 requires exactly 40 hex characters; SHA-256 requires exactly 64 hex characters."
                     type: str
                     returned: Always
                 flags:
@@ -957,6 +1012,7 @@ item:
               - V(NS         |       2       |   Name Server record)
               - V(PTR        |      12       |   Pointer record)
               - V(SOA        |       6       |   Start of Authority record)
+              - V(SSHFP      |      44       |   SSH Public Key Fingerprint record)
               - V(SRV        |      33       |   Service record)
               - V(SVCB       |      64       |   Service Binding Record)
               - V(TXT        |      16       |   Text record)
