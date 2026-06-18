@@ -1,0 +1,12 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: "Delete DTC Policy"
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: absent
+      ignore_errors: true

@@ -35,6 +35,8 @@ action_groups:
     - dns_host
     - dns_host_info
     - dns_view_bulk_copy
+    - dtc_lbdn
+    - dtc_lbdn_info
 
   ipam:
     - ipam_ip_space
@@ -101,3 +103,15 @@ action_groups:
   dtc:
     - dtc_health_check_icmp
     - dtc_health_check_icmp_info
+    - dtc_health_check_tcp
+    - dtc_health_check_tcp_info
+    - dtc_server
+    - dtc_server_info
+    - dtc_pool
+    - dtc_pool_info
+    - dtc_policy
+    - dtc_policy_info
+    - dtc_health_check_snmp
+    - dtc_health_check_snmp_info
+    - dtc_snmp_user_security_model
+    - dtc_snmp_user_security_model_info
