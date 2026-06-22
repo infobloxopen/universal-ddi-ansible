@@ -206,6 +206,11 @@ class NextAvailableAddressBlockInfoModule(UniversalDDIAnsibleModule):
                     break
 
                 remaining_count = count - len(find_results)
+
+                # Skip address blocks where parent CIDR is equal to or larger than the requested one and continue searching other valid address blocks
+                if ab.cidr >= self.params["cidr"]:
+                    continue
+
                 find_result = self.find_address_block(id=ab.id, count=remaining_count)
 
                 if isinstance(find_result, int):
