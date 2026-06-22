@@ -1,0 +1,79 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        health_check_http_name: "test-health_check_http_name-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: health_check_http
+
+    - name: Get HTTP Health Check information by filters (name)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          name: "{{ health_check_http_name }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+
+    - name: Get HTTP Health Check information by filters (Id)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filters:
+          id: "{{ health_check_http.id }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+
+    - name: Get HTTP Health Check information by filter query
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filter_query: "name=='{{ health_check_http_name }}'"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+
+    - name: Get HTTP Health Check information by tag filters
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+
+    - name: Get HTTP Health Check information by tag filter query
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: health_check_http_info
+    - assert:
+        that:
+          - health_check_http_info.objects | length == 1
+          - health_check_http_info.objects[0].id == health_check_http.id
+          - health_check_http_info.objects[0].tags.location == tag_value
+
+  always:
+    - name: "Delete HTTP Health Check"
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "DELETE / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      ignore_errors: true
