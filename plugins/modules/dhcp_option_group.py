@@ -86,6 +86,21 @@ EXAMPLES = r"""
       infoblox.universal_ddi.dhcp_option_group:
         name: "option_group_name"
         state: "present"
+    
+    - name: Create a DHCP Option Space ( Required as parent for DHCP Options )
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "example-option-space"
+        state: present
+      register: option_space
+    
+    - name: Create a DHCP Option Code ( Required as parent for DHCP Options )
+      infoblox.universal_ddi.dhcp_option_code:
+          name: "example_option_code_name"
+          code: "243"
+          option_space: "{{ option_space.id }}"
+          type: "int16"
+          state: present
+      register: option_code
       
     - name: Create a DHCP Option Group with additional parameters
       infoblox.universal_ddi.dhcp_option_group:
@@ -93,8 +108,8 @@ EXAMPLES = r"""
         comment: "This is a  DHCP Option Group"
         dhcp_options:
             - type: "option"
-              option_code: 234
-              option_value: "False"
+              option_code: "{{ option_code.id }}"
+              option_value: 235
         state: "present"
     
     - name: Delete the DHCP Option Group

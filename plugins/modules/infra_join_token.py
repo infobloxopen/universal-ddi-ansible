@@ -56,19 +56,19 @@ extends_documentation_fragment:
 EXAMPLES = r"""
   - name: Create a Join token
     infoblox.universal_ddi.infra_join_token:
-      name: "example_token"
+      name: "example_token_ansible"
+      description: "Example Join Token"
       state: "present"
 
-  - name: Create a Join Token with Additional Fields
+  - name: Create a Join Token with tags
     infoblox.universal_ddi.infra_join_token:
-      name: "example_token"
-      description: "Example Join Token"
+      name: "example_token_ansible"
       tags:
         location: "my-location"
 
   - name: Revoke a Join token
     infoblox.universal_ddi.infra_join_token:
-      name: "example_token"
+      name: "example_token_ansible"
       state: "revoked"
 """
 
