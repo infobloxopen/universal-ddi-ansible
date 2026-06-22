@@ -199,7 +199,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import PDPHealthCheck, HealthCheckPdpApi
+    from dtc import HealthCheckPdpApi, PDPHealthCheck
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -312,7 +312,9 @@ class HealthCheckPdpModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -332,7 +334,6 @@ def main():
         retry_up=dict(type="int", default=1),
         tags=dict(type="dict"),
         timeout=dict(type="int", default=10),
-
     )
 
     module = HealthCheckPdpModule(
