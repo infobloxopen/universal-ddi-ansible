@@ -5,7 +5,7 @@
       portal_key: "{{ portal_key }}"
   block:
     - ansible.builtin.set_fact:
-        health_check_pdp_name: "health-check-pdp-{{ 999999 | random | string }}"
+        health_check_pdp_name: "test-health-check-pdp-{{ 999999 | random | string }}"
         tag_value: "site-{{ 999999 | random | string }}"
 
     - name: Create PDP Health Check

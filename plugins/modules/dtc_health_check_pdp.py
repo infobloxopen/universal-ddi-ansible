@@ -97,7 +97,7 @@ EXAMPLES = r"""
         tags:
             location: "site-1"
         state: present
-    
+
     - name: Delete PDP Health Check
       infoblox.universal_ddi.dtc_health_check_pdp:
         name: "example_pdp_health_check"
