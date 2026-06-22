@@ -12,7 +12,7 @@ DOCUMENTATION = r"""
 module: dtc_health_check_pdp
 short_description: Manages a DTC PDP health check
 description:
-    - Manages a DTC ICMP health check
+    - Manages a DTC PDP health check
 version_added: 1.0.0
 author: Infoblox Inc. (@infobloxopen)
 options:
