@@ -479,11 +479,13 @@ def main():
 
     if module.params["check_response_header"] and not module.params.get("check_response_header_regexes"):
         module.fail_json(
-            msg="'check_response_header_regexes' must be provided and non-empty when 'check_response_header' is true.")
+            msg="'check_response_header_regexes' must be provided and non-empty when 'check_response_header' is true."
+        )
 
     if module.params["check_response_body"] and not module.params.get("check_response_body_regex"):
         module.fail_json(
-            msg="'check_response_body_regex' must be provided and non-empty when 'check_response_body' is true.")
+            msg="'check_response_body_regex' must be provided and non-empty when 'check_response_body' is true."
+        )
 
     module.run_command()
 
