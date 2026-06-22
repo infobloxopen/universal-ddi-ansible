@@ -104,6 +104,7 @@ EXAMPLES = r"""
         port: 2123
         state: absent
 """
+
 RETURN = r"""
 id:
     description:
