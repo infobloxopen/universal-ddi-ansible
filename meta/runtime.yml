@@ -115,3 +115,5 @@ action_groups:
     - dtc_health_check_snmp_info
     - dtc_snmp_user_security_model
     - dtc_snmp_user_security_model_info
+    - dtc_health_check_pdp
+    - dtc_health_check_pdp_info
