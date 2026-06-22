@@ -82,7 +82,7 @@ options:
             - "The type of the Service used in anycast configuration."
         choices:
             - "DNS"
-            - "DHCP"
+            - "NTP"
             - "DFP"
         type: str
         required: true
@@ -228,7 +228,7 @@ objects:
                 - "The type of the Service used in anycast configuration."
             choices:
                 - "DNS"
-                - "DHCP"
+                - "NTP"
                 - "DFP"
             type: str
             returned: Always
@@ -390,7 +390,7 @@ def main():
                 name=dict(type="str", required=True),
             ),
         ),
-        service=dict(type="str", required=True, choices=["DNS", "DHCP", "DFP"]),
+        service=dict(type="str", required=True, choices=["DNS", "NTP", "DFP"]),
         tags=dict(type="dict"),
     )
 

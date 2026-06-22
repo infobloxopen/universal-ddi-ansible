@@ -201,12 +201,12 @@
         infoblox.universal_ddi.anycast_config:
           name: "{{ ac_config_name_1 }}"
           anycast_ip_address: "10.10.0.0"
-          service: "DHCP"
+          service: "NTP"
           state: "present"
         register: ac_config
       - name: Get Anycast Configuration Information
         infoblox.universal_ddi.anycast_config_info:
-          service: "DHCP"
+          service: "NTP"
           name: "{{ ac_config_name_1 }}"
         register: ac_config_info
       - assert:
@@ -215,7 +215,7 @@
               - ac_config_info is not failed
               - ac_config_info.objects | length == 1
               - ac_config_info.objects[0].name == ac_config_name_1
-              - ac_config_info.objects[0].service == "DHCP"
+              - ac_config_info.objects[0].service == "NTP"
 
       - name: Creating an Anycast Configuration with IPv6 address
         infoblox.universal_ddi.anycast_config:
@@ -245,11 +245,11 @@
         state: "absent"
       ignore_errors: true
 
-    - name: Delete Anycast Configuration enabled with DHCP service
+    - name: Delete Anycast Configuration enabled with NTP service
       infoblox.universal_ddi.anycast_config:
         name: "{{ ac_config_name_1 }}"
         anycast_ip_address: "10.10.0.0"
-        service: "DHCP"
+        service: "NTP"
         state: "absent"
       ignore_errors: true
 
