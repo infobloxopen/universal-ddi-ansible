@@ -192,6 +192,16 @@ objects:
                 - "The relative owner name to the zone origin. Must be specified for creating the DNS resource record and is read only for other operations."
             type: str
             returned: Always
+        protection:
+            description:
+                - "Protection configuration containing user group with protected access."
+            type: dict
+            returned: Always
+            contains:
+                level:
+                    description: "The protection level of the DNS resource record."
+                    type: str
+                    returned: Always
         options:
             description:
                 - "The DNS resource record type-specific non-protocol options."

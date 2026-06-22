@@ -82,6 +82,16 @@ options:
                     - "Only applicable if the I(create_ptr) option is set to I(true)."
                 type: bool
         type: dict
+    configure_record_protection:
+        description:
+            - "Protection level for the DNS resource record."
+            - "When set, configures protected access for the created or updated record."
+            - "Use 'None' to remove protection from a record."
+        type: str
+        choices:
+            - DDI Admin
+            - Global Admin
+            - None
     rdata:
         description:
             - "The DNS resource record data in JSON format. Certain DNS resource record-specific subfields are required for creating the DNS resource record."
@@ -178,6 +188,7 @@ options:
             order:
                 description: 
                     - "For B(NAPTR) record, a 16-bit unsigned integer specifying the order in which the NAPTR records must be processed. Low numbers are processed before high numbers, and once a NAPTR is found whose rule \"matches\" the target, the client must not consider any NAPTRs with a higher value for order (except as noted below for the \"flags\" field. The range of the value is 0 to 65535."
+                    - "Defaults to 0."
                 type: int
                 required: true
             regexp:
@@ -250,6 +261,7 @@ options:
             priority:
                 description:
                     - "For B(SRV) record, an unsigned 16-bit integer which specifies the priority of this target host. The range of the value is 0 to 65535. A client must attempt to contact the target host with the lowest-numbered priority it can reach. Target hosts with the same priority should be tried in an order defined by the I(weight) field."
+                    - "Defaults to 0."
                 type: int
                 required: true
             weight:
@@ -263,6 +275,11 @@ options:
             text:
                 description:
                     - "For B(TXT) record, the semantics of the text depends on the domain where it is found."
+                type: str
+                required: true
+            target_name:
+                description:
+                    - "For Alias, HTTPS, SVCB records, the target domain name in FQDN format."
                 type: str
                 required: true
             type:
@@ -380,6 +397,16 @@ EXAMPLES = r"""
         tags:
             location: "site-1"
         state: "present"
+
+    - name: Create an A Record with Record Protection
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        name_in_zone: "protected-record"
+        rdata:
+            address: "192.168.20.20"
+        type: "A"
+        configure_record_protection: "DDI Admin"
+        state: "present"
    
     - name: Create an AAAA Record in an Auth Zone
       infoblox.universal_ddi.dns_record:
@@ -481,6 +508,14 @@ EXAMPLES = r"""
         type: "SVCB"
         state: "present"
 
+    - name: Create a HTTPS Record in an Auth Zone
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "https.example.com."
+        type: "HTTPS"
+        state: "present"
+
     - name: Create a TXT Record in an Auth Zone
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"
@@ -572,6 +607,16 @@ item:
                 - "The DNS protocol textual representation of the DNS resource record data."
             type: str
             returned: Always
+        protection:
+            description:
+                - "Protection configuration containing user group with protected access."
+            type: dict
+            returned: Always
+            contains:
+                level:
+                    description: "The protection level of the DNS resource record."
+                    type: str
+                    returned: Always
         id:
             description:
                 - "The resource identifier."
@@ -834,6 +879,11 @@ item:
                         - "For B(TXT) record, the semantics of the text depends on the domain where it is found."
                     type: str
                     returned: Always
+                target_name:
+                    description:
+                        - "For Alias, B(HTTPS) and B(SVCB) records, the target domain name in FQDN format."
+                    type: str
+                    returned: Always
                 type:
                     description: 
                         - "For B(Generic record), the following types are supported:"
@@ -1004,7 +1054,7 @@ class RecordModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
         super(RecordModule, self).__init__(*args, **kwargs)
 
-        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id"]
+        exclude = ["state", "csp_url", "api_key", "portal_url", "portal_key", "id", "configure_record_protection"]
         self._payload_params = {k: v for k, v in self.params.items() if v is not None and k not in exclude}
         self._payload = Record.from_dict(self._payload_params)
         self._existing = None
@@ -1024,6 +1074,11 @@ class RecordModule(UniversalDDIAnsibleModule):
     @property
     def payload(self):
         return self._payload
+
+    @staticmethod
+    def _normalize_protection_level(level):
+        # API may return None for unprotected records while module input uses "None".
+        return None if level in (None, "None", "") else level
 
     def payload_changed(self):
         if self.existing is None:
@@ -1060,22 +1115,56 @@ class RecordModule(UniversalDDIAnsibleModule):
             if len(resp.results) == 0:
                 return None
 
+    def configure_record_protection(self, record=None):
+        protection = self.params.get("configure_record_protection")
+        current = record if record is not None else self.existing
+        zone_id = current.zone if current is not None else self.params.get("zone")
+        rname = current.name_in_zone if current is not None else self.payload.name_in_zone
+        rtype = current.type if current is not None else self.payload.type
+        payload = {"zone_id": zone_id, "protected_records": [{"rname": rname, "level": protection, "rtype": rtype}]}
+
+        if protection is not None:
+            RecordApi(self.client).configure_record_protection(body=payload)
+        return
+
     def create(self):
         if self.check_mode:
             return None
-
         resp = RecordApi(self.client).create(body=self.payload, inherit="full")
+        desired_protection = self._normalize_protection_level(self.params.get("configure_record_protection"))
+        if desired_protection is not None:
+            self.configure_record_protection(record=resp.result)
+            # Re-read so returned object includes any protection updates.
+            resp = RecordApi(self.client).read(resp.result.id, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def update(self):
         if self.check_mode:
             return None
 
-        update_body = self.payload
-        update_body = self.validate_readonly_on_update(self.existing, update_body, ["type", "zone"])
+        protection_changed = False
+        if self.params.get("configure_record_protection") is not None:
+            # Check if protection actually needs changing
+            current_protection = self.existing.protection.level if self.existing.protection else None
+            desired_protection = self.params.get("configure_record_protection")
+            current_protection = self._normalize_protection_level(current_protection)
+            desired_protection = self._normalize_protection_level(desired_protection)
+            if current_protection != desired_protection:
+                self.configure_record_protection()
+                protection_changed = True
 
-        resp = RecordApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
-        return resp.result.model_dump(by_alias=True, exclude_none=True)
+        # Only update record if payload changed (excluding protection)
+        if self.payload_changed():
+            update_body = self.payload
+            update_body = self.validate_readonly_on_update(self.existing, update_body, ["type", "zone"])
+            resp = RecordApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+            return resp.result.model_dump(by_alias=True, exclude_none=True)
+        elif protection_changed:
+            # Only protection changed, re-read the record to get updated data
+            resp = RecordApi(self.client).read(self.existing.id, inherit="full")
+            return resp.result.model_dump(by_alias=True, exclude_none=True)
+        else:
+            return self.existing.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
         if self.check_mode:
@@ -1096,7 +1185,8 @@ class RecordModule(UniversalDDIAnsibleModule):
                 result["changed"] = True
                 result["msg"] = "Record created"
             elif self.params["state"] == "present" and self.existing is not None:
-                if self.payload_changed():
+                # Update if payload changed OR if configure_record_protection is set
+                if self.payload_changed() or self.params.get("configure_record_protection") is not None:
                     item = self.update()
                     result["changed"] = True
                     result["msg"] = "Record updated"
@@ -1142,6 +1232,7 @@ def main():
         ),
         name_in_zone=dict(type="str", default=""),
         options=dict(type="dict"),
+        configure_record_protection=dict(type="str", choices=["DDI Admin", "Global Admin", "None"], default=None),
         rdata=dict(type="dict", required=True),
         tags=dict(type="dict"),
         ttl=dict(type="int"),
