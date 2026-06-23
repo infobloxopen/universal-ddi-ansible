@@ -38,10 +38,12 @@ options:
         description:
             - "Optional. Flag which enables/disables B(SIPHealthCheck). Defaults to I(false)."
         type: bool
+        default: False
     interval:
         description:
             - "Optional. Interval value in seconds. The health check runs only for the specified interval and it is measured from the beginning of the previous check cycle. Defaults to I(15)."
         type: int
+        default: 15
     name:
         description:
             - "Display name of B(SIPHealthCheck)."
@@ -236,7 +238,7 @@ item:
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import SIPHealthCheck, HealthCheckSipApi
+    from dtc import HealthCheckSipApi, SIPHealthCheck
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -349,7 +351,9 @@ class HealthCheckSipModule(UniversalDDIAnsibleModule):
                 after=item,
             )
             result["object"] = item
-            result["id"] = self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            result["id"] = (
+                self.existing.id if self.existing is not None else item["id"] if (item and "id" in item) else None
+            )
         except ApiException as e:
             self.fail_json(msg=f"Failed to execute command: {e.status} {e.reason} {e.body}")
 
@@ -361,8 +365,8 @@ def main():
         id=dict(type="str", required=False),
         state=dict(type="str", required=False, choices=["present", "absent"], default="present"),
         comment=dict(type="str"),
-        disabled=dict(type="bool"),
-        interval=dict(type="int"),
+        disabled=dict(type="bool", default=False),
+        interval=dict(type="int", default=15),
         name=dict(type="str"),
         port=dict(type="int", default=5060),
         result_code=dict(type="int", default=200),
