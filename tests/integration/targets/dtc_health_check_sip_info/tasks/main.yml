@@ -1,0 +1,75 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        health_check_sip_name: "test-health_check_sip_name-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create SIP Health Check
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        port: 5060
+        transport: "TCP"
+        state: present
+      register: health_check_sip
+
+    - name: Get SIP Health Check information by filters (name)
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+
+    - name: Get SIP Health Check information by filters (id)
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        id: "{{ health_check_sip.id }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+
+    - name: Get SIP Health Check information by filter query
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filter_query: "name=='{{ health_check_sip_name }}'"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+
+    - name: Get SIP Health Check information by tag filters
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+
+    - name: Get SIP Health Check information by tag filter query
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+          - health_check_sip_info.objects[0].tags.location == tag_value
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete SIP Health Check"
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: absent
+      ignore_errors: true
