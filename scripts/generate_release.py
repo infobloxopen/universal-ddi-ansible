@@ -32,29 +32,33 @@ OUTPUT_DIR = REPO_ROOT / "release_output"
 
 def get_merged_prs(base_ref: str, head_ref: str, repo: str) -> list[dict]:
     """Fetch merged PRs between two refs using gh CLI."""
-    result = subprocess.run(
-        [
-            "gh", "pr", "list",
-            "--repo", repo,
-            "--state", "merged",
-            "--base", "master",
-            "--json", "number,title,body,labels,comments",
-            "--limit", "200",
-            "--search", f"merged:>={_get_tag_date(base_ref, repo)}",
-        ],
-        capture_output=True, text=True, check=True
-    )
+    search_filter = _get_merge_date_filter(base_ref, repo)
+    cmd = [
+        "gh", "pr", "list",
+        "--repo", repo,
+        "--state", "merged",
+        "--base", "master",
+        "--json", "number,title,body,labels,comments",
+        "--limit", "200",
+    ]
+    if search_filter:
+        cmd.extend(["--search", search_filter])
+
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
     prs = json.loads(result.stdout)
     return prs
 
 
-def _get_tag_date(tag: str, repo: str) -> str:
-    """Get the date of a tag to use as search filter."""
+def _get_merge_date_filter(tag: str, repo: str) -> str | None:
+    """Get a merge date filter from a release tag. Returns None if tag doesn't exist."""
     result = subprocess.run(
         ["gh", "api", f"repos/{repo}/releases/tags/{tag}", "--jq", ".published_at"],
-        capture_output=True, text=True, check=True
+        capture_output=True, text=True
     )
-    return result.stdout.strip()[:10]
+    if result.returncode != 0 or not result.stdout.strip():
+        print(f"   ⚠️  No release found for tag \'{tag}\', fetching all merged PRs")
+        return None
+    return f"merged:>={result.stdout.strip()[:10]}"
 
 
 def extract_copilot_review(pr: dict) -> str | None:
