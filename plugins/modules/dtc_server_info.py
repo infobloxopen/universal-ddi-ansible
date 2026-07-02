@@ -13,7 +13,7 @@ module: dtc_server_info
 short_description: Retrieves DTC Servers
 description:
     - Retrieves information about existing DTC Servers.
-version_added: 1.1.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

@@ -13,7 +13,7 @@ module: dtc_policy_info
 short_description: Retrieve DTC Policies
 description:
     - Retrieves information about existing DTC Policies.
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

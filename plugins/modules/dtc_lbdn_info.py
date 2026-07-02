@@ -13,7 +13,7 @@ module: dtc_lbdn_info
 short_description: Retrieves existing DTC LBDNs
 description:
     - Retrieves information about existing DTC LBDNs
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

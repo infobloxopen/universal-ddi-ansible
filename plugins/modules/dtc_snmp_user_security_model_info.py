@@ -13,7 +13,7 @@ module: dtc_snmp_user_security_model_info
 short_description: Retrieves SNMP User Security Models
 description:
     - Retrieve information about existing SNMP User Security Models
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
