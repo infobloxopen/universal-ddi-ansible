@@ -101,6 +101,8 @@ action_groups:
     - anycast_host_info
 
   dtc:
+    - dtc_health_check_http
+    - dtc_health_check_http_info
     - dtc_health_check_icmp
     - dtc_health_check_icmp_info
     - dtc_health_check_tcp
