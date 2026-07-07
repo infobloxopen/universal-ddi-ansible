@@ -163,7 +163,7 @@ EXAMPLES = r"""
         state: present
       register: health_check_tcp
     
-    - name: "Create a ICMP Health Check (required as parent)"
+    - name: "Create an ICMP Health Check (required as parent)"
       infoblox.universal_ddi.dtc_health_check_icmp:
         name: "example_icmp_health_check"
         state: present
@@ -182,11 +182,11 @@ EXAMPLES = r"""
         method: "ratio" 
         comment: "Example DTC Pool"
         health_checks:
-            - health_check_id: "{{ health_check_tcp.id }}"
-            - health_check_id: "{{ health_check_icmp.id }}"
+          - health_check_id: "{{ health_check_tcp.id }}"
+          - health_check_id: "{{ health_check_icmp.id }}"
         servers:
-            - server_id: "{{ dtc_server.id }}"
-              weight: 10
+          - server_id: "{{ dtc_server.id }}"
+            weight: 10
         pool_availability: "quorum"
         pool_servers_quorum: 1
         server_availability: "quorum"

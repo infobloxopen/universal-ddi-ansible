@@ -29,7 +29,7 @@
     - name: "Delete SNMP Health Check"
       infoblox.universal_ddi.dtc_health_check_snmp:
         name: "{{ health_check_snmp_name }}"
-        version: v1
+        version: v2c
         community: "public"
         state: absent
       ignore_errors: true
