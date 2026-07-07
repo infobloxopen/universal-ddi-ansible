@@ -1,2 +1,2 @@
 ---
-dependencies: [setup_dtc_server]
+dependencies: [setup_dtc_server, setup_dtc_health_checks]

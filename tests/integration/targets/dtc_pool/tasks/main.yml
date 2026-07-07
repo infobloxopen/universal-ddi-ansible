@@ -1,5 +1,4 @@
 ---
-# TODO: Add test case for DTC Pool with health checks
 - module_defaults:
     group/infoblox.universal_ddi.all:
       portal_url: "{{ portal_url }}"
@@ -42,6 +41,8 @@
             - dtc_pool is changed
             - dtc_pool_info is not failed
             - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].pool_availability == "any"
+            - dtc_pool_info.objects[0].server_availability == "all"
 
       - name: Create a DTC Pool (idempotent)
         infoblox.universal_ddi.dtc_pool:
@@ -180,86 +181,6 @@
             - dtc_pool_info.objects | length == 1
             - dtc_pool_info.objects[0].method == "global_availability"
 
-      - name: Create a DTC Pool with Pool availability set to All
-        infoblox.universal_ddi.dtc_pool:
-          name: "{{ dtc_pool_name }}"
-          method: "round_robin"
-          pool_availability: "all"
-          state: present
-        register: dtc_pool
-      - name: Get information about DTC Pool
-        infoblox.universal_ddi.dtc_pool_info:
-          filters:
-            name: "{{ dtc_pool_name }}"
-        register: dtc_pool_info
-      - assert:
-          that:
-            - dtc_pool is changed
-            - dtc_pool_info is not failed
-            - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].pool_availability == "all"
-
-      - name: Create a DTC Pool with pool servers quorum
-        infoblox.universal_ddi.dtc_pool:
-          name: "{{ dtc_pool_name }}"
-          method: "round_robin"
-          pool_availability: "quorum"
-          pool_servers_quorum: 1
-          state: present
-        register: dtc_pool
-      - name: Get information about DTC Pool
-        infoblox.universal_ddi.dtc_pool_info:
-          filters:
-            name: "{{ dtc_pool_name }}"
-        register: dtc_pool_info
-      - assert:
-          that:
-            - dtc_pool is changed
-            - dtc_pool_info is not failed
-            - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].pool_availability == "quorum"
-            - dtc_pool_info.objects[0].pool_servers_quorum == 1
-
-      - name: Create a DTC Pool with server availability set to Any
-        infoblox.universal_ddi.dtc_pool:
-          name: "{{ dtc_pool_name }}"
-          method: "round_robin"
-          server_availability: "any"
-          state: present
-        register: dtc_pool
-      - name: Get information about DTC Pool
-        infoblox.universal_ddi.dtc_pool_info:
-          filters:
-            name: "{{ dtc_pool_name }}"
-        register: dtc_pool_info
-      - assert:
-          that:
-            - dtc_pool is changed
-            - dtc_pool_info is not failed
-            - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].server_availability == "any"
-
-      - name: Create a DTC Pool with server health checks quorum
-        infoblox.universal_ddi.dtc_pool:
-          name: "{{ dtc_pool_name }}"
-          method: "round_robin"
-          server_availability: "quorum"
-          server_health_checks_quorum: 1
-          state: present
-        register: dtc_pool
-      - name: Get information about DTC Pool
-        infoblox.universal_ddi.dtc_pool_info:
-          filters:
-            name: "{{ dtc_pool_name }}"
-        register: dtc_pool_info
-      - assert:
-          that:
-            - dtc_pool is changed
-            - dtc_pool_info is not failed
-            - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].server_availability == "quorum"
-            - dtc_pool_info.objects[0].server_health_checks_quorum == 1
-
       - name: Create a DTC Pool with Tags
         infoblox.universal_ddi.dtc_pool:
           name: "{{ dtc_pool_name }}"
@@ -299,6 +220,48 @@
             - dtc_pool_info.objects | length == 1
             - dtc_pool_info.objects[0].ttl == 3600
 
+      - name: Create a DTC Pool with Inheritance Sources as override
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          inheritance_sources:
+            ttl:
+              action: "override"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "override"
+
+      - name: Create a DTC Pool with Inheritance Sources as inherit
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          inheritance_sources:
+            ttl:
+              action: "inherit"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "inherit"
+
       - name: Create a DTC Pool with DTC Servers
         infoblox.universal_ddi.dtc_pool:
           name: "{{ dtc_pool_name }}"
@@ -325,13 +288,15 @@
             - dtc_pool_info.objects[0].servers[1].server_id == _dtc_server2.id
             - dtc_pool_info.objects[0].servers[1].weight == 50
 
-      - name: Create a DTC Pool with Inheritance Sources as inherit
+      - name: Create a DTC Pool with Health Checks
         infoblox.universal_ddi.dtc_pool:
           name: "{{ dtc_pool_name }}"
           method: "round_robin"
-          inheritance_sources:
-            ttl:
-              action: "inherit"
+          health_checks:
+            - health_check_id: "{{ _health_check_http.id }}"
+            - health_check_id: "{{ _health_check_tcp.id }}"
+            - health_check_id: "{{ _health_check_icmp.id }}"
+            - health_check_id: "{{ _health_check_snmp.id }}"
           state: present
         register: dtc_pool
       - name: Get information about DTC Pool
@@ -344,15 +309,16 @@
             - dtc_pool is changed
             - dtc_pool_info is not failed
             - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "inherit"
+            - dtc_pool_info.objects[0].health_checks[0].health_check_id == _health_check_http.id
+            - dtc_pool_info.objects[0].health_checks[1].health_check_id == _health_check_tcp.id
+            - dtc_pool_info.objects[0].health_checks[2].health_check_id == _health_check_icmp.id
+            - dtc_pool_info.objects[0].health_checks[3].health_check_id == _health_check_snmp.id
 
-      - name: Create a DTC Pool with Inheritance Sources as override
+      - name: Create a DTC Pool with Pool availability set to All
         infoblox.universal_ddi.dtc_pool:
           name: "{{ dtc_pool_name }}"
           method: "round_robin"
-          inheritance_sources:
-            ttl:
-              action: "override"
+          pool_availability: "all"
           state: present
         register: dtc_pool
       - name: Get information about DTC Pool
@@ -365,7 +331,74 @@
             - dtc_pool is changed
             - dtc_pool_info is not failed
             - dtc_pool_info.objects | length == 1
-            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "override"
+            - dtc_pool_info.objects[0].pool_availability == "all"
+
+      - name: Create a DTC Pool with pool servers quorum
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          servers:
+            - server_id: "{{ _dtc_server1.id }}"
+            - server_id: "{{ _dtc_server2.id }}"
+          pool_availability: "quorum"
+          pool_servers_quorum: 2
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].pool_availability == "quorum"
+            - dtc_pool_info.objects[0].pool_servers_quorum == 2
+
+      - name: Create a DTC Pool with server availability set to Any
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          server_availability: "any"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].server_availability == "any"
+
+      - name: Create a DTC Pool with server health checks quorum
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          health_checks:
+            - health_check_id: "{{ _health_check_tcp.id }}"
+            - health_check_id: "{{ _health_check_icmp.id }}"
+          server_availability: "quorum"
+          server_health_checks_quorum: 2
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].server_availability == "quorum"
+            - dtc_pool_info.objects[0].server_health_checks_quorum == 2
 
   always:
     - name: Delete the DTC Pool
@@ -378,4 +411,9 @@
     - name: Delete the Server
       ansible.builtin.include_role:
         name: setup_dtc_server
+        tasks_from: cleanup.yml
+
+    - name: Delete the Health Checks
+      ansible.builtin.include_role:
+        name: setup_dtc_health_checks
         tasks_from: cleanup.yml
