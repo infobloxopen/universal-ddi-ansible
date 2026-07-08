@@ -367,7 +367,7 @@ def main():
         comment=dict(type="str"),
         disabled=dict(type="bool", default=False),
         interval=dict(type="int", default=15),
-        name=dict(type="str"),
+        name=dict(type="str", required=True),
         port=dict(type="int", default=5060),
         result_code=dict(type="int", default=200),
         result_mode=dict(type="str", choices=["ANY", "CODE_IS", "CODE_IS_NOT"], default="CODE_IS"),
