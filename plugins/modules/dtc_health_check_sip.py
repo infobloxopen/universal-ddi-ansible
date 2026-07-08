@@ -48,6 +48,7 @@ options:
         description:
             - "Display name of B(SIPHealthCheck)."
         type: str
+        required: true
     port:
         description:
             - "Optional. Destination port for the SIP OPTIONS request. Defaults to I(5060) for both TCP and UDP transport."
@@ -134,7 +135,7 @@ id:
         - ID of the HealthCheckSip object
     type: str
     returned: Always
-item:
+object:
     description:
         - HealthCheckSip object
     type: complex
