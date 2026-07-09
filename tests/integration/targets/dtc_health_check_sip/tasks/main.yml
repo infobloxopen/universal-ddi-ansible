@@ -31,7 +31,7 @@
         name: "{{ health_check_sip_name }}"
         state: present
       register: health_check_sip
-    - name: Get SIP Health Check information by ID
+    - name: Get SIP Health Check information by name
       infoblox.universal_ddi.dtc_health_check_sip_info:
         filters:
           name: "{{ health_check_sip_name }}"
