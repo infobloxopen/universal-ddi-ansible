@@ -5,7 +5,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -15,12 +15,12 @@ jobs:
       pip-cache-key: ${{ steps.cache-key.outputs.value }}
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: infoblox.universal_ddi
 
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -51,7 +51,7 @@ jobs:
           key: ${{ steps.cache-key.outputs.value }}
 
       - name: Upload collection source
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: collection-src
           path: infoblox.universal_ddi/
@@ -192,7 +192,7 @@ jobs:
 
     steps:
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
@@ -203,7 +203,7 @@ jobs:
           key: ${{ needs.prepare.outputs.pip-cache-key }}
 
       - name: Download collection source
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: collection-src
           path: infoblox.universal_ddi/
@@ -214,19 +214,11 @@ jobs:
           echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
           echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
 
-      - uses: ansible-community/ansible-test-gh-action@v1.17.0
+      - uses: ansible-community/ansible-test-gh-action@v1.18.0
         with:
-          token: ${{ github.token }}
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: 'stable-2.20'
           target-python-version: '3.12'
           testing-type: integration
           target: ${{ matrix.targets }}
 
-      - name: Upload test logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-logs-${{ matrix.group }}
-          path: infoblox.universal_ddi/tests/output/
-          retention-days: 30
