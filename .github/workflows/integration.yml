@@ -222,3 +222,31 @@ jobs:
           testing-type: integration
           target: ${{ matrix.targets }}
 
+  cleanup:
+    name: Cleanup
+    needs: integration
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Download collection source
+        uses: actions/download-artifact@v8
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+
+      - name: Install universal-ddi-python-client
+        run: pip install "git+https://github.com/infobloxopen/universal-ddi-python-client.git"
+
+      - name: Set up integration_config.yml
+        run: |
+          echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
+          echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
+
+      - name: Run cleanup
+        run: python infoblox.universal_ddi/tests/integration/cleanup.py --delete
+
