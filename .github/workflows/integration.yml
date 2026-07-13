@@ -5,32 +5,248 @@ on:
     branches:
       - master
   schedule:
-    # every day at 02:00 UTC
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * 1-5'
   workflow_dispatch:
 
 jobs:
-  integration:
+  prepare:
     runs-on: ubuntu-latest
+    outputs:
+      pip-cache-key: ${{ steps.cache-key.outputs.value }}
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: infoblox.universal_ddi
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Generate pip cache key
+        id: cache-key
+        run: |
+          echo "value=pip-${{ runner.os }}-py3.12-ansible-stable-2.20-${{ hashFiles('infoblox.universal_ddi/requirements.txt', 'infoblox.universal_ddi/test-requirements.txt') }}" >> $GITHUB_OUTPUT
+
+      - name: Restore pip cache
+        id: pip-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ steps.cache-key.outputs.value }}
+
+      - name: Pre-install ansible-core and test dependencies
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+        run: |
+          pip install 'ansible-core>=2.20,<2.21'
+          pip install -r infoblox.universal_ddi/requirements.txt
+          pip install -r infoblox.universal_ddi/test-requirements.txt
+
+      - name: Save pip cache
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ steps.cache-key.outputs.value }}
+
+      - name: Upload collection source
+        uses: actions/upload-artifact@v7
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+          retention-days: 1
+
+  integration:
+    needs: prepare
+    name: Integration (${{ matrix.group }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 9
+      matrix:
+        include:
+          - group: anycast
+            targets: >-
+              anycast_config
+              anycast_config_info
+              anycast_host
+              anycast_host_info
+
+          - group: cloud_discovery
+            targets: >-
+              cloud_discovery_providers_aws
+              cloud_discovery_providers_aws_info
+              cloud_discovery_providers_azure
+              cloud_discovery_providers_azure_info
+              cloud_discovery_providers_gcp
+              cloud_discovery_providers_gcp_info
+
+          - group: dhcp
+            targets: >-
+              dhcp_fixed_address
+              dhcp_fixed_address_info
+              dhcp_ha_group
+              dhcp_ha_group_info
+              dhcp_host
+              dhcp_host_info
+              dhcp_option_code
+              dhcp_option_code_info
+              dhcp_option_group
+              dhcp_option_group_info
+              dhcp_option_space
+              dhcp_option_space_info
+              dhcp_server
+              dhcp_server_info
+
+          - group: dns_records_1
+            targets: >-
+              dns_a_record
+              dns_a_record_info
+              dns_aaaa_record
+              dns_aaaa_record_info
+              dns_caa_record
+              dns_caa_record_info
+              dns_cname_record
+              dns_cname_record_info
+              dns_delegation
+              dns_delegation_info
+              dns_dname_record
+              dns_dname_record_info
+
+          - group: dns_records_2
+            targets: >-
+              dns_generic_record
+              dns_generic_record_info
+              dns_mx_record
+              dns_mx_record_info
+              dns_naptr_record
+              dns_naptr_record_info
+              dns_ns_record
+              dns_ns_record_info
+              dns_ptr_record
+              dns_ptr_record_info
+              dns_srv_record
+              dns_srv_record_info
+              dns_svcb_record
+              dns_svcb_record_info
+              dns_txt_record
+              dns_txt_record_info
+
+          - group: dns_infra
+            targets: >-
+              dns_acl
+              dns_acl_info
+              dns_auth_nsg
+              dns_auth_nsg_info
+              dns_auth_zone
+              dns_auth_zone_info
+              dns_forward_nsg
+              dns_forward_nsg_info
+              dns_forward_zone
+              dns_forward_zone_info
+              dns_host
+              dns_host_info
+              dns_server
+              dns_server_info
+              dns_view
+              dns_view_bulk_copy
+              dns_view_info
+
+          - group: ipam
+            targets: >-
+              ipam_address
+              ipam_address_block
+              ipam_address_block_info
+              ipam_address_info
+              ipam_host
+              ipam_host_info
+              ipam_ip_space
+              ipam_ip_space_info
+              ipam_next_available_address_block_info
+              ipam_next_available_ip_info
+              ipam_next_available_subnet_info
+              ipam_range
+              ipam_range_info
+              ipam_subnet
+              ipam_subnet_info
+
+          - group: federation
+            targets: >-
+              ipam_federation_federated_block
+              ipam_federation_federated_block_info
+              ipam_federation_federated_realm
+              ipam_federation_federated_realm_info
+
+          - group: infra_keys
+            targets: >-
+              infra_host
+              infra_host_info
+              infra_join_token
+              infra_join_token_info
+              infra_service
+              infra_service_info
+              keys_kerberos_info
+              keys_tsig
+              keys_tsig_info
+
+    steps:
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Restore pip cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ needs.prepare.outputs.pip-cache-key }}
+
+      - name: Download collection source
+        uses: actions/download-artifact@v8
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+
+      - name: Set up integration_config.yml
+        run: |
+          mkdir -p infoblox.universal_ddi/tests/integration
+          echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
+          echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
+
+      - uses: ansible-community/ansible-test-gh-action@v1.18.0
+        with:
+          collection-src-directory: infoblox.universal_ddi
+          ansible-core-version: 'stable-2.20'
+          target-python-version: '3.12'
+          testing-type: integration
+          target: ${{ matrix.targets }}
+
+  cleanup:
+    name: Cleanup
+    needs: integration
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Download collection source
+        uses: actions/download-artifact@v8
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+
+      - name: Install universal-ddi-python-client
+        run: pip install "git+https://github.com/infobloxopen/universal-ddi-python-client.git"
 
       - name: Set up integration_config.yml
         run: |
           echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
           echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - uses: ansible-community/ansible-test-gh-action@v1.17.0
-        with:
-          collection-src-directory: infoblox.universal_ddi
-          ansible-core-version: 'stable-2.20'
-          target-python-version: '3.12'
-          testing-type: integration
+      - name: Run cleanup
+        continue-on-error: true
+        run: python infoblox.universal_ddi/tests/integration/cleanup.py --delete

@@ -1032,6 +1032,8 @@ class RecordModule(UniversalDDIAnsibleModule):
 
         return self.is_changed(self.existing.model_dump(by_alias=True, exclude_none=True), self.payload_params)
 
+    # DNS record Operations using Absolute Name and View are not Supported in Ansible as querying via view
+    # is not supported by the API.
     def find(self):
         if self.params["id"] is not None:
             try:
@@ -1075,6 +1077,8 @@ class RecordModule(UniversalDDIAnsibleModule):
         update_body = self.validate_readonly_on_update(self.existing, update_body, ["type", "zone"])
 
         resp = RecordApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+        if resp is None or resp.result is None:
+            resp = RecordApi(self.client).read(self.existing.id, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):

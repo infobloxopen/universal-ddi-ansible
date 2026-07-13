@@ -2631,6 +2631,8 @@ class IPSpaceModule(UniversalDDIAnsibleModule):
             return None
 
         resp = IpSpaceApi(self.client).update(id=self.existing.id, body=self.payload, inherit="full")
+        if resp is None or resp.result is None:
+            resp = IpSpaceApi(self.client).read(self.existing.id, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):
