@@ -1,0 +1,327 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dtc_policy_name: "test-dtc-policy-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DTC Policy (check_mode)
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: present
+      check_mode: true
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 0
+
+    - name: Create a DTC Policy
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+
+    - name: Create a DTC Policy (idempotent)
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: present
+      register: dtc_policy
+    - assert:
+        that:
+          - dtc_policy is not changed
+          - dtc_policy is not failed
+
+    - name: Delete a DTC Policy (check_mode)
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: absent
+      check_mode: true
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+
+    - name: Delete a DTC Policy
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: absent
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 0
+
+    - name: Delete a DTC Policy (idempotent)
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        state: absent
+      register: dtc_policy
+    - assert:
+        that:
+          - dtc_policy is not changed
+          - dtc_policy is not failed
+
+    - name: Create a DTC Policy with comment
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        comment: "sample comment"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].comment == "sample comment"
+
+    - name: Create a DTC Policy with disabled flag
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        disabled: true
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].disabled == true
+
+    - name: Create a DTC Policy with TTL
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        ttl: 1200
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].ttl == 1200
+
+    - name: Create a DTC Policy with method set to global_availability
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "global_availability"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].method == "global_availability"
+
+    - name: Create a DTC Policy with method set to ratio
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "ratio"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].method == "ratio"
+
+    - name: Create a DTC Policy with Tags
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].tags.location == tag_value
+
+    - name: Create a DTC Policy with inheritance sources set to override
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "round_robin"
+        inheritance_sources:
+          ttl:
+            action: "override"
+        ttl: 4800
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].inheritance_sources.ttl.action == "override"
+          - dtc_policy_info.objects[0].ttl == 4800
+
+    - name: Create a DTC Policy with Pools
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "ratio"
+        pools:
+          - pool_id: "{{ _dtc_pool_1.id }}"
+            weight: 10
+          - pool_id: "{{ _dtc_pool_2.id }}"
+            weight: 20
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].pools | length == 2
+          - dtc_policy_info.objects[0].pools[0].pool_id == _dtc_pool_1.id
+          - dtc_policy_info.objects[0].pools[0].weight == 10
+          - dtc_policy_info.objects[0].pools[1].pool_id == _dtc_pool_2.id
+          - dtc_policy_info.objects[0].pools[1].weight == 20
+
+    - name: Create a DTC Policy with Rules
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "ratio"
+        pools:
+          - pool_id: "{{ _dtc_pool_3.id }}"
+            weight: 10
+        rules:
+          - source: "subnet"
+            name: "Subnet rule 1"
+            code: "nodata"
+            subnets:
+              - "10.0.0.0/24"
+              - "20.0.0.0/24"
+          - source: "subnet"
+            name: "Subnet rule 2"
+            destination: "pool"
+            pool_id: "{{ _dtc_pool_3.id }}"
+            subnets:
+              - "40.0.0.0/24"
+          - source: "default"
+            name: "Default"
+            code: "nxdomain"
+        state: present
+      register: dtc_policy
+    - name: Get information about the DTC Policy
+      infoblox.universal_ddi.dtc_policy_info:
+        filters:
+          name: "{{ dtc_policy_name }}"
+      register: dtc_policy_info
+    - assert:
+        that:
+          - dtc_policy is changed
+          - dtc_policy is not failed
+          - dtc_policy_info.objects | length == 1
+          - dtc_policy_info.objects[0].rules | length == 3
+          - dtc_policy_info.objects[0].rules[0].source == "subnet"
+          - dtc_policy_info.objects[0].rules[0].name == "Subnet rule 1"
+          - dtc_policy_info.objects[0].rules[0].code == "nodata"
+          - dtc_policy_info.objects[0].rules[0].subnets | length == 2
+          - dtc_policy_info.objects[0].rules[0].subnets[0] == "10.0.0.0/24"
+          - dtc_policy_info.objects[0].rules[0].subnets[1] == "20.0.0.0/24"
+          - dtc_policy_info.objects[0].rules[1].source == "subnet"
+          - dtc_policy_info.objects[0].rules[1].name == "Subnet rule 2"
+          - dtc_policy_info.objects[0].rules[1].destination == "pool"
+          - dtc_policy_info.objects[0].rules[1].pool_id == _dtc_pool_3.id
+          - dtc_policy_info.objects[0].rules[1].subnets[0] == "40.0.0.0/24"
+          - dtc_policy_info.objects[0].rules[2].source == "default"
+          - dtc_policy_info.objects[0].rules[2].name == "Default"
+          - dtc_policy_info.objects[0].rules[2].code == "nxdomain"
+
+  always:
+    - name: Delete a DTC Policy
+      infoblox.universal_ddi.dtc_policy:
+        name: "{{ dtc_policy_name }}"
+        method: "ratio"
+        state: absent
+
+    - name: Delete DTC Pools
+      ansible.builtin.include_role:
+        name: setup_dtc_pool
+        tasks_from: cleanup.yml

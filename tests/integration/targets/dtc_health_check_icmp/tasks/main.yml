@@ -1,0 +1,233 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        health_check_icmp_name: "test-health_check_icmp_name-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create ICMP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        state: present
+      check_mode: true
+      register: health_check_icmp_check
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_check_info
+    - assert:
+        that:
+          - health_check_icmp_check is changed
+          - health_check_icmp_check_info is not failed
+          - health_check_icmp_check_info.objects | length == 0
+
+    - name: Create an ICMP Health Check
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_icmp_check
+    - name: Get ICMP Health Check
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_check_info
+    - assert:
+        that:
+          - health_check_icmp_check_info.objects | length == 1
+          - health_check_icmp_check_info.objects[0].name == health_check_icmp_name
+
+    - name: Create ICMP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_icmp_idempotent
+    - assert:
+        that:
+          - health_check_icmp_idempotent is not changed
+          - health_check_icmp_idempotent is not failed
+
+    - name: Delete ICMP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      check_mode: true
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp is changed
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+
+    - name: Delete ICMP Health Check
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp is changed
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 0
+
+    - name: Delete ICMP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: absent
+      register: health_check_icmp
+    - assert:
+        that:
+          - not health_check_icmp is changed
+          - health_check_icmp.failed is not defined or not health_check_icmp.failed
+
+    - name: Create ICMP Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        comment: "Test Comment"
+        state: present
+      register: health_check_icmp_comment
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].comment == "Test Comment"
+
+    - name: Create ICMP Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        tags:
+          test_tag: "{{ tag_value }}"
+        state: present
+      register: health_check_icmp_tags
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_tags_info
+    - assert:
+        that:
+          - health_check_icmp_tags_info is not failed
+          - health_check_icmp_tags_info.objects | length == 1
+          - health_check_icmp_tags_info.objects[0].tags.test_tag == "{{ tag_value }}"
+
+    - name: Create ICMP Health Check with disabled true
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        disabled: true
+        state: present
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].disabled == true
+
+    - name: Create ICMP Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        interval: 20
+        state: present
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].interval == 20
+
+    - name: Create ICMP Health Check with retry_down
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        retry_down: 2
+        state: present
+      register: health_check_icmp_retry_down
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].retry_down == 2
+
+    - name: Create ICMP Health Check with retry_up
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        retry_up: 3
+        state: present
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].retry_up == 3
+
+    - name: Create ICMP Health Check with timeout
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        timeout: 10
+        interval: 20
+        state: present
+      register: health_check_icmp
+    - name: Get ICMP Health Check information
+      infoblox.universal_ddi.dtc_health_check_icmp_info:
+        filters:
+          name: "{{ health_check_icmp_name }}"
+      register: health_check_icmp_info
+    - assert:
+        that:
+          - health_check_icmp_info is not failed
+          - health_check_icmp_info.objects | length == 1
+          - health_check_icmp_info.objects[0].timeout == 10
+
+  always:
+    - name: "Delete ICMP Health Check"
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        state: absent
+      ignore_errors: true
