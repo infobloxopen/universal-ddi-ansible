@@ -22,11 +22,11 @@ from pathlib import Path
 from typing import Iterator
 
 import universal_ddi_client
-from universal_ddi_client import ApiException
 from dns_config import AclApi, AuthNsgApi, AuthZoneApi, ForwardNsgApi, ForwardZoneApi, ServerApi, ViewApi
 from infra_mgmt import DetailApi, HostsApi, ServicesApi
 from ipam import IpSpaceApi, OptionGroupApi, OptionSpaceApi
 from ipam_federation import FederatedRealmApi
+from universal_ddi_client import ApiException
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -40,6 +40,7 @@ _PAGE_SIZE = 500
 # ---------------------------------------------------------------------------
 # Client factory
 # ---------------------------------------------------------------------------
+
 
 def _build_client(portal_url: str, portal_key: str) -> universal_ddi_client.ApiClient:
     config = universal_ddi_client.Configuration(
@@ -71,6 +72,7 @@ def _load_yaml_config(path: Path) -> dict:
 # Pagination helper
 # ---------------------------------------------------------------------------
 
+
 def _paginate(api_list_fn, **kwargs) -> Iterator:
     """
     Yield every result from a paginated list call.
@@ -91,6 +93,7 @@ def _paginate(api_list_fn, **kwargs) -> Iterator:
 # ---------------------------------------------------------------------------
 # Base cleaner
 # ---------------------------------------------------------------------------
+
 
 class ResourceCleaner(ABC):
     """
@@ -144,10 +147,7 @@ class ResourceCleaner(ABC):
         print(f"\n{'[DRY RUN] ' if dry_run else ''}=== {self.resource_name} ===")
 
         try:
-            candidates = [
-                r for r in self.list_all()
-                if self.get_name(r) and self.get_name(r).startswith(prefixes)
-            ]
+            candidates = [r for r in self.list_all() if self.get_name(r) and self.get_name(r).startswith(prefixes)]
         except ApiException as exc:
             print(f"  ERROR listing resources: {exc}")
             return 0, 1
@@ -356,7 +356,8 @@ class DetailServicesCleaner(ResourceCleaner):
 
         try:
             candidates = [
-                svc for svc in self.list_all()
+                svc
+                for svc in self.list_all()
                 if svc.hosts
                 and svc.hosts[0].composite_status != "online"
                 and svc.hosts[0].display_name in _SERVICE_HOST_NAMES
@@ -435,6 +436,7 @@ CLEANERS: list[type[ResourceCleaner]] = [
 # Runner
 # ---------------------------------------------------------------------------
 
+
 def run(
     portal_url: str,
     portal_key: str,
@@ -470,6 +472,7 @@ def run(
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
@@ -523,16 +526,8 @@ def main() -> None:
 
     # Credential resolution order: CLI > env var > config file
     cfg = _load_yaml_config(Path(args.config))
-    portal_url = (
-        args.portal_url
-        or os.environ.get("INFOBLOX_PORTAL_URL")
-        or cfg.get("portal_url")
-    )
-    portal_key = (
-        args.portal_key
-        or os.environ.get("INFOBLOX_PORTAL_KEY")
-        or cfg.get("portal_key")
-    )
+    portal_url = args.portal_url or os.environ.get("INFOBLOX_PORTAL_URL") or cfg.get("portal_url")
+    portal_key = args.portal_key or os.environ.get("INFOBLOX_PORTAL_KEY") or cfg.get("portal_key")
 
     if not portal_url or not portal_key:
         sys.exit(

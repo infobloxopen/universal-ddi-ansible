@@ -435,9 +435,7 @@ def main():
     )
 
     if module.params["mode"] == "anycast":
-        module.fail_json(
-            msg="The 'anycast' mode is deprecated and no longer supported."
-        )
+        module.fail_json(msg="The 'anycast' mode is deprecated and no longer supported.")
 
     module.run_command()
 
