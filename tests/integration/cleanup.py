@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Integration test cleanup script.
 
@@ -63,7 +62,7 @@ def _load_yaml_config(path: Path) -> dict:
                 continue
             if ":" not in line:
                 continue
-            key, _, value = line.partition(":")
+            key, value = line.split(":", 1)
             result[key.strip()] = value.strip().strip('"').strip("'")
     return result
 
@@ -114,12 +113,10 @@ class ResourceCleaner(ABC):
     @abstractmethod
     def list_all(self):
         """Return an iterable of resource objects with .id and a name attribute."""
-        ...
 
     @abstractmethod
     def delete(self, resource_id: str) -> None:
         """Delete the resource identified by resource_id."""
-        ...
 
     def get_name(self, resource) -> str | None:
         """Extract the display name from a resource object.
@@ -188,7 +185,7 @@ class DnsViewCleaner(ResourceCleaner):
     """Cleans up DNS Views, including dependent zones when necessary."""
 
     resource_name = "DNS Views"
-    default_prefixes = ("my-test-view","view-",)
+    default_prefixes = ("my-test-view", "view-")
 
     def list_all(self):
         return _paginate(ViewApi(self.client).list)
@@ -369,7 +366,7 @@ class DetailServicesCleaner(ResourceCleaner):
             return 0, 1
 
         if not candidates:
-            print(f"  Nothing to clean up")
+            print("Nothing to clean up")
             return 0, 0
 
         deleted = errors = 0

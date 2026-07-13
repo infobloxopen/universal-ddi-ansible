@@ -250,4 +250,3 @@ jobs:
       - name: Run cleanup
         continue-on-error: true
         run: python infoblox.universal_ddi/tests/integration/cleanup.py --delete
-
