@@ -1,0 +1,381 @@
+---
+# TODO: Add test case for DTC Pool with health checks
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+      - ansible.builtin.set_fact:
+          dtc_pool_name: "test_dtc_pool-{{ 99999 | random }}"
+
+      - name: Create a DTC Pool (check mode)
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: present
+        check_mode: true
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 0
+
+      - name: Create a DTC Pool
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+
+      - name: Create a DTC Pool (idempotent)
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: present
+        register: dtc_pool
+      - assert:
+          that:
+            - dtc_pool is not changed
+            - dtc_pool is not failed
+
+      - name: Delete a DTC Pool (check mode)
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: absent
+        check_mode: true
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+
+      - name: Delete a DTC Pool
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: absent
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 0
+
+      - name: Delete a DTC Pool (idempotent)
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          state: absent
+        register: dtc_pool
+      - assert:
+          that:
+            - dtc_pool is not changed
+            - dtc_pool is not failed
+
+      - name: Create a DTC Pool
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "ratio"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].name == dtc_pool_name
+            - dtc_pool_info.objects[0].method == "ratio"
+            - dtc_pool_info.objects[0].pool_availability == "any"
+            - dtc_pool_info.objects[0].disabled == false
+            - dtc_pool_info.objects[0].server_availability == "all"
+
+      - name: Create a DTC Pool with comment
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "ratio"
+          comment: "Test comment"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].name == dtc_pool_name
+            - dtc_pool_info.objects[0].method == "ratio"
+            - dtc_pool_info.objects[0].comment == "Test comment"
+
+      - name: Create a DTC Pool with disabled
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          disabled: true
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].disabled == true
+
+      - name: Create a DTC Pool with updated method
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "global_availability"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].method == "global_availability"
+
+      - name: Create a DTC Pool with Pool availability set to All
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          pool_availability: "all"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].pool_availability == "all"
+
+      - name: Create a DTC Pool with pool servers quorum
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          pool_availability: "quorum"
+          pool_servers_quorum: 1
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].pool_availability == "quorum"
+            - dtc_pool_info.objects[0].pool_servers_quorum == 1
+
+      - name: Create a DTC Pool with server availability set to Any
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          server_availability: "any"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].server_availability == "any"
+
+      - name: Create a DTC Pool with server health checks quorum
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          server_availability: "quorum"
+          server_health_checks_quorum: 1
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].server_availability == "quorum"
+            - dtc_pool_info.objects[0].server_health_checks_quorum == 1
+
+      - name: Create a DTC Pool with Tags
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          tags:
+            location: "site-1"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].tags.location == "site-1"
+
+      - name: Create a DTC pool with TTL
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          ttl: 3600
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].ttl == 3600
+
+      - name: Create a DTC Pool with DTC Servers
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "ratio"
+          servers:
+            - server_id: "{{ _dtc_server1.id }}"
+              weight: 100
+            - server_id: "{{ _dtc_server2.id }}"
+              weight: 50
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].servers[0].server_id == _dtc_server1.id
+            - dtc_pool_info.objects[0].servers[0].weight == 100
+            - dtc_pool_info.objects[0].servers[1].server_id == _dtc_server2.id
+            - dtc_pool_info.objects[0].servers[1].weight == 50
+
+      - name: Create a DTC Pool with Inheritance Sources as inherit
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          inheritance_sources:
+            ttl:
+              action: "inherit"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "inherit"
+
+      - name: Create a DTC Pool with Inheritance Sources as override
+        infoblox.universal_ddi.dtc_pool:
+          name: "{{ dtc_pool_name }}"
+          method: "round_robin"
+          inheritance_sources:
+            ttl:
+              action: "override"
+          state: present
+        register: dtc_pool
+      - name: Get information about DTC Pool
+        infoblox.universal_ddi.dtc_pool_info:
+          filters:
+            name: "{{ dtc_pool_name }}"
+        register: dtc_pool_info
+      - assert:
+          that:
+            - dtc_pool is changed
+            - dtc_pool_info is not failed
+            - dtc_pool_info.objects | length == 1
+            - dtc_pool_info.objects[0].inheritance_sources.ttl.action == "override"
+
+  always:
+    - name: Delete the DTC Pool
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_name }}"
+        method: "round_robin"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete the Server
+      ansible.builtin.include_role:
+        name: setup_dtc_server
+        tasks_from: cleanup.yml

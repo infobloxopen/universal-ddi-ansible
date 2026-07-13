@@ -1,0 +1,346 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        record_name: "test-sshfp-record-{{ 999999 | random | string }}"
+
+    - name: Create an SSHFP Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: present
+      check_mode: true
+      register: sshfp_record
+    - name: Get information about the SSHFP Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record is changed
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 0
+
+    - name: Create an SSHFP Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - name: Get information about the SSHFP Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record is changed
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].type == "SSHFP"
+          - sshfp_record_info.objects[0].zone == sshfp_record.object.zone
+
+    - name: Create an SSHFP Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - assert:
+        that:
+          - sshfp_record is not changed
+          - sshfp_record is not failed
+
+    - name: Delete the SSHFP Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: absent
+      check_mode: true
+      register: sshfp_record
+    - name: Get information about the SSHFP Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record is changed
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+
+    - name: Delete the SSHFP Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: absent
+      register: sshfp_record
+    - name: Get information about the SSHFP Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 0
+
+    - name: Delete the SSHFP Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 1
+          fingerprint_type: 1
+          fingerprint: "1234567890abcdef1234567890abcdef12345678"
+        type: "SSHFP"
+        state: absent
+      register: sshfp_record
+    - assert:
+        that:
+          - sshfp_record is not changed
+          - sshfp_record is not failed
+
+    - name: Create SSHFP Record with comment
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        comment: "This is a test SSHFP Record"
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].comment == "This is a test SSHFP Record"
+
+    - name: Create SSHFP Record with TTL
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        ttl: 3600
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].ttl == 3600
+
+    - name: Create SSHFP Record with Disabled
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        disabled: true
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].disabled == true
+
+    - name: Create SSHFP Record with Tags
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 2
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        tags:
+          location: "site-1"
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].tags.location == "site-1"
+
+    - name: Update SSHFP Record algorithm
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 4
+          fingerprint_type: 2
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].rdata.algorithm == 4
+
+    - name: Update SSHFP Record Fingerprint Type
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 4
+          fingerprint_type: 1
+          fingerprint: "abcdefabcdefabcdefabcdefabcdefabcdefabcd"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].rdata.fingerprint_type == 1
+
+    - name: Update SSHFP Record Fingerprint
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 4
+          fingerprint_type: 1
+          fingerprint: "fedcbafedcbafedcbafedcbafedcbafedcbafedc"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - name: Get SSHFP Record info
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].rdata.fingerprint == "fedcbafedcbafedcbafedcbafedcbafedcbafedc"
+
+    - name: Create SSHFP Record with Name in Zone and Zone
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 4
+          fingerprint_type: 1
+          fingerprint: "fedcbafedcbafedcbafedcbafedcbafedcbafedc"
+        type: "SSHFP"
+        state: present
+      register: sshfp_record
+    - name: Get Information about the SSHFP Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "{{ record_name }}"
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record.id
+          - sshfp_record_info.objects[0].name_in_zone == sshfp_record.object.name_in_zone
+          - sshfp_record_info.objects[0].zone == sshfp_record.object.zone
+
+  always:
+    - name: Delete the SSHFP Record
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 4
+          fingerprint_type: 1
+          fingerprint: "fedcbafedcbafedcbafedcbafedcbafedcbafedc"
+        type: "SSHFP"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete the Auth Zone
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml

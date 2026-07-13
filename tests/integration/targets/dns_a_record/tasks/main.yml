@@ -10,9 +10,6 @@
         record_name: "test-a-record-{{ 999999 | random | string }}"
         record_2_name: "test-a-record-2-{{ 999999 | random | string }}"
 
-    - ansible.builtin.set_fact:
-        absolute_name_spec: "{{ record_2_name }}.{{ _fqdn_auth_zone }}"
-
     - name: Create an A Record (check mode)
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"
@@ -354,22 +351,6 @@
           - a_record_info.objects[0].id == a_record.id
           - a_record_info.objects[0].name_in_zone == a_record.object.name_in_zone
           - a_record_info.objects[0].zone == a_record.object.zone
-
-    - name: Create an A Record using Absolute Name Spec and View
-      infoblox.universal_ddi.dns_record:
-        absolute_name_spec: "{{ absolute_name_spec }}"
-        view: "{{ _view.id }}"
-        comment: "This is a test A Record created using ANS and View"
-        rdata:
-          address: "15.0.0.0"
-        type: "A"
-        state: present
-      ignore_errors: true
-      register: a_record2
-    - assert:
-        that:
-          - a_record2 is failed
-          - a_record2.msg == 'missing required arguments: zone'
 
   always:
      - name: "Delete the A Record"

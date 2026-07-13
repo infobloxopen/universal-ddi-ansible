@@ -1,0 +1,81 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dtc_lbdn_name: "test-dtc-lbdn-{{ 999999 | random | string }}."
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DTC LBDN
+      infoblox.universal_ddi.dtc_lbdn:
+        name: "{{ dtc_lbdn_name }}"
+        view: "{{ _view.id }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: dtc_lbdn
+
+    - name: Get DTC LBDN Information by ID
+      infoblox.universal_ddi.dtc_lbdn_info:
+        id: "{{ dtc_lbdn.id }}"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.object.id
+
+    - name: Get DTC LBDN information by filters (Name and View)
+      infoblox.universal_ddi.dtc_lbdn_info:
+        filters:
+          name: "{{ dtc_lbdn_name }}"
+          view: "{{ _view.id }}"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+
+    - name: Get DTC LBDN information by filter (only Name)
+      infoblox.universal_ddi.dtc_lbdn_info:
+        filters:
+          name: "{{ dtc_lbdn_name }}"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+
+    - name: Get DTC LBDN information by raw filter query
+      infoblox.universal_ddi.dtc_lbdn_info:
+        filter_query: "name=='{{ dtc_lbdn_name }}' and view=='{{ _view.id }}'"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+
+    - name: Get DTC LBDN information by tag filters
+      infoblox.universal_ddi.dtc_lbdn_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: dtc_lbdn_info
+    - assert:
+        that:
+          - dtc_lbdn_info.objects | length == 1
+          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+
+
+  always:
+    - name: Delete the DTC LBDN
+      infoblox.universal_ddi.dtc_lbdn:
+        name: "{{ dtc_lbdn_name }}"
+        view: "{{ _view.id }}"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete the View
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml

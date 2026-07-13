@@ -5,17 +5,65 @@ on:
     branches:
       - master
   schedule:
-    # every day at 02:00 UTC
-    - cron: '0 2 * * *'
+    - cron: '0 2 * * 1-5'
   workflow_dispatch:
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      pip-cache-key: ${{ steps.cache-key.outputs.value }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v7
+        with:
+          path: infoblox.universal_ddi
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Generate pip cache key
+        id: cache-key
+        run: |
+          echo "value=pip-${{ runner.os }}-py3.12-ansible-stable-2.20-${{ hashFiles('infoblox.universal_ddi/requirements.txt', 'infoblox.universal_ddi/test-requirements.txt') }}" >> $GITHUB_OUTPUT
+
+      - name: Restore pip cache
+        id: pip-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ steps.cache-key.outputs.value }}
+
+      - name: Pre-install ansible-core and test dependencies
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+        run: |
+          pip install 'ansible-core>=2.20,<2.21'
+          pip install -r infoblox.universal_ddi/requirements.txt
+          pip install -r infoblox.universal_ddi/test-requirements.txt
+
+      - name: Save pip cache
+        if: steps.pip-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ steps.cache-key.outputs.value }}
+
+      - name: Upload collection source
+        uses: actions/upload-artifact@v7
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+          retention-days: 1
+
   integration:
+    needs: prepare
     name: Integration (${{ matrix.group }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 5
+      max-parallel: 9
       matrix:
         include:
           - group: anycast
@@ -143,25 +191,63 @@ jobs:
               keys_tsig_info
 
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v4
-        with:
-          path: infoblox.universal_ddi
-
-      - name: Set up integration_config.yml
-        run: |
-          echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
-          echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
-
       - name: Set up Python 3.12
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
 
-      - uses: ansible-community/ansible-test-gh-action@v1.17.0
+      - name: Restore pip cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/.cache/pip
+          key: ${{ needs.prepare.outputs.pip-cache-key }}
+
+      - name: Download collection source
+        uses: actions/download-artifact@v8
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+
+      - name: Set up integration_config.yml
+        run: |
+          mkdir -p infoblox.universal_ddi/tests/integration
+          echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
+          echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
+
+      - uses: ansible-community/ansible-test-gh-action@v1.18.0
         with:
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: 'stable-2.20'
           target-python-version: '3.12'
           testing-type: integration
           target: ${{ matrix.targets }}
+
+  cleanup:
+    name: Cleanup
+    needs: integration
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Download collection source
+        uses: actions/download-artifact@v8
+        with:
+          name: collection-src
+          path: infoblox.universal_ddi/
+
+      - name: Install universal-ddi-python-client
+        run: pip install "git+https://github.com/infobloxopen/universal-ddi-python-client.git"
+
+      - name: Set up integration_config.yml
+        run: |
+          echo "portal_key: ${{ secrets.INFOBLOX_PORTAL_KEY }}" > infoblox.universal_ddi/tests/integration/integration_config.yml
+          echo "portal_url: ${{ secrets.INFOBLOX_PORTAL_URL }}" >> infoblox.universal_ddi/tests/integration/integration_config.yml
+
+      - name: Run cleanup
+        continue-on-error: true
+        run: python infoblox.universal_ddi/tests/integration/cleanup.py --delete
+

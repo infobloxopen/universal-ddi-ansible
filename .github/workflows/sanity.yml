@@ -37,16 +37,16 @@ jobs:
 
     steps:
       - name: Checkout the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: infoblox.universal_ddi
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
 
-      - uses: ansible-community/ansible-test-gh-action@v1.17.0
+      - uses: ansible-community/ansible-test-gh-action@v1.18.0
         with:
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: ${{ matrix.ansible }}
