@@ -9,6 +9,6 @@
       infoblox.universal_ddi.anycast_config:
         name: "{{ anycast_config_name }}"
         anycast_ip_address: "10.1.0.0"
-        service: "DHCP"
+        service: "DNS"
         state: absent
       ignore_errors: true
