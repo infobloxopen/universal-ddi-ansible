@@ -506,6 +506,45 @@
           - ip_space_info.objects[0].inheritance_sources.hostname_rewrite_block.action == "inherit"
           - ip_space_info.objects[0].inheritance_sources.vendor_specific_option_option_space.action == "inherit"
 
+    - name: "Create an IP Space with Default Realm"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms:
+          - "{{ _federated_realm1.id }}"
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 1
+          - ip_space_info.objects[0].default_realms == [
+            _federated_realm1.id
+            ]
+
+    - name: "Disassociate the IP Space from Default Realm"
+      infoblox.universal_ddi.ipam_ip_space:
+        name: "{{ name }}"
+        default_realms: [ ]
+        state: "present"
+      register: ip_space
+    - name: Get information about the IP Space
+      infoblox.universal_ddi.ipam_ip_space_info:
+        filters:
+          name: "{{ name }}"
+      register: ip_space_info
+    - assert:
+        that:
+          - ip_space is not failed
+          - ip_space_info.objects | length == 1
+          - ip_space_info.objects[0].default_realms | length == 0
+          - ip_space_info.objects[0].default_realms == []
+
     - name: "Create an IP space with DHCP Options"
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"
@@ -534,6 +573,10 @@
 
   always:
     # Cleanup if the test fails
+    - ansible.builtin.include_role:
+        name: "setup_federation_federated_block"
+        tasks_from: "cleanup.yml"
+
     - name: "Delete IP Space"
       infoblox.universal_ddi.ipam_ip_space:
         name: "{{ name }}"

@@ -27,6 +27,7 @@ from universal_ddi_client import ApiException
 from dns_config import AclApi, AuthNsgApi, AuthZoneApi, ForwardNsgApi, ForwardZoneApi, ServerApi, ViewApi
 from infra_mgmt import DetailApi, HostsApi, ServicesApi
 from ipam import IpSpaceApi, OptionGroupApi, OptionSpaceApi
+from ipam_federation import FederatedRealmApi
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -308,6 +309,19 @@ class OptionGroupCleaner(ResourceCleaner):
         OptionGroupApi(self.client).delete(resource_id)
 
 
+class FederatedRealmCleaner(ResourceCleaner):
+    """Cleans up IPAM Federation Federated Realms."""
+
+    resource_name = "Federated Realms"
+    default_prefixes = ("test-federated-realm-",)
+
+    def list_all(self):
+        return _paginate(FederatedRealmApi(self.client).list)
+
+    def delete(self, resource_id: str) -> None:
+        FederatedRealmApi(self.client).delete(resource_id)
+
+
 class IpSpaceCleaner(ResourceCleaner):
     """Cleans up IPAM IP Spaces."""
 
@@ -412,6 +426,7 @@ CLEANERS: list[type[ResourceCleaner]] = [
     DnsViewCleaner,
     OptionSpaceCleaner,
     OptionGroupCleaner,
+    FederatedRealmCleaner,
     IpSpaceCleaner,
     # Example — uncomment and import the relevant API to enable:
     # AddressBlockCleaner,
