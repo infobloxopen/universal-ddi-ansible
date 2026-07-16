@@ -25,7 +25,7 @@ from openai import OpenAI
 
 SCRIPT_DIR = Path(__file__).parent
 TEMPLATES_DIR = SCRIPT_DIR / "templates"
-REPO_ROOT = SCRIPT_DIR.parent
+REPO_ROOT = SCRIPT_DIR.parent.parent  # .github/scripts/ -> .github/ -> repo root
 CHANGELOG_PATH = REPO_ROOT / "changelogs" / "changelog.yaml"
 OUTPUT_DIR = REPO_ROOT / "release_output"
 
