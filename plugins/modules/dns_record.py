@@ -858,7 +858,7 @@ item:
                     returned: Always
                 port:
                     description:
-                        - "For B(SRV) record, an unsigned 16-bit integer which specifies the port on this target host of this service. The range of the value is 0 to 65535. This is often as specified in Assigned Numbers but need not be."
+                        - "For B(SRV) record, an unsigned 16-bit integer which specifies the port on this target host of this service. The range of the value is 0 to 65535. This is often as specified in Assigned Numbers but need not be. "
                     type: int
                     returned: Always
                 priority:
