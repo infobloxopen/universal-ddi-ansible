@@ -1045,6 +1045,7 @@ from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules imp
 
 try:
     from dns_data import Record, RecordApi
+    from dns_data.models import ConfigureRecordProtectionRequest, ProtectedRecordItem
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
@@ -1117,15 +1118,17 @@ class RecordModule(UniversalDDIAnsibleModule):
 
     def configure_record_protection(self, record=None):
         protection = self.params.get("configure_record_protection")
+        if protection is None:
+            return
         current = record if record is not None else self.existing
         zone_id = current.zone if current is not None else self.params.get("zone")
         rname = current.name_in_zone if current is not None else self.payload.name_in_zone
         rtype = current.type if current is not None else self.payload.type
-        payload = {"zone_id": zone_id, "protected_records": [{"rname": rname, "level": protection, "rtype": rtype}]}
-
-        if protection is not None:
-            RecordApi(self.client).configure_record_protection(body=payload)
-        return
+        body = ConfigureRecordProtectionRequest(
+            zone_id=zone_id,
+            protected_records=[ProtectedRecordItem(rname=rname, level=protection, rtype=rtype)],
+        )
+        RecordApi(self.client).configure_record_protection(body=body)
 
     def create(self):
         if self.check_mode:
@@ -1185,8 +1188,15 @@ class RecordModule(UniversalDDIAnsibleModule):
                 result["changed"] = True
                 result["msg"] = "Record created"
             elif self.params["state"] == "present" and self.existing is not None:
-                # Update if payload changed OR if configure_record_protection is set
-                if self.payload_changed() or self.params.get("configure_record_protection") is not None:
+                protection_param = self.params.get("configure_record_protection")
+                protection_changed = False
+                if protection_param is not None:
+                    current_protection = self._normalize_protection_level(
+                        self.existing.protection.level if self.existing.protection else None
+                    )
+                    desired_protection = self._normalize_protection_level(protection_param)
+                    protection_changed = current_protection != desired_protection
+                if self.payload_changed() or protection_changed:
                     item = self.update()
                     result["changed"] = True
                     result["msg"] = "Record updated"
