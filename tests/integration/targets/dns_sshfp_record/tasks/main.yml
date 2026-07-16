@@ -322,7 +322,212 @@
           - sshfp_record_info.objects[0].name_in_zone == sshfp_record.object.name_in_zone
           - sshfp_record_info.objects[0].zone == sshfp_record.object.zone
 
+    - name: Create a SSHFP Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 1
+          fingerprint: "aabbccdd1122334455667788aabbccdd11223344"
+        type: "SSHFP"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: sshfp_record_ddi_admin
+    - name: Get information about the SSHFP Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_ddi_admin is changed
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record_ddi_admin.id
+          - sshfp_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a SSHFP Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: sshfp_record_global_admin
+    - name: Get information about the SSHFP Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record_global_admin is changed
+          - sshfp_record_info is not failed
+          - sshfp_record_info.objects | length == 1
+          - sshfp_record_info.objects[0].id == sshfp_record_global_admin.id
+          - sshfp_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create a SSHFP Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 1
+          fingerprint: "aabbccdd1122334455667788aabbccdd11223344"
+        type: "SSHFP"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: sshfp_record
+    - assert:
+        that:
+          - sshfp_record is not changed
+          - sshfp_record is not failed
+
+    - name: Create a SSHFP Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: sshfp_record
+    - assert:
+        that:
+          - sshfp_record is not changed
+          - sshfp_record is not failed
+
+    - name: Update SSHFP Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 1
+          fingerprint: "aabbccdd1122334455667788aabbccdd11223344"
+        type: "SSHFP"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: sshfp_record
+    - name: Get information about the SSHFP Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record is changed
+          - sshfp_record is not failed
+          - sshfp_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from SSHFP Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        configure_record_protection: "None"
+        state: present
+      register: sshfp_record
+    - name: Get information about the SSHFP Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SSHFP"
+      register: sshfp_record_info
+    - assert:
+        that:
+          - sshfp_record is changed
+          - sshfp_record is not failed
+          - sshfp_record_info.objects[0]['protection'] is not defined or sshfp_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from SSHFP Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        configure_record_protection: "None"
+        state: present
+      register: sshfp_record
+    - assert:
+        that:
+          - sshfp_record is not changed
+          - sshfp_record is not failed
+
   always:
+    - name: "Remove protection from SSHFP Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 1
+          fingerprint: "aabbccdd1122334455667788aabbccdd11223344"
+        type: "SSHFP"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the SSHFP Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 1
+          fingerprint: "aabbccdd1122334455667788aabbccdd11223344"
+        type: "SSHFP"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove protection from SSHFP Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the SSHFP Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          algorithm: 3
+          fingerprint_type: 2
+          fingerprint: "aabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccddaabbccdd"
+        type: "SSHFP"
+        state: absent
+      ignore_errors: true
+
     - name: Delete the SSHFP Record
       infoblox.universal_ddi.dns_record:
         name_in_zone: "{{ record_name }}"
