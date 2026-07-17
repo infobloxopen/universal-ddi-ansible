@@ -419,6 +419,7 @@ def main():
                 role=dict(type="str"),
             ),
         ),
+        # TODO : Remove anycast mode from the module once it is removed from the API.
         mode=dict(
             type="str",
             choices=["active-active", "active-passive", "advanced-active-passive", "anycast"],

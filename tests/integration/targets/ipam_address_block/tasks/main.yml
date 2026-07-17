@@ -8,256 +8,256 @@
     - ansible.builtin.set_fact:
         tag_value: "site-{{ 999999 | random | string }}"
 
-#    - name: "Create an Address Block (check mode)"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#      check_mode: true
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 0
-#
-#    - name: "Create an Address Block"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#
-#    - name: "Create an Address Block (idempotent)"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#      register: address_block
-#    - assert:
-#        that:
-#          - address_block is not changed
-#          - address_block is not failed
-#
-#    - name: "Create Next Available Address Block"
-#      infoblox.universal_ddi.ipam_address_block:
-#        space: "{{ _ip_space.id }}"
-#        cidr: 20
-#        next_available_id: "{{ address_block.id }}"
-#        state: "present"
-#      register: next_available_address_block
-#    - name: Get Address Block Information by ID
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        id: "{{ next_available_address_block.id }}"
-#      register: next_available_address_block_info
-#    - assert:
-#        that:
-#          - next_available_address_block is changed
-#          - next_available_address_block is not failed
-#          - next_available_address_block_info.objects | length == 1
-#
-#    - name: "Delete an Address Block (check mode)"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "absent"
-#      check_mode: true
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#
-#    - name: "Delete an Address Block"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "absent"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 0
-#
-#    - name: "Delete an Address Block (idempotent)"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "absent"
-#      register: address_block
-#    - assert:
-#        that:
-#          - address_block is not changed
-#          - address_block is not failed
-#
-#    - name: "Create an Address Block with separate cidr"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0"
-#        cidr: 16
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#
-#    - name: "Create an Address Block with ASM config overridden"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        asm_config:
-#          asm_threshold: 70
-#          enable: true
-#          enable_notification: true
-#          forecast_period: 12
-#          growth_factor: 40
-#          growth_type: "count"
-#          history: 40
-#          min_total: 30
-#          min_unused: 30
-#        inheritance_sources:
-#          asm_config:
-#            asm_enable_block:
-#              action: inherit
-#            asm_growth_block:
-#              action: override
-#            asm_threshold:
-#              action: override
-#            forecast_period:
-#              action: override
-#            history:
-#              action: override
-#            min_total:
-#              action: override
-#            min_unused:
-#              action: override
-#        state: "present"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is changed
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#          - address_block_info.objects[0].asm_config.asm_threshold == 70
-#          - address_block_info.objects[0].asm_config.forecast_period == 12
-#          - address_block_info.objects[0].inheritance_sources.asm_config.asm_enable_block.action == "inherit"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.asm_growth_block.action == "override"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.asm_threshold.action == "override"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.forecast_period.action == "override"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.history.action == "override"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.min_total.action == "override"
-#          - address_block_info.objects[0].inheritance_sources.asm_config.min_unused.action == "override"
-#
-#    - name: "Create an Address Block with comment"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#        comment: "Comment."
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#          - address_block_info.objects[0].comment == address_block.object.comment
-#
-#    - name: "Create an Address Block with ddns_client_update set to server"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#        ddns_client_update: "server"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#          - address_block_info.objects[0].ddns_client_update == "server"
-#
-#    - name: "Create an Address Block with ddns_use_conflict_resolution set to false"
-#      infoblox.universal_ddi.ipam_address_block:
-#        address: "10.0.0.0/16"
-#        space: "{{ _ip_space.id }}"
-#        state: "present"
-#        ddns_use_conflict_resolution: "false"
-#      register: address_block
-#    - name: Get information about the Address Block
-#      infoblox.universal_ddi.ipam_address_block_info:
-#        filters:
-#          address: "10.0.0.0"
-#          space: "{{ _ip_space.id }}"
-#          cidr: 16
-#      register: address_block_info
-#    - assert:
-#        that:
-#          - address_block is not failed
-#          - address_block_info.objects | length == 1
-#          - address_block_info.objects[0].ddns_use_conflict_resolution == false
+    - name: "Create an Address Block (check mode)"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+      check_mode: true
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 0
+
+    - name: "Create an Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+
+    - name: "Create an Address Block (idempotent)"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+      register: address_block
+    - assert:
+        that:
+          - address_block is not changed
+          - address_block is not failed
+
+    - name: "Create Next Available Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        space: "{{ _ip_space.id }}"
+        cidr: 20
+        next_available_id: "{{ address_block.id }}"
+        state: "present"
+      register: next_available_address_block
+    - name: Get Address Block Information by ID
+      infoblox.universal_ddi.ipam_address_block_info:
+        id: "{{ next_available_address_block.id }}"
+      register: next_available_address_block_info
+    - assert:
+        that:
+          - next_available_address_block is changed
+          - next_available_address_block is not failed
+          - next_available_address_block_info.objects | length == 1
+
+    - name: "Delete an Address Block (check mode)"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      check_mode: true
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+
+    - name: "Delete an Address Block"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 0
+
+    - name: "Delete an Address Block (idempotent)"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "absent"
+      register: address_block
+    - assert:
+        that:
+          - address_block is not changed
+          - address_block is not failed
+
+    - name: "Create an Address Block with separate cidr"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0"
+        cidr: 16
+        space: "{{ _ip_space.id }}"
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+
+    - name: "Create an Address Block with ASM config overridden"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        asm_config:
+          asm_threshold: 70
+          enable: true
+          enable_notification: true
+          forecast_period: 12
+          growth_factor: 40
+          growth_type: "count"
+          history: 40
+          min_total: 30
+          min_unused: 30
+        inheritance_sources:
+          asm_config:
+            asm_enable_block:
+              action: inherit
+            asm_growth_block:
+              action: override
+            asm_threshold:
+              action: override
+            forecast_period:
+              action: override
+            history:
+              action: override
+            min_total:
+              action: override
+            min_unused:
+              action: override
+        state: "present"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is changed
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].asm_config.asm_threshold == 70
+          - address_block_info.objects[0].asm_config.forecast_period == 12
+          - address_block_info.objects[0].inheritance_sources.asm_config.asm_enable_block.action == "inherit"
+          - address_block_info.objects[0].inheritance_sources.asm_config.asm_growth_block.action == "override"
+          - address_block_info.objects[0].inheritance_sources.asm_config.asm_threshold.action == "override"
+          - address_block_info.objects[0].inheritance_sources.asm_config.forecast_period.action == "override"
+          - address_block_info.objects[0].inheritance_sources.asm_config.history.action == "override"
+          - address_block_info.objects[0].inheritance_sources.asm_config.min_total.action == "override"
+          - address_block_info.objects[0].inheritance_sources.asm_config.min_unused.action == "override"
+
+    - name: "Create an Address Block with comment"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+        comment: "Comment."
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].comment == address_block.object.comment
+
+    - name: "Create an Address Block with ddns_client_update set to server"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+        ddns_client_update: "server"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].ddns_client_update == "server"
+
+    - name: "Create an Address Block with ddns_use_conflict_resolution set to false"
+      infoblox.universal_ddi.ipam_address_block:
+        address: "10.0.0.0/16"
+        space: "{{ _ip_space.id }}"
+        state: "present"
+        ddns_use_conflict_resolution: "false"
+      register: address_block
+    - name: Get information about the Address Block
+      infoblox.universal_ddi.ipam_address_block_info:
+        filters:
+          address: "10.0.0.0"
+          space: "{{ _ip_space.id }}"
+          cidr: 16
+      register: address_block_info
+    - assert:
+        that:
+          - address_block is not failed
+          - address_block_info.objects | length == 1
+          - address_block_info.objects[0].ddns_use_conflict_resolution == false
 
     - name: "Create an Address Block with DHCP config overridden"
       infoblox.universal_ddi.ipam_address_block:
@@ -291,6 +291,10 @@
               action: inherit
             lease_time_v6:
               action: inherit
+            hold_reclaimed_time:
+              action: inherit
+            hold_reclaimed_time_v6:
+              action: inherit
         state: "present"
       register: address_block
     - name: Get information about the Address Block
@@ -307,10 +311,10 @@
           - address_block_info.objects[0].dhcp_config.lease_time == 3600
           - address_block_info.objects[0].inheritance_sources.dhcp_config.lease_time.action == "override"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.abandoned_reclaim_time.action == "override"
-          - address_block_info.objects[0].inheritance_sources.dhcp_config.abandoned_reclaim_time_v6.action == "override"
+          - address_block_info.objects[0].inheritance_sources.dhcp_config.abandoned_reclaim_time_v6.action == "inherit"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.allow_unknown.action == "inherit"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.allow_unknown_v6.action == "inherit"
-          - address_block_info.objects[0].inheritance_sources.dhcp_config.echo_client_id.action == "override"
+          - address_block_info.objects[0].inheritance_sources.dhcp_config.echo_client_id.action == "inherit"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.filters.action == "inherit"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.filters_v6.action == "inherit"
           - address_block_info.objects[0].inheritance_sources.dhcp_config.ignore_client_uid.action == "inherit"
@@ -401,48 +405,49 @@
           - address_block_info.objects | length == 1
           - address_block_info.objects[0].compartment_id == ""
 
-    - name: "Create an Address Block and associate it to a Federated Realm"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "51.51.0.0/16"
-        space: "{{ _ip_space.id }}"
-        federated_realms: [ "{{ _federated_realm1.id }}" ]
-        state: "present"
-      register: address_block
-    - name: Get information about the Address Block
-      infoblox.universal_ddi.ipam_address_block_info:
-        filters:
-          address: "51.51.0.0"
-          space: "{{ _ip_space.id }}"
-          cidr: 16
-      register: address_block_info
-    - assert:
-        that:
-          - address_block is not failed
-          - address_block_info.objects | length == 1
-          - address_block_info.objects[0].federated_realms | length == 1
-          - address_block_info.objects[0].federated_realms == [ _federated_realm1.id ]
-
-    - name: "Disassociate the Address Block from the Federated Realm"
-      infoblox.universal_ddi.ipam_address_block:
-        address: "51.51.0.0/16"
-        space: "{{ _ip_space.id }}"
-        federated_realms: [ ]
-        state: "present"
-      register: address_block
-    - name: Get information about the Address Block
-      infoblox.universal_ddi.ipam_address_block_info:
-        filters:
-          address: "51.51.0.0"
-          space: "{{ _ip_space.id }}"
-          cidr: 16
-      register: address_block_info
-    - assert:
-        that:
-          - address_block is not failed
-          - address_block_info.objects | length == 1
-          - address_block_info.objects[0].federated_realms | length == 0
-          - address_block_info.objects[0].federated_realms == []
-          - address_block_info.objects[0].delegation == ""
+# TODO : Tests For Federated Block have been skipped as the require delegation endpoint for Block Deletion
+#    - name: "Create an Address Block and associate it to a Federated Realm"
+#      infoblox.universal_ddi.ipam_address_block:
+#        address: "51.51.0.0/16"
+#        space: "{{ _ip_space.id }}"
+#        federated_realms: [ "{{ _federated_realm1.id }}" ]
+#        state: "present"
+#      register: address_block
+#    - name: Get information about the Address Block
+#      infoblox.universal_ddi.ipam_address_block_info:
+#        filters:
+#          address: "51.51.0.0"
+#          space: "{{ _ip_space.id }}"
+#          cidr: 16
+#      register: address_block_info
+#    - assert:
+#        that:
+#          - address_block is not failed
+#          - address_block_info.objects | length == 1
+#          - address_block_info.objects[0].federated_realms | length == 1
+#          - address_block_info.objects[0].federated_realms == [ _federated_realm1.id ]
+#
+#    - name: "Disassociate the Address Block from the Federated Realm"
+#      infoblox.universal_ddi.ipam_address_block:
+#        address: "51.51.0.0/16"
+#        space: "{{ _ip_space.id }}"
+#        federated_realms: [ ]
+#        state: "present"
+#      register: address_block
+#    - name: Get information about the Address Block
+#      infoblox.universal_ddi.ipam_address_block_info:
+#        filters:
+#          address: "51.51.0.0"
+#          space: "{{ _ip_space.id }}"
+#          cidr: 16
+#      register: address_block_info
+#    - assert:
+#        that:
+#          - address_block is not failed
+#          - address_block_info.objects | length == 1
+#          - address_block_info.objects[0].federated_realms | length == 0
+#          - address_block_info.objects[0].federated_realms == []
+#          - address_block_info.objects[0].delegation == ""
 
     - name: "Create an Address Block with DHCP Options"
       infoblox.universal_ddi.ipam_address_block:
@@ -520,5 +525,5 @@
       ignore_errors: true
 
     - ansible.builtin.include_role:
-        name: setup_federation_federated_block
+        name: setup_federation_federated_realms
         tasks_from: cleanup.yml
