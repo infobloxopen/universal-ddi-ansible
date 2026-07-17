@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 9
+      max-parallel: 10
       matrix:
         include:
           - group: anycast
@@ -174,6 +174,25 @@ jobs:
               ipam_range_info
               ipam_subnet
               ipam_subnet_info
+
+          - group: dtc
+            targets: >-
+              dtc_health_check_http
+              dtc_health_check_http_info
+              dtc_health_check_icmp
+              dtc_health_check_icmp_info
+              dtc_health_check_snmp
+              dtc_health_check_snmp_info
+              dtc_health_check_tcp
+              dtc_health_check_tcp_info
+              dtc_lbdn
+              dtc_lbdn_info
+              dtc_policy
+              dtc_policy_info
+              dtc_pool
+              dtc_pool_info
+              dtc_server
+              dtc_server_info
 
           - group: federation
             targets: >-
