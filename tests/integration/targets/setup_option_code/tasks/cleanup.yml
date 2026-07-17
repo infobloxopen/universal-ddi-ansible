@@ -7,6 +7,9 @@
 
     - name: "Delete DHCP Option Code"
       infoblox.universal_ddi.dhcp_option_code:
+        code: 234
         name: "{{ option_code_name }}"
+        option_space: "{{ _option_space.id }}"
+        type: "boolean"
         state: "absent"
       ignore_errors: true

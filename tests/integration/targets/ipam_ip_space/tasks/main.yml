@@ -582,3 +582,11 @@
         name: "{{ name }}"
         state: "absent"
       ignore_errors: true
+
+    - ansible.builtin.include_role:
+        name: setup_option_code
+        tasks_from: cleanup.yml
+
+    - ansible.builtin.include_role:
+        name: setup_option_group
+        tasks_from: cleanup.yml
