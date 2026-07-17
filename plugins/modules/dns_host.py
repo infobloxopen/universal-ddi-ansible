@@ -84,15 +84,17 @@ EXAMPLES = r"""
       infoblox.universal_ddi.infra_host_info:
         filters:
           display_name: "example_infra_host"
+      register: infra_host_info
 
     - name: Create a DNS Server (required as parent)
       infoblox.universal_ddi.dns_server:
         name: "example_server"
         state: present
+      register: server
 
     - name: Update DNS Host
       infoblox.universal_ddi.dns_host:
-        id: "{{ infra_host.id }}"
+        id: "{{ infra_host_info.objects[0].legacy_id }}"
         absolute_name: "example_server_name"
         server: "{{ server.id }}"
         state: present

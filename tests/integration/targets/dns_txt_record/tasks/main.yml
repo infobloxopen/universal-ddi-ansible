@@ -257,7 +257,190 @@
           - txt_record_info.objects[0].name_in_zone == txt_record.object.name_in_zone
           - txt_record_info.objects[0].zone == txt_record.object.zone
 
+    - name: Create a TXT Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text ddi admin"
+        type: "TXT"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: txt_record_ddi_admin
+    - name: Get information about the TXT Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "TXT"
+      register: txt_record_info
+    - assert:
+        that:
+          - txt_record_ddi_admin is changed
+          - txt_record_info is not failed
+          - txt_record_info.objects | length == 1
+          - txt_record_info.objects[0].id == txt_record_ddi_admin.id
+          - txt_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a TXT Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: txt_record_global_admin
+    - name: Get information about the TXT Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "TXT"
+      register: txt_record_info
+    - assert:
+        that:
+          - txt_record_global_admin is changed
+          - txt_record_info is not failed
+          - txt_record_info.objects | length == 1
+          - txt_record_info.objects[0].id == txt_record_global_admin.id
+          - txt_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create a TXT Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text ddi admin"
+        type: "TXT"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: txt_record
+    - assert:
+        that:
+          - txt_record is not changed
+          - txt_record is not failed
+
+    - name: Create a TXT Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: txt_record
+    - assert:
+        that:
+          - txt_record is not changed
+          - txt_record is not failed
+
+    - name: Update TXT Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text ddi admin"
+        type: "TXT"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: txt_record
+    - name: Get information about the TXT Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "TXT"
+      register: txt_record_info
+    - assert:
+        that:
+          - txt_record is changed
+          - txt_record is not failed
+          - txt_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from TXT Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        configure_record_protection: "None"
+        state: present
+      register: txt_record
+    - name: Get information about the TXT Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "TXT"
+      register: txt_record_info
+    - assert:
+        that:
+          - txt_record is changed
+          - txt_record is not failed
+          - txt_record_info.objects[0]['protection'] is not defined or txt_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from TXT Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        configure_record_protection: "None"
+        state: present
+      register: txt_record
+    - assert:
+        that:
+          - txt_record is not changed
+          - txt_record is not failed
+
   always:
+    - name: "Remove protection from TXT Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text ddi admin"
+        type: "TXT"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the TXT Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text ddi admin"
+        type: "TXT"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove protection from TXT Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the TXT Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          text: "protected text global admin"
+        type: "TXT"
+        state: absent
+      ignore_errors: true
+
     - name: "Delete the TXT Record"
       infoblox.universal_ddi.dns_record:
         name_in_zone: "{{ record_name }}"
@@ -266,7 +449,7 @@
           text: "sample text"
         type: "TXT"
         state: absent
-      register: txt_record
+      ignore_errors: true
 
     - name: "Delete the Auth Zone"
       ansible.builtin.include_role:

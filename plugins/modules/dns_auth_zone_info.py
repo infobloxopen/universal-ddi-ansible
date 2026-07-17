@@ -64,11 +64,11 @@ EXAMPLES = r"""
   - name: Get Auth Zone information by filters (e.g. name)
     infoblox.universal_ddi.dns_auth_zone_info:
       filters:
-        fqdn: "example_zone"
+        fqdn: "example-zone."
 
   - name: Get Auth Zone information by raw filter query
     infoblox.universal_ddi.dns_auth_zone_info:
-      filter_query: "name=='example_zone'"
+      filter_query: "name=='example-zone.'"
 
   - name: Get Auth Zone information by tag filters
     infoblox.universal_ddi.dns_auth_zone_info:

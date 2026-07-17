@@ -1,0 +1,466 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    # Create a random HTTPS record name to avoid conflicts
+    - ansible.builtin.set_fact:
+        record_name: "test-https-record-{{ 999999 | random | string }}"
+
+    - name: Create a HTTPS Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: present
+      check_mode: true
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 0
+
+    - name: Create a HTTPS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].type == "HTTPS"
+          - https_record_info.objects[0].zone == https_record.object.zone
+          - https_record_info.objects[0].rdata.target_name == "svc.example.com."
+
+    - name: Create a HTTPS Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: present
+      register: https_record
+    - assert:
+        that:
+          - https_record is not changed
+          - https_record is not failed
+
+    - name: Delete the HTTPS Record (check mode)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: absent
+      check_mode: true
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+
+    - name: Delete the HTTPS Record
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 0
+
+    - name: Delete the HTTPS Record (idempotent)
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+    - assert:
+        that:
+          - https_record is not changed
+          - https_record is not failed
+
+    - name: Create a HTTPS Record with comment
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        comment: "This is a test HTTPS Record"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].comment == "This is a test HTTPS Record"
+
+    - name: Create a HTTPS Record with TTL
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        ttl: 3600
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].ttl == 3600
+
+    - name: Create a HTTPS Record with Disabled
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        disabled: true
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].disabled == true
+
+    - name: Create a HTTPS Record with Tags
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        tags:
+          location: "site-1"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].tags.location == "site-1"
+
+    - name: Create a HTTPS Record with Inheritance Sources
+      infoblox.universal_ddi.dns_record:
+        zone: "{{ _auth_zone.id }}"
+        type: "HTTPS"
+        rdata:
+          target_name: "svc1.example.com."
+        inheritance_sources:
+          ttl:
+            action: "inherit"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].inheritance_sources.ttl.action == "inherit"
+
+    - name: Create a HTTPS Record with Name in Zone and Zone
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        state: present
+      register: https_record
+    - name: Get Information about the HTTPS Record
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "{{ record_name }}"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].name_in_zone == https_record.object.name_in_zone
+          - https_record_info.objects[0].zone == https_record.object.zone
+
+    - name: Delete the HTTPS Record with Name in Zone
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "{{ record_name }}"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc1.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+
+    - name: Create a HTTPS Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: https_record_ddi_admin
+    - name: Get information about the HTTPS Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_ddi_admin is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record_ddi_admin.id
+          - https_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a HTTPS Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: https_record_global_admin
+    - name: Get information about the HTTPS Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record_global_admin is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record_global_admin.id
+          - https_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create a HTTPS Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: https_record
+    - assert:
+        that:
+          - https_record is not changed
+          - https_record is not failed
+
+    - name: Create a HTTPS Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: https_record
+    - assert:
+        that:
+          - https_record is not changed
+          - https_record is not failed
+
+    - name: Update HTTPS Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record is changed
+          - https_record is not failed
+          - https_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from HTTPS Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+    - name: Get information about the HTTPS Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
+      register: https_record_info
+    - assert:
+        that:
+          - https_record is changed
+          - https_record is not failed
+          - https_record_info.objects[0]['protection'] is not defined or https_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from HTTPS Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+    - assert:
+        that:
+          - https_record is not changed
+          - https_record is not failed
+
+  always:
+    - name: "Remove protection from HTTPS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+      ignore_errors: true
+
+    - name: "Delete the HTTPS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc2.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+      ignore_errors: true
+
+    - name: "Remove protection from HTTPS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        configure_record_protection: "None"
+        state: present
+      register: https_record
+      ignore_errors: true
+
+    - name: "Delete the HTTPS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          target_name: "svc3.example.com."
+        type: "HTTPS"
+        state: absent
+      register: https_record
+      ignore_errors: true
+
+    - name: "Delete the Auth Zone"
+      ansible.builtin.include_role:
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
+
+    - name: "Delete the View"
+      ansible.builtin.include_role:
+        name: setup_view
+        tasks_from: cleanup.yml
