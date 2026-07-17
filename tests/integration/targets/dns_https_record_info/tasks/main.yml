@@ -76,10 +76,10 @@
 
     - name: "Delete Auth Zone"
       ansible.builtin.include_role:
-       name: setup_auth_zone
-       tasks_from: cleanup.yml
+        name: setup_auth_zone
+        tasks_from: cleanup.yml
 
     - name: "Delete the View"
       ansible.builtin.include_role:
-       name: setup_view
-       tasks_from: cleanup.yml
+        name: setup_view
+        tasks_from: cleanup.yml
