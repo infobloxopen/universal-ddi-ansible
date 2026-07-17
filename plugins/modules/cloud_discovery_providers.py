@@ -146,6 +146,22 @@ options:
                             view_name:
                                 description: "Name of the view."
                                 type: str
+                            zone_filters:
+                                description:
+                                    - "List of zone filters to include or exclude specific zones from discovery."
+                                type: list
+                                elements: dict
+                                suboptions:
+                                    action:
+                                        description: "Filter action. E.g., I(include) or I(exclude)."
+                                        type: str
+                                        choices:
+                                            - "include"
+                                            - "exclude"
+                                    wildcards:
+                                        description: "List of wildcard patterns to match zone names."
+                                        type: list
+                                        elements: str
                     ipam:
                         description: "IPAM configuration details."
                         type: dict
@@ -345,6 +361,32 @@ EXAMPLES = r"""
             restricted_to_accounts:
               - "123456789013"
         state: present
+
+    - name: Create an AWS provider with zone filters
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "aws_provider_zone_filters"
+        provider_type: "Amazon Web Services"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+              access_identifier: "arn:aws:iam::422983262101:role/infoblox_discovery"
+        destination_types_enabled:
+          - "DNS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+                zone_filters:
+                  - action: "exclude"
+                    wildcards:
+                      - "*.internal.example.com"
+                      - "test.*"
+            destination_type: "DNS"
+        state: present
 """  # noqa: E501
 
 RETURN = r"""
@@ -506,6 +548,20 @@ item:
                                     description: "Name of the view."
                                     type: str
                                     returned: Always
+                                zone_filters:
+                                    description: "List of zone filters to include or exclude specific zones from discovery."
+                                    type: list
+                                    returned: Always
+                                    elements: dict
+                                    contains:
+                                        action:
+                                            description: "Filter action, e.g., I(include) or I(exclude)."
+                                            type: str
+                                            returned: Always
+                                        wildcards:
+                                            description: "List of wildcard patterns to match zone names."
+                                            type: list
+                                            returned: Always
                         ipam:
                             description: "IPAM configuration details."
                             type: dict
@@ -818,18 +874,90 @@ class ProvidersModule(UniversalDDIAnsibleModule):
         resp = ProvidersApi(self.client).create(body=self.payload)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
+    # TODO: Remove Additional Properties from Python Client
+    @staticmethod
+    def _strip_additional_properties(obj):
+        """Recursively remove 'additional_properties' keys from dicts.
+
+        Pydantic models in the cloud_discovery client include an
+        'additional_properties' field that is serialized as an empty dict by
+        model_dump().  The API rejects this as an unknown field, so it must be
+        stripped before every PUT call.
+        """
+        if isinstance(obj, dict):
+            return {
+                k: ProvidersModule._strip_additional_properties(v)
+                for k, v in obj.items()
+                if k != "additional_properties"
+            }
+        if isinstance(obj, list):
+            return [ProvidersModule._strip_additional_properties(item) for item in obj]
+        return obj
+
+    def _inject_source_config_ids(self, payload):
+        """
+        SourceConfig.to_dict() — used by the API client for body serialization —
+        explicitly excludes 'id' as a read-only field.  Setting it via
+        additional_properties is the only way to ensure it survives serialization
+        and reaches the PUT endpoint, which requires a non-empty source config ID.
+
+        The API currently allows at most one source_config per provider (multiple/
+        auto_discover_multiple both reject a second entry), so entries are matched
+        by position; the bounds check below only guards the 0-vs-1-length case
+        (e.g. source_configs becoming empty).
+        """
+        existing_source_configs = self.existing.source_configs or []
+        for i, sc in enumerate(payload.source_configs or []):
+            if i >= len(existing_source_configs):
+                break
+            existing_id = existing_source_configs[i].id
+            if existing_id is not None:
+                if not isinstance(sc.additional_properties, dict):
+                    sc.additional_properties = {}
+                sc.additional_properties["id"] = existing_id
+
     def update(self):
         if self.check_mode:
             return None
 
-        for i in range(len(self.payload.source_configs)):
-            self.payload.source_configs[i].id = self.existing.source_configs[i].id
+        payload_dict = self.payload.model_dump(by_alias=True, exclude_none=True)
+        payload_dict = self._strip_additional_properties(payload_dict)
 
-        ProvidersApi(self.client).update(id=self.existing.id, body=self.payload)
+        # Retain cloud_credential_id from the existing source_configs at the dict level
+        # (before from_dict) since the user typically does not provide it.
+        existing_source_configs = self.existing.source_configs or []
+        for sc, existing_sc in zip(payload_dict.get("source_configs", []), existing_source_configs):
+            if existing_sc.cloud_credential_id is not None:
+                sc["cloud_credential_id"] = existing_sc.cloud_credential_id
+
+        clean_payload = DiscoveryConfig.from_dict(payload_dict)
+
+        # 'id' must be injected after from_dict via additional_properties — see docstring above.
+        self._inject_source_config_ids(clean_payload)
+
+        ProvidersApi(self.client).update(id=self.existing.id, body=clean_payload)
 
     def delete(self):
         if self.check_mode:
             return
+
+        # The provider must be in 'disabled' state before it can be deleted.
+        # If it is not already disabled, update it first, then delete.
+        if self.existing.desired_state != "disabled":
+            # Build a clean dict from the existing object, strip source_configs.accounts
+            # (server-computed read-only fields) and any additional_properties artifacts,
+            # then set desired_state to "disabled" before the update call.
+            disable_dict = self.existing.model_dump(by_alias=True, exclude_none=True)
+            for sc in disable_dict.get("source_configs", []):
+                sc.pop("accounts", None)
+            disable_dict["desired_state"] = "disabled"
+            disable_dict = self._strip_additional_properties(disable_dict)
+            disable_body = DiscoveryConfig.from_dict(disable_dict)
+
+            # 'id' must be injected after from_dict via additional_properties — see docstring above.
+            self._inject_source_config_ids(disable_body)
+
+            ProvidersApi(self.client).update(id=self.existing.id, body=disable_body)
 
         ProvidersApi(self.client).delete(self.existing.id)
 
@@ -937,6 +1065,14 @@ def main():
                                 sync_type=dict(type="str", choices=["read_only", "read_write"]),
                                 view_id=dict(type="str"),
                                 view_name=dict(type="str"),
+                                zone_filters=dict(
+                                    type="list",
+                                    elements="dict",
+                                    options=dict(
+                                        action=dict(type="str", choices=["include", "exclude"]),
+                                        wildcards=dict(type="list", elements="str"),
+                                    ),
+                                ),
                             ),
                         ),
                         ipam=dict(

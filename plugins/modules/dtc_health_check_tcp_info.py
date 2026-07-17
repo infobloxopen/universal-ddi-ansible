@@ -13,7 +13,7 @@ module: dtc_health_check_tcp_info
 short_description: Retrieves DTC TCP Health Checks
 description:
     - Retrieve information about existing DTC TCP Health Checks.
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

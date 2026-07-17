@@ -9,10 +9,10 @@ __metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
-module: dtc_health_check_snmp_info
-short_description: Retrieves DTC SNMP Health Checks
+module: dtc_health_check_http_info
+short_description: Retrieves DTC HTTP Health Checks
 description:
-    - Retrieve information about existing DTC SNMP Health Checks.
+    - Retrieve information about existing DTC HTTP Health Checks.
 version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
@@ -47,112 +47,99 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
-    - name: Get SNMP Health Check by ID
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        id: "{{ health_check_snmp.id }}"
-
-    - name: Get SNMP Health Check by filters (name)
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
+    - name: Get HTTP Health Check information by filters (name)
+      infoblox.universal_ddi.dtc_health_check_http_info:
         filters:
-          name: "example-snmp-health-check"
+          name: "example_http_health_check"
 
-    - name: Get SNMP Health Check by filter query
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
-        filter_query: "name=='example-snmp-health-check'"
+    - name: Get HTTP Health Check information by filters (id)
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        id: "{{ http_health_check.id }}"
 
-    - name: Get SNMP Health Check by tag filters
-      infoblox.universal_ddi.dtc_health_check_snmp_info:
+    - name: Get HTTP Health Check information by filter query
+      infoblox.universal_ddi.dtc_health_check_http_info:
+        filter_query: "name=='example_http_health_check'"
+    
+    - name: Get HTTP Health Check information by tag filters
+      infoblox.universal_ddi.dtc_health_check_http_info:
         tag_filters:
-          environment: "production"
-"""
+          location: "site-1"
+"""  # noqa: E501
 
 RETURN = r"""
 id:
     description:
-        - ID of the HealthCheckSnmp object
+        - ID of the HealthCheckHttp object
     type: str
     returned: Always
 objects:
     description:
-        - HealthCheckSnmp object
+        - HealthCheckHttp object
     type: list
     elements: dict
     returned: Always
     contains:
-        check_list:
+        check_response_body:
             description:
-                - "List of specific checks for SNMP entries and their values in MIB hierarchy. Supported up to 15 checks."
+                - "Optional. Flag which enables checking of the HTTP response body content. Defaults to I(false)."
+            type: bool
+            returned: Always
+        check_response_body_negative:
+            description:
+                - "Optional. Flag which changes the meaning of the regex match result. If set to I(true), the response is valid if regular expression matches not found. Defaults to I(false)."
+                - "The flag is currently not supported."
+            type: bool
+            returned: Always
+        check_response_body_regex:
+            description:
+                - "Optional. Regular expression to search for a string in the HTTP response body. Error if empty while I(check_response_body) is I(true). Defaults to empty."
+            type: str
+            returned: Always
+        check_response_header:
+            description:
+                - "Optional. Flag which enables checking of the HTTP response header(s) content. Defaults to I(false)."
+            type: bool
+            returned: Always
+        check_response_header_negative:
+            description:
+                - "Optional. Flag which changes the meaning of the header regexes match result. If set to I(true), neither expression matches must be found in their respective headers for the headers to be considered valid. Defaults to I(false)."
+            type: bool
+            returned: Always
+        check_response_header_regexes:
+            description:
+                - "Optional. List of (header, regular expression) pairs. All expression matches must be found in their respective headers for the headers to be considered valid. Error if empty while I(check_response_header) is I(true). Defaults to empty."
             type: list
             returned: Always
             elements: dict
             contains:
-                comment:
+                header:
                     description:
-                        - "Optional. Comment for B(EntryCheck)."
+                        - "HTTP header name."
                     type: str
                     returned: Always
-                max_value:
+                regex:
                     description:
-                        - "Optional. Expected max value of an entry to check against. Used for B(in) operator only, otherwise ignored."
+                        - "Regular expression to match against HTTP header value."
                     type: str
                     returned: Always
-                name:
-                    description:
-                        - "Name is a dotted-decimal number that defines the location of the entry in the universal MIB tree."
-                    type: str
-                    returned: Always
-                operator:
-                    description:
-                        - "Operator defines operation to perform on an entry value."
-                        - "Allowed values:"
-                        - "* any - any value must be present"
-                        - "* eq  - entry value must be equal to check's B(value)."
-                        - "* leq - entry value must be less or equal to check's B(value)."
-                        - "* geq - entry value must be greater or equal to check's B(value)."
-                        - "* in  - entry value must be greater or equal than B(value) and less or equal than B(max_value)."
-                        - "Operator B(in) is supported only for B(integer) types."
-                    type: str
-                    returned: Always
-                type:
-                    description:
-                        - "Type defines type of an entry value."
-                        - "Allowed values:"
-                        - "* string"
-                        - "* integer"
-                        - "String type does not support B(in) operator."
-                    type: str
-                    returned: Always
-                value:
-                    description:
-                        - "Optional. Expected value of an entry to check against. Ignored for B(any) operator."
-                    type: str
-                    returned: Always
+        codes:
+            description:
+                - "Optional. Response Status Codes meaning the health check is successful. If empty, any code means success. Individual codes and code ranges are supported, ex. \"102,105-107,109-110,120\"."
+            type: str
+            returned: Always
         comment:
             description:
-                - "Optional. Comment for B(SNMPHealthCheck)."
-            type: str
-            returned: Always
-        community:
-            description:
-                - "Optional. SNMP community string used for authentication. Mandatory for B(v1) and B(v2c) versions, ignored for B(v3)."
-                - "Defaults to B(public)."
-            type: str
-            returned: Always
-        context_engine_id:
-            description:
-                - "Optional. Uniquely identifies an SNMP entity that may realize an instance of a context with a particular context name."
-                - "Format is an arbitrary string that can contain from 10 to 64 hexadecimal digits (5 to 32 octet numbers)."
-                - "Ignored for B(v1) and B(v2c) versions."
-            type: str
-            returned: Always
-        context_name:
-            description:
-                - "Optional. Name of administratively unique context for B(v3) version. Ignored for B(v1) and B(v2c) versions."
+                - "Optional. Comment for B(HTTPHealthCheck)."
             type: str
             returned: Always
         disabled:
             description:
-                - "Optional. Flag which enables/disables B(SNMPHealthCheck). Defaults to I(false)."
+                - "Optional. Flag which enables/disables B(HTTPHealthCheck). Defaults to I(false)."
+            type: bool
+            returned: Always
+        https:
+            description:
+                - "Optional. Flag which enables Hypertext Transfer Protocol Secure (HTTPS) in a health check. Defaults to I(false)."
             type: bool
             returned: Always
         id:
@@ -167,7 +154,7 @@ objects:
             returned: Always
         metadata:
             description:
-                - "Output only. B(SNMPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
+                - "Output only. B(HTTPHealthCheck) metadata. Defaults to empty object and should be explicitly requested using field selection."
             type: dict
             returned: Always
             contains:
@@ -195,13 +182,18 @@ objects:
                             returned: Always
         name:
             description:
-                - "Display name of B(SNMPHealthCheck)."
+                - "Display name of B(HTTPHealthCheck)."
             type: str
             returned: Always
         port:
             description:
-                - "Optional. Destination UDP port of B(SNMPHealthCheck). Defaults to I(161)."
+                - "Destination TCP port of B(HTTPHealthCheck)."
             type: int
+            returned: Always
+        request:
+            description:
+                - "HTTP request in a text format, it consists of HTTP method, request target, HTTP headers, request body."
+            type: str
             returned: Always
         retry_down:
             description:
@@ -215,7 +207,7 @@ objects:
             returned: Always
         tags:
             description:
-                - "Optional. The tags for B(SNMPHealthCheck) in JSON format."
+                - "Optional. The tags for B(HTTPHealthCheck) in JSON format."
             type: dict
             returned: Always
         timeout:
@@ -223,40 +215,26 @@ objects:
                 - "Optional. Timeout value in seconds. The health check waits for the specified number of seconds after sending a request. If it does not receive a response within the number of seconds, then the health check is considered as failed. Defaults to I(10)."
             type: int
             returned: Always
-        user_security_model:
-            description:
-                - "The resource identifier."
-            type: str
-            returned: Always
-        version:
-            description:
-                - "SNMP version."
-                - "Allowed values:"
-                - "* v1  - version 1"
-                - "* v2c - version 2 community"
-                - "* v3  - version 3"
-            type: str
-            returned: Always
 """  # noqa: E501
 
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
 
 try:
-    from dtc import HealthCheckSnmpApi
+    from dtc import HealthCheckHttpApi
     from universal_ddi_client import ApiException, NotFoundException
 except ImportError:
     pass  # Handled by UniversalDDIAnsibleModule
 
 
-class HealthCheckSnmpInfoModule(UniversalDDIAnsibleModule):
+class HealthCheckHttpInfoModule(UniversalDDIAnsibleModule):
     def __init__(self, *args, **kwargs):
-        super(HealthCheckSnmpInfoModule, self).__init__(*args, **kwargs)
+        super(HealthCheckHttpInfoModule, self).__init__(*args, **kwargs)
         self._existing = None
         self._limit = 1000
 
     def find_by_id(self):
         try:
-            resp = HealthCheckSnmpApi(self.client).read(self.params["id"])
+            resp = HealthCheckHttpApi(self.client).read(self.params["id"])
             return [resp.result]
         except NotFoundException as e:
             return []
@@ -282,7 +260,7 @@ class HealthCheckSnmpInfoModule(UniversalDDIAnsibleModule):
 
         while True:
             try:
-                resp = HealthCheckSnmpApi(self.client).list(
+                resp = HealthCheckHttpApi(self.client).list(
                     offset=offset, limit=self._limit, filter=filter_str, tfilter=tag_filter_str
                 )
 
@@ -327,7 +305,7 @@ def main():
         tag_filter_query=dict(type="str", required=False),
     )
 
-    module = HealthCheckSnmpInfoModule(
+    module = HealthCheckHttpInfoModule(
         argument_spec=module_args,
         supports_check_mode=True,
         mutually_exclusive=[
