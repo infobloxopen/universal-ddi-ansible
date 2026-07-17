@@ -45,7 +45,6 @@
         name: "{{ cloud_discovery_provider_aws_name }}"
         provider_type: "Amazon Web Services"
         account_preference: "single"
-        desired_state: "disabled"
         credential_preference:
           access_identifier_type: "role_arn"
           credential_type: "dynamic"
