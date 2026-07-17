@@ -9,4 +9,3 @@
         name: "{{ option_group_name }}"
         state: "absent"
       ignore_errors: true
-

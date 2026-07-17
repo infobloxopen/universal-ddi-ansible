@@ -539,5 +539,3 @@
     - ansible.builtin.include_role:
         name: setup_ip_space
         tasks_from: cleanup.yml
-
-
