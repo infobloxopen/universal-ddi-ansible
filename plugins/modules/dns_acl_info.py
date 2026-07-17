@@ -54,16 +54,16 @@ EXAMPLES = r"""
   - name: Get ACL by filters
     infoblox.universal_ddi.dns_acl_info:
       filters:
-        name: "{{ acl_name }}"
+        name: "example_acl"
 
   - name: Get ACL by filter query
     infoblox.universal_ddi.dns_acl_info:
-      filter_query: "name=='{{ acl_name }}'"
+      filter_query: "name=='example_acl'"
 
   - name: Get ACL by tag filters
     infoblox.universal_ddi.dns_acl_info:
       tag_filters:
-        location: "us-west"
+        location: "site-1"
 """
 
 RETURN = r"""

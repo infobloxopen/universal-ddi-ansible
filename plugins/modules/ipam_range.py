@@ -211,6 +211,13 @@ EXAMPLES = r"""
         space: "{{ ip_space.id }}"
         state: "present"
 
+    - name: Create a Option Space ( required as parent for DHCP Option Code )
+      infoblox.universal_ddi.dhcp_option_space:
+        name: "example-option-space"
+        protocol: "ip4"
+        state: present
+      register: option_space
+
     - name: Create a DHCP Option Code ( required as parent for DHCP Options)
       infoblox.universal_ddi.dhcp_option_code:
         code: 234

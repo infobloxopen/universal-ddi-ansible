@@ -95,26 +95,34 @@ extends_documentation_fragment:
 """  # noqa: E501
 
 EXAMPLES = r"""
+  - name: Create a View (required as parent)
+    infoblox.universal_ddi.dns_view:
+      name: "dns-example-view"
+      state: present
+    register: example_view
+    
   - name: Create a Forward Zone
     infoblox.universal_ddi.dns_forward_zone:
       fqdn: "example_zone."
+      view: "{{ example_view.id }}"
       state: present
 
   - name: Create an Forward Zone with Additional Fields
     infoblox.universal_ddi.dns_forward_zone:
       fqdn: "example_zone."
       comment: "Example Forward Zone"
+      view: "{{ example_view.id }}"
       disabled: true
       external_forwarders:
        - address: "192.168.10.10"
-      notify: true
       state: "present"
       tags:
         location: "site-1"
 
   - name: Delete the Zone
     infoblox.universal_ddi.dns_forward_zone:
-      name: "example_zone."
+      fqdn: "example_zone."
+      view: "{{ example_view.id }}"
       state: "absent"
 """  # noqa: E501
 

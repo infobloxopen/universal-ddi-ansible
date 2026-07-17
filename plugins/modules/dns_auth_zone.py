@@ -637,14 +637,14 @@ EXAMPLES = r"""
 
   - name: Create an Auth Zone
     infoblox.universal_ddi.dns_auth_zone:
-      fqdn: "auth-zone"
+      fqdn: "auth-zone.com."
       primary_type: cloud
       view: "{{ view.id }}"
       state: present
 
   - name: Create an Auth Zone with Additional Fields
     infoblox.universal_ddi.dns_auth_zone:
-      fqdn: "auth-zone"
+      fqdn: "auth-zone.com."
       primary_type: cloud
       comment: "Example Auth Zone"
       view: "{{ view.id }}"
