@@ -323,7 +323,7 @@ class IpSpaceCleaner(ResourceCleaner):
     """Cleans up IPAM IP Spaces."""
 
     resource_name = "IP Spaces"
-    default_prefixes = ("ip-space", "test")
+    default_prefixes = ("ip-space", "test-ip-space-")
 
     def list_all(self):
         return _paginate(IpSpaceApi(self.client).list)

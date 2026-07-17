@@ -405,7 +405,7 @@
           - address_block_info.objects | length == 1
           - address_block_info.objects[0].compartment_id == ""
 
-# TODO : Tests For Federated Block have been skipped as the require delegation endpoint for Block Deletion
+# TODO: Tests for federated blocks are skipped because they require the delegation endpoint for block deletion.
 #    - name: "Create an Address Block and associate it to a Federated Realm"
 #      infoblox.universal_ddi.ipam_address_block:
 #        address: "51.51.0.0/16"
