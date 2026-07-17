@@ -16,7 +16,7 @@ Minor Changes
 -------------
 
 - cloud_discovery_providers - Added a ``zone_filters`` option to include or exclude specific zones from discovery for AWS, Azure, and GCP providers (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
-- dhcp_ha_group - ``anycast`` mode is deprecated(https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+- dhcp_ha_group - ``anycast`` mode is deprecated (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
 - dns_record - Added a ``configure_record_protection`` option to set, update, or remove protected-access levels on DNS resource records (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
 - dns_record, dns_record_info - Added a ``target_name`` ``rdata`` sub-option used by HTTPS/SVCB record types (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
 - dns_record, dns_record_info - Added support for managing SSHFP (SSH public key fingerprint) records (https://github.com/infobloxopen/universal-ddi-ansible/pull/61).
