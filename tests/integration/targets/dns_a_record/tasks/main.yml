@@ -10,9 +10,6 @@
         record_name: "test-a-record-{{ 999999 | random | string }}"
         record_2_name: "test-a-record-2-{{ 999999 | random | string }}"
 
-    - ansible.builtin.set_fact:
-        absolute_name_spec: "{{ record_2_name }}.{{ _fqdn_auth_zone }}"
-
     - name: Create an A Record (check mode)
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"

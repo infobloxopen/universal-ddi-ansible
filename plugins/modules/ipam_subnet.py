@@ -2539,6 +2539,8 @@ class SubnetModule(UniversalDDIAnsibleModule):
         update_body = self.validate_readonly_on_update(self.existing, update_body, ["address", "space", "cidr"])
 
         resp = SubnetApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+        if resp is None or resp.result is None:
+            resp = SubnetApi(self.client).read(self.existing.id, inherit="full")
         return resp.result.model_dump(by_alias=True, exclude_none=True)
 
     def delete(self):

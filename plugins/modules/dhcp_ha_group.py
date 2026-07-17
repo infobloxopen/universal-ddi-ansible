@@ -61,6 +61,7 @@ options:
     mode:
         description:
             - "The mode of the HA group."
+            - "V(anycast) is deprecated and will be removed in a future release."
         type: str
         choices:
             - active-active
@@ -418,6 +419,7 @@ def main():
                 role=dict(type="str"),
             ),
         ),
+        # TODO : Remove anycast mode from the module once it is removed from the API.
         mode=dict(
             type="str",
             choices=["active-active", "active-passive", "advanced-active-passive", "anycast"],
@@ -432,6 +434,9 @@ def main():
         supports_check_mode=True,
         required_if=[("state", "present", ["name", "hosts"])],
     )
+
+    if module.params["mode"] == "anycast":
+        module.fail_json(msg="The 'anycast' mode is deprecated and no longer supported.")
 
     module.run_command()
 

@@ -1,2 +1,3 @@
 ---
-dependencies: [setup_ip_space, setup_multiple_realms, setup_federation_federated_block, setup_option_code, setup_option_group]
+dependencies: [setup_ip_space, setup_federation_federated_realms, setup_option_code, setup_option_group]
+# TODO: add setup_federation_federated_block and related tests with delegation endpoint added

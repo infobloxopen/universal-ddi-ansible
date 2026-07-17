@@ -405,7 +405,7 @@ EXAMPLES = r"""
         type: "A"
         configure_record_protection: "DDI Admin"
         state: "present"
-   
+
     - name: Create an AAAA Record in an Auth Zone
       infoblox.universal_ddi.dns_record:
         zone: "{{ _auth_zone.id }}"
@@ -1094,6 +1094,8 @@ class RecordModule(UniversalDDIAnsibleModule):
 
         return self.is_changed(self.existing.model_dump(by_alias=True, exclude_none=True), self.payload_params)
 
+    # DNS record Operations using Absolute Name and View are not Supported in Ansible as querying via view
+    # is not supported by the API.
     def find(self):
         if self.params["id"] is not None:
             try:
@@ -1139,6 +1141,7 @@ class RecordModule(UniversalDDIAnsibleModule):
     def create(self):
         if self.check_mode:
             return None
+
         resp = RecordApi(self.client).create(body=self.payload, inherit="full")
         desired_protection = self._normalize_protection_level(self.params.get("configure_record_protection"))
         if desired_protection is not None:
@@ -1167,6 +1170,8 @@ class RecordModule(UniversalDDIAnsibleModule):
             update_body = self.payload
             update_body = self.validate_readonly_on_update(self.existing, update_body, ["type", "zone"])
             resp = RecordApi(self.client).update(id=self.existing.id, body=update_body, inherit="full")
+            if resp is None or resp.result is None:
+                resp = RecordApi(self.client).read(self.existing.id, inherit="full")
             return resp.result.model_dump(by_alias=True, exclude_none=True)
         elif protection_changed:
             # Only protection changed, re-read the record to get updated data
