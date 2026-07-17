@@ -133,7 +133,7 @@ jobs:
               dns_txt_record
               dns_txt_record_info
 
-          - group: dns_infra
+          - group: dns_config
             targets: >-
               dns_acl
               dns_acl_info
