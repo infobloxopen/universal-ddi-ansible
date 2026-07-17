@@ -21,14 +21,14 @@
     - name: Get information about the HTTPS Record
       infoblox.universal_ddi.dns_record_info:
         filters:
-            zone: "{{ _auth_zone.id }}"
-            type: "HTTPS"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-        - https_record is changed
-        - https_record_info is not failed
-        - https_record_info.objects | length == 0
+        that:
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 0
 
     - name: Create a HTTPS Record
       infoblox.universal_ddi.dns_record:
@@ -46,13 +46,13 @@
       register: https_record_info
     - assert:
         that:
-        - https_record is changed
-        - https_record_info is not failed
-        - https_record_info.objects | length == 1
-        - https_record_info.objects[0].id == https_record.id
-        - https_record_info.objects[0].type == "HTTPS"
-        - https_record_info.objects[0].zone == https_record.object.zone
-        - https_record_info.objects[0].rdata.target_name == "svc.example.com."
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].type == "HTTPS"
+          - https_record_info.objects[0].zone == https_record.object.zone
+          - https_record_info.objects[0].rdata.target_name == "svc.example.com."
 
     - name: Create a HTTPS Record (idempotent)
       infoblox.universal_ddi.dns_record:
@@ -83,10 +83,10 @@
           type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-        - https_record is changed
-        - https_record_info is not failed
-        - https_record_info.objects | length == 1
+        that:
+          - https_record is changed
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
 
     - name: Delete the HTTPS Record
       infoblox.universal_ddi.dns_record:
@@ -99,13 +99,13 @@
     - name: Get information about the HTTPS Record
       infoblox.universal_ddi.dns_record_info:
         filters:
-            zone: "{{ _auth_zone.id }}"
-            type: "HTTPS"
+          zone: "{{ _auth_zone.id }}"
+          type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-        - https_record_info is not failed
-        - https_record_info.objects | length == 0
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 0
 
     - name: Delete the HTTPS Record (idempotent)
       infoblox.universal_ddi.dns_record:
@@ -116,9 +116,9 @@
         state: absent
       register: https_record
     - assert:
-       that:
-        - https_record is not changed
-        - https_record is not failed
+        that:
+          - https_record is not changed
+          - https_record is not failed
 
     - name: Create a HTTPS Record with comment
       infoblox.universal_ddi.dns_record:
@@ -136,11 +136,11 @@
           type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-        - https_record_info is not failed
-        - https_record_info.objects | length == 1
-        - https_record_info.objects[0].id == https_record.id
-        - https_record_info.objects[0].comment == "This is a test HTTPS Record"
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].comment == "This is a test HTTPS Record"
 
     - name: Create a HTTPS Record with TTL
       infoblox.universal_ddi.dns_record:
@@ -158,11 +158,11 @@
           type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-        - https_record_info is not failed
-        - https_record_info.objects | length == 1
-        - https_record_info.objects[0].id == https_record.id
-        - https_record_info.objects[0].ttl == 3600
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].ttl == 3600
 
     - name: Create a HTTPS Record with Disabled
       infoblox.universal_ddi.dns_record:
@@ -180,7 +180,7 @@
           type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
+        that:
           - https_record_info is not failed
           - https_record_info.objects | length == 1
           - https_record_info.objects[0].id == https_record.id
@@ -203,11 +203,11 @@
           type: "HTTPS"
       register: https_record_info
     - assert:
-       that:
-            - https_record_info is not failed
-            - https_record_info.objects | length == 1
-            - https_record_info.objects[0].id == https_record.id
-            - https_record_info.objects[0].tags.location == "site-1"
+        that:
+          - https_record_info is not failed
+          - https_record_info.objects | length == 1
+          - https_record_info.objects[0].id == https_record.id
+          - https_record_info.objects[0].tags.location == "site-1"
 
     - name: Create a HTTPS Record with Inheritance Sources
       infoblox.universal_ddi.dns_record:
