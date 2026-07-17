@@ -13,7 +13,7 @@ module: dtc_policy
 short_description: Manages a DTC Policy
 description:
     - Manages a DTC Policy
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
