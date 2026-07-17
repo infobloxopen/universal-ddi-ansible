@@ -45,7 +45,7 @@ jobs:
 
       - name: Save pip cache
         if: steps.pip-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ~/.cache/pip
           key: ${{ steps.cache-key.outputs.value }}
