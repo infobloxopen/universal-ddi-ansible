@@ -4,6 +4,53 @@ infoblox.universal\_ddi Release Notes
 
 .. contents:: Topics
 
+v1.2.0
+======
+
+Release Summary
+---------------
+
+Adds full Ansible support for DTC (DNS Traffic Control): new modules for DTC Servers, Pools, Policies, LBDNs, and HTTP/ICMP/SNMP/TCP Health Checks (plus SNMP User Security Models). Also adds SSHFP and HTTPS DNS record support, a new record-protection option to ``dns_record``, zone filtering in ``cloud_discovery_providers``, and several bug fixes across Anycast, DHCP, DNS, IPAM, and Cloud Discovery modules.
+
+Minor Changes
+-------------
+
+- cloud_discovery_providers - Added a ``zone_filters`` option to include or exclude specific zones from discovery for AWS, Azure, and GCP providers (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
+- dhcp_ha_group - ``anycast`` mode is deprecated (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+- dns_record - Added a ``configure_record_protection`` option to set, update, or remove protected-access levels on DNS resource records (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
+- dns_record, dns_record_info - Added a ``target_name`` ``rdata`` sub-option used by HTTPS/SVCB record types (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
+- dns_record, dns_record_info - Added support for managing SSHFP (SSH public key fingerprint) records (https://github.com/infobloxopen/universal-ddi-ansible/pull/61).
+- ipam_address_block, ipam_ip_space - Added previously missing ``authoritative_dhcp``, ``hold_reclaimed_time``, and ``hold_reclaimed_time_v6`` inheritance options (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+
+Bugfixes
+--------
+
+- anycast_config, anycast_config_info - Added ``NTP`` service mode and deprecated ``DHCP`` service mode (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+- cloud_discovery_providers - Fixed provider deletion to transition the provider to a disabled state before deleting it, as required by the API (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
+- dns_record, ipam_address_block, ipam_ip_space, ipam_subnet - Fixed ``changed`` status reporting by re-reading the resource when the API's update response omits the result object (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+
+New Modules
+-----------
+
+- infoblox.universal_ddi.dtc_health_check_http - Manage DTC HTTP Health Check.
+- infoblox.universal_ddi.dtc_health_check_http_info - Get DTC HTTP Health Check information.
+- infoblox.universal_ddi.dtc_health_check_icmp - Manage DTC ICMP Health Check.
+- infoblox.universal_ddi.dtc_health_check_icmp_info - Get DTC ICMP Health Check information.
+- infoblox.universal_ddi.dtc_health_check_snmp - Manage DTC SNMP Health Check.
+- infoblox.universal_ddi.dtc_health_check_snmp_info - Get DTC SNMP Health Check information.
+- infoblox.universal_ddi.dtc_health_check_tcp - Manage DTC TCP Health Check.
+- infoblox.universal_ddi.dtc_health_check_tcp_info - Get DTC TCP Health Check information.
+- infoblox.universal_ddi.dtc_lbdn - Manage DTC LBDN.
+- infoblox.universal_ddi.dtc_lbdn_info - Get DTC LBDN information.
+- infoblox.universal_ddi.dtc_policy - Manage DTC Policy.
+- infoblox.universal_ddi.dtc_policy_info - Get DTC Policy information.
+- infoblox.universal_ddi.dtc_pool - Manage DTC Pool.
+- infoblox.universal_ddi.dtc_pool_info - Get DTC Pool information.
+- infoblox.universal_ddi.dtc_server - Manage DTC Server.
+- infoblox.universal_ddi.dtc_server_info - Get DTC Server information.
+- infoblox.universal_ddi.dtc_snmp_user_security_model - Manage DTC SNMP User Security Model.
+- infoblox.universal_ddi.dtc_snmp_user_security_model_info - Get DTC SNMP User Security Model information.
+
 v1.1.0
 ======
 
