@@ -109,7 +109,7 @@ EXAMPLES = r"""
         dhcp_options:
             - type: "option"
               option_code: "{{ option_code.id }}"
-              option_value: 235
+              option_value: "235"
         state: "present"
     
     - name: Delete the DHCP Option Group

@@ -92,7 +92,7 @@ EXAMPLES = r"""
     
     - name: Create a Delegation
       infoblox.universal_ddi.dns_delegation:
-        fqdn: delegation.example_zone.
+        fqdn: delegation.auth-zone.com.
         view: "{{ view.id }}"
         delegation_servers:
           - fqdn: ns1.example.com.
@@ -103,7 +103,7 @@ EXAMPLES = r"""
     
     - name: Delete the DNS Delegation
       infoblox.universal_ddi.dns_delegation:
-        fqdn: delegation.example_zone.
+        fqdn: delegation.auth-zone.com.
         view: "{{ view.id }}"
         state: absent
 """  # noqa: E501

@@ -52,7 +52,7 @@ EXAMPLES = r"""
       filters:
         id: "{{ forward_zone_id }}"
 
-  - name: Get Forward Zone information by filters (e.g. name)
+  - name: Get Forward Zone information by filters (e.g. fqdn)
     infoblox.universal_ddi.dns_forward_zone_info:
       filters:
         fqdn: "example-zone.com."
