@@ -457,7 +457,7 @@
           - azure_provider is changed
           - azure_provider_info is not failed
           # Zone Filters are not returned in the response, so we cannot assert on them. We can only assert that the provider was created successfully.
-          - aws_provider_info.objects | length == 1
+          - azure_provider_info.objects | length == 1
 
     - name: Create an Azure cloud discovery provider with desired_state
       infoblox.universal_ddi.cloud_discovery_providers:

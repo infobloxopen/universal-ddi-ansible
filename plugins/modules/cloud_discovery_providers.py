@@ -898,10 +898,18 @@ class ProvidersModule(UniversalDDIAnsibleModule):
         explicitly excludes 'id' as a read-only field.  Setting it via
         additional_properties is the only way to ensure it survives serialization
         and reaches the PUT endpoint, which requires a non-empty source config ID.
+
+        source_configs can be added/removed/reordered between existing and payload,
+        so entries are matched by position only up to the shorter of the two lists.
         """
+        existing_source_configs = self.existing.source_configs or []
         for i, sc in enumerate(payload.source_configs or []):
-            existing_id = self.existing.source_configs[i].id
+            if i >= len(existing_source_configs):
+                break
+            existing_id = existing_source_configs[i].id
             if existing_id is not None:
+                if not isinstance(sc.additional_properties, dict):
+                    sc.additional_properties = {}
                 sc.additional_properties["id"] = existing_id
 
     def update(self):
@@ -913,8 +921,10 @@ class ProvidersModule(UniversalDDIAnsibleModule):
 
         # Retain cloud_credential_id from the existing source_configs at the dict level
         # (before from_dict) since the user typically does not provide it.
-        for i, sc in enumerate(payload_dict.get("source_configs", [])):
-            existing_sc = self.existing.source_configs[i]
+        # Matched by position only up to the shorter of the two lists, since the
+        # number of source_configs may differ between existing and payload.
+        existing_source_configs = self.existing.source_configs or []
+        for sc, existing_sc in zip(payload_dict.get("source_configs", []), existing_source_configs):
             if existing_sc.cloud_credential_id is not None:
                 sc["cloud_credential_id"] = existing_sc.cloud_credential_id
 
