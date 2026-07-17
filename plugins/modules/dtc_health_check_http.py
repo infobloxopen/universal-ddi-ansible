@@ -13,7 +13,7 @@ module: dtc_health_check_http
 short_description: Manages a DTC HTTP Health Check
 description:
     - Manages a DTC HTTP Health Check.
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
