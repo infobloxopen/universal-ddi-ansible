@@ -55,11 +55,11 @@ EXAMPLES = r"""
   - name: Get Forward Zone information by filters (e.g. name)
     infoblox.universal_ddi.dns_forward_zone_info:
       filters:
-        fqdn: "example_zone"
+        fqdn: "example-zone.com."
 
   - name: Get Forward Zone information by raw filter query
     infoblox.universal_ddi.dns_forward_zone_info:
-      filter_query: "fqdn=='example_zone'"
+      filter_query: "fqdn=='example-zone.com.'"
 
   - name: Get Forward Zone information by tag filters
     infoblox.universal_ddi.dns_forward_zone_info:
