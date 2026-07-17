@@ -419,6 +419,45 @@
           - gcp_provider_info.objects | length == 1
           - gcp_provider_info.objects[0].tags.location == tag_value
 
+    - name: Create a GCP cloud discovery provider with zone_filters
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_gcp_name }}"
+        provider_type: "Google Cloud Platform"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "project_id"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+            restricted_to_accounts:
+              - "{{ config_access_id }}"
+        destination_types_enabled:
+          - "DNS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+                zone_filters:
+                  - action: "exclude"
+                    wildcards:
+                      - "*.internal.example.com"
+            destination_type: "DNS"
+        state: present
+      register: gcp_provider
+    - name: Get GCP cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_gcp_name }}"
+      register: gcp_provider_info
+    - assert:
+        that:
+          - gcp_provider is changed
+          - gcp_provider_info is not failed
+          # Zone Filters are not returned in the response, so we cannot assert on them. We can only assert that the provider was created successfully.
+          - gcp_provider_info.objects | length == 1
+
     - name: Create a GCP cloud discovery provider with desired_state
       infoblox.universal_ddi.cloud_discovery_providers:
         name: "{{ cloud_discovery_provider_gcp_name }}"

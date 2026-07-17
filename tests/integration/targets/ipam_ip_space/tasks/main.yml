@@ -574,7 +574,7 @@
   always:
     # Cleanup if the test fails
     - ansible.builtin.include_role:
-        name: "setup_federation_federated_block"
+        name: "setup_federation_federated_realms"
         tasks_from: "cleanup.yml"
 
     - name: "Delete IP Space"

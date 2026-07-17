@@ -352,7 +352,190 @@
           - a_record_info.objects[0].name_in_zone == a_record.object.name_in_zone
           - a_record_info.objects[0].zone == a_record.object.zone
 
+    - name: Create an A Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.1"
+        type: "A"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: a_record_ddi_admin
+    - name: Get information about the A Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "A"
+      register: a_record_info
+    - assert:
+        that:
+          - a_record_ddi_admin is changed
+          - a_record_info is not failed
+          - a_record_info.objects | length == 1
+          - a_record_info.objects[0].id == a_record_ddi_admin.id
+          - a_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create an A Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.2"
+        type: "A"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: a_record_global_admin
+    - name: Get information about the A Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "A"
+      register: a_record_info
+    - assert:
+        that:
+          - a_record_global_admin is changed
+          - a_record_info is not failed
+          - a_record_info.objects | length == 1
+          - a_record_info.objects[0].id == a_record_global_admin.id
+          - a_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create an A Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.1"
+        type: "A"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: a_record
+    - assert:
+        that:
+          - a_record is not changed
+          - a_record is not failed
+
+    - name: Create an A Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.2"
+        type: "A"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: a_record
+    - assert:
+        that:
+          - a_record is not changed
+          - a_record is not failed
+
+    - name: Update A Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.1"
+        type: "A"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: a_record
+    - name: Get information about the A Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "A"
+      register: a_record_info
+    - assert:
+        that:
+          - a_record is changed
+          - a_record is not failed
+          - a_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from A Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.2"
+        type: "A"
+        configure_record_protection: "None"
+        state: present
+      register: a_record
+    - name: Get information about the A Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "A"
+      register: a_record_info
+    - assert:
+        that:
+          - a_record is changed
+          - a_record is not failed
+          - a_record_info.objects[0]['protection'] is not defined or a_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from A Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          address: "192.168.30.2"
+        type: "A"
+        configure_record_protection: "None"
+        state: present
+      register: a_record
+    - assert:
+        that:
+          - a_record is not changed
+          - a_record is not failed
+
   always:
+     - name: "Remove protection from A Record with DDI Admin protection"
+       infoblox.universal_ddi.dns_record:
+         name_in_zone: "protected-ddi-admin"
+         zone: "{{ _auth_zone.id }}"
+         rdata:
+           address: "192.168.30.1"
+         type: "A"
+         configure_record_protection: "None"
+         state: present
+       ignore_errors: true
+
+     - name: "Delete the A Record with DDI Admin protection"
+       infoblox.universal_ddi.dns_record:
+         name_in_zone: "protected-ddi-admin"
+         zone: "{{ _auth_zone.id }}"
+         rdata:
+           address: "192.168.30.1"
+         type: "A"
+         state: absent
+       ignore_errors: true
+
+     - name: "Remove protection from A Record with Global Admin protection"
+       infoblox.universal_ddi.dns_record:
+         name_in_zone: "protected-global-admin"
+         zone: "{{ _auth_zone.id }}"
+         rdata:
+           address: "192.168.30.2"
+         type: "A"
+         configure_record_protection: "None"
+         state: present
+       ignore_errors: true
+
+     - name: "Delete the A Record with Global Admin protection"
+       infoblox.universal_ddi.dns_record:
+         name_in_zone: "protected-global-admin"
+         zone: "{{ _auth_zone.id }}"
+         rdata:
+           address: "192.168.30.2"
+         type: "A"
+         state: absent
+       ignore_errors: true
+
      - name: "Delete the A Record"
        infoblox.universal_ddi.dns_record:
          name_in_zone: "{{ record_name }}"

@@ -13,7 +13,7 @@ module: dtc_snmp_user_security_model
 short_description: Manages SNMP User Security
 description:
     - Manages SNMP User Security
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

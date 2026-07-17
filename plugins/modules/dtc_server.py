@@ -13,7 +13,7 @@ module: dtc_server
 short_description: Manages a DTC Server
 description:
     - Manages a DTC Server.
-version_added: 1.1.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

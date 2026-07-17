@@ -306,7 +306,212 @@
           - srv_record_info.objects[0].name_in_zone == srv_record.object.name_in_zone
           - srv_record_info.objects[0].zone == srv_record.object.zone
 
+    - name: Create a SRV Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9090
+          priority: 30
+          target: "protected.example.com."
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: srv_record_ddi_admin
+    - name: Get information about the SRV Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SRV"
+      register: srv_record_info
+    - assert:
+        that:
+          - srv_record_ddi_admin is changed
+          - srv_record_info is not failed
+          - srv_record_info.objects | length == 1
+          - srv_record_info.objects[0].id == srv_record_ddi_admin.id
+          - srv_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a SRV Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        configure_record_protection: "Global Admin"
+        state: present
+      register: srv_record_global_admin
+    - name: Get information about the SRV Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SRV"
+      register: srv_record_info
+    - assert:
+        that:
+          - srv_record_global_admin is changed
+          - srv_record_info is not failed
+          - srv_record_info.objects | length == 1
+          - srv_record_info.objects[0].id == srv_record_global_admin.id
+          - srv_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create a SRV Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9090
+          priority: 30
+          target: "protected.example.com."
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: srv_record
+    - assert:
+        that:
+          - srv_record is not changed
+          - srv_record is not failed
+
+    - name: Create a SRV Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        configure_record_protection: "Global Admin"
+        state: present
+      register: srv_record
+    - assert:
+        that:
+          - srv_record is not changed
+          - srv_record is not failed
+
+    - name: Update SRV Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9090
+          priority: 30
+          target: "protected.example.com."
+        configure_record_protection: "Global Admin"
+        state: present
+      register: srv_record
+    - name: Get information about the SRV Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SRV"
+      register: srv_record_info
+    - assert:
+        that:
+          - srv_record is changed
+          - srv_record is not failed
+          - srv_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from SRV Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        configure_record_protection: "None"
+        state: present
+      register: srv_record
+    - name: Get information about the SRV Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "SRV"
+      register: srv_record_info
+    - assert:
+        that:
+          - srv_record is changed
+          - srv_record is not failed
+          - srv_record_info.objects[0]['protection'] is not defined or srv_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from SRV Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        configure_record_protection: "None"
+        state: present
+      register: srv_record
+    - assert:
+        that:
+          - srv_record is not changed
+          - srv_record is not failed
+
   always:
+    - name: "Remove protection from SRV Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9090
+          priority: 30
+          target: "protected.example.com."
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the SRV Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          port: 9090
+          priority: 30
+          target: "protected.example.com."
+        type: "SRV"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove protection from SRV Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        type: "SRV"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the SRV Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          port: 9091
+          priority: 30
+          target: "protected2.example.com."
+        type: "SRV"
+        state: absent
+      ignore_errors: true
+
     - name: "Delete SRV Record"
       infoblox.universal_ddi.dns_record:
         name_in_zone: "{{ record_name }}"
