@@ -224,11 +224,12 @@
           state: "absent"
       ignore_errors: true
 
+    - name: Delete the DHCP Option Code
+      ansible.builtin.include_role:
+        name: setup_option_code
+        tasks_from: cleanup.yml
+
     - name: Delete the DHCP Option Space
       ansible.builtin.include_role:
         name: setup_option_space
-        tasks_from: cleanup.yml
-
-    - ansible.builtin.include_role:
-        name: setup_option_code
         tasks_from: cleanup.yml
