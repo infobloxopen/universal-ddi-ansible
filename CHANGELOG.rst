@@ -32,22 +32,22 @@ Bugfixes
 New Modules
 -----------
 
-- infoblox.universal_ddi.dtc_server - Manage DTC Server.
-- infoblox.universal_ddi.dtc_server_info - Get DTC Server information.
-- infoblox.universal_ddi.dtc_pool - Manage DTC Pool.
-- infoblox.universal_ddi.dtc_pool_info - Get DTC Pool information.
-- infoblox.universal_ddi.dtc_policy - Manage DTC Policy.
-- infoblox.universal_ddi.dtc_policy_info - Get DTC Policy information.
-- infoblox.universal_ddi.dtc_lbdn - Manage DTC LBDN.
-- infoblox.universal_ddi.dtc_lbdn_info - Get DTC LBDN information.
 - infoblox.universal_ddi.dtc_health_check_http - Manage DTC HTTP Health Check.
 - infoblox.universal_ddi.dtc_health_check_http_info - Get DTC HTTP Health Check information.
 - infoblox.universal_ddi.dtc_health_check_icmp - Manage DTC ICMP Health Check.
 - infoblox.universal_ddi.dtc_health_check_icmp_info - Get DTC ICMP Health Check information.
-- infoblox.universal_ddi.dtc_health_check_tcp - Manage DTC TCP Health Check.
-- infoblox.universal_ddi.dtc_health_check_tcp_info - Get DTC TCP Health Check information.
 - infoblox.universal_ddi.dtc_health_check_snmp - Manage DTC SNMP Health Check.
 - infoblox.universal_ddi.dtc_health_check_snmp_info - Get DTC SNMP Health Check information.
+- infoblox.universal_ddi.dtc_health_check_tcp - Manage DTC TCP Health Check.
+- infoblox.universal_ddi.dtc_health_check_tcp_info - Get DTC TCP Health Check information.
+- infoblox.universal_ddi.dtc_lbdn - Manage DTC LBDN.
+- infoblox.universal_ddi.dtc_lbdn_info - Get DTC LBDN information.
+- infoblox.universal_ddi.dtc_policy - Manage DTC Policy.
+- infoblox.universal_ddi.dtc_policy_info - Get DTC Policy information.
+- infoblox.universal_ddi.dtc_pool - Manage DTC Pool.
+- infoblox.universal_ddi.dtc_pool_info - Get DTC Pool information.
+- infoblox.universal_ddi.dtc_server - Manage DTC Server.
+- infoblox.universal_ddi.dtc_server_info - Get DTC Server information.
 - infoblox.universal_ddi.dtc_snmp_user_security_model - Manage DTC SNMP User Security Model.
 - infoblox.universal_ddi.dtc_snmp_user_security_model_info - Get DTC SNMP User Security Model information.
 

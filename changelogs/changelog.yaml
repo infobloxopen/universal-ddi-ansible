@@ -232,8 +232,8 @@ releases:
   1.2.0:
     changes:
       bugfixes:
-      - anycast_config, anycast_config_info - Added ``NTP`` service mode and
-        deprecated ``DHCP`` service mode (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+      - anycast_config, anycast_config_info - Added ``NTP`` service mode and deprecated
+        ``DHCP`` service mode (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
       - cloud_discovery_providers - Fixed provider deletion to transition the provider
         to a disabled state before deleting it, as required by the API (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
       - dns_record, ipam_address_block, ipam_ip_space, ipam_subnet - Fixed ``changed``
@@ -254,37 +254,13 @@ releases:
         (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
       release_summary: 'Adds full Ansible support for DTC (DNS Traffic Control): new
         modules for DTC Servers, Pools, Policies, LBDNs, and HTTP/ICMP/SNMP/TCP Health
-        Checks (plus SNMP User Security Models). Also adds SSHFP and HTTPS DNS
-        record support, a new record-protection option to ``dns_record``, zone
-        filtering in ``cloud_discovery_providers``, and several bug fixes across
-        Anycast, DHCP, DNS, IPAM, and Cloud Discovery modules.
+        Checks (plus SNMP User Security Models). Also adds SSHFP and HTTPS DNS record
+        support, a new record-protection option to ``dns_record``, zone filtering
+        in ``cloud_discovery_providers``, and several bug fixes across Anycast, DHCP,
+        DNS, IPAM, and Cloud Discovery modules.
 
         '
     modules:
-    - description: Manage DTC Server.
-      name: dtc_server
-      namespace: ''
-    - description: Get DTC Server information.
-      name: dtc_server_info
-      namespace: ''
-    - description: Manage DTC Pool.
-      name: dtc_pool
-      namespace: ''
-    - description: Get DTC Pool information.
-      name: dtc_pool_info
-      namespace: ''
-    - description: Manage DTC Policy.
-      name: dtc_policy
-      namespace: ''
-    - description: Get DTC Policy information.
-      name: dtc_policy_info
-      namespace: ''
-    - description: Manage DTC LBDN.
-      name: dtc_lbdn
-      namespace: ''
-    - description: Get DTC LBDN information.
-      name: dtc_lbdn_info
-      namespace: ''
     - description: Manage DTC HTTP Health Check.
       name: dtc_health_check_http
       namespace: ''
@@ -297,17 +273,41 @@ releases:
     - description: Get DTC ICMP Health Check information.
       name: dtc_health_check_icmp_info
       namespace: ''
+    - description: Manage DTC SNMP Health Check.
+      name: dtc_health_check_snmp
+      namespace: ''
+    - description: Get DTC SNMP Health Check information.
+      name: dtc_health_check_snmp_info
+      namespace: ''
     - description: Manage DTC TCP Health Check.
       name: dtc_health_check_tcp
       namespace: ''
     - description: Get DTC TCP Health Check information.
       name: dtc_health_check_tcp_info
       namespace: ''
-    - description: Manage DTC SNMP Health Check.
-      name: dtc_health_check_snmp
+    - description: Manage DTC LBDN.
+      name: dtc_lbdn
       namespace: ''
-    - description: Get DTC SNMP Health Check information.
-      name: dtc_health_check_snmp_info
+    - description: Get DTC LBDN information.
+      name: dtc_lbdn_info
+      namespace: ''
+    - description: Manage DTC Policy.
+      name: dtc_policy
+      namespace: ''
+    - description: Get DTC Policy information.
+      name: dtc_policy_info
+      namespace: ''
+    - description: Manage DTC Pool.
+      name: dtc_pool
+      namespace: ''
+    - description: Get DTC Pool information.
+      name: dtc_pool_info
+      namespace: ''
+    - description: Manage DTC Server.
+      name: dtc_server
+      namespace: ''
+    - description: Get DTC Server information.
+      name: dtc_server_info
       namespace: ''
     - description: Manage DTC SNMP User Security Model.
       name: dtc_snmp_user_security_model
