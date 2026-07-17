@@ -114,7 +114,20 @@
     - assert:
         that:
           - subnet_info is failed
-          - "'The next available subnet cidr value must be greater than parent and between 1 and 32.' in subnet_info.msg"
+          - "'No subnets available with the given tags and CIDR.' in subnet_info.msg"
+
+    - name: "Get next available subnet with valid tags after searching all the available address blocks with valid tags"
+      infoblox.universal_ddi.ipam_next_available_subnet_info:
+        tag_filters:
+          environment: "test-2"
+          location: "site-2"
+        cidr: 27
+        count: 8
+      register: subnet_info
+    - assert:
+        that:
+          - subnet_info is not failed
+          - subnet_info.objects | length == 8
 
   always:
     # Cleanup if the test fails
