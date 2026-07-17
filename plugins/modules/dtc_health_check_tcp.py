@@ -13,7 +13,7 @@ module: dtc_health_check_tcp
 short_description: Manages a DTC TCP Health Check
 description:
     - Manages a DTC TCP Health Check
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:

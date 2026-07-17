@@ -13,7 +13,7 @@ module: dtc_health_check_http_info
 short_description: Retrieves DTC HTTP Health Checks
 description:
     - Retrieve information about existing DTC HTTP Health Checks.
-version_added: 1.0.0
+version_added: 1.2.0
 author: Infoblox Inc. (@infobloxopen)
 options:
     id:
