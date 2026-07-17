@@ -883,8 +883,11 @@ class ProvidersModule(UniversalDDIAnsibleModule):
         stripped before every PUT call.
         """
         if isinstance(obj, dict):
-            return {k: ProvidersModule._strip_additional_properties(v)
-                    for k, v in obj.items() if k != "additional_properties"}
+            return {
+                k: ProvidersModule._strip_additional_properties(v)
+                for k, v in obj.items()
+                if k != "additional_properties"
+            }
         if isinstance(obj, list):
             return [ProvidersModule._strip_additional_properties(item) for item in obj]
         return obj
