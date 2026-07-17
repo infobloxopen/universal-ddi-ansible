@@ -85,7 +85,7 @@ EXAMPLES = r"""
     
     - name: Create an Auth Zone (Delegation requires a parent zone)
       infoblox.universal_ddi.dns_auth_zone:
-        fqdn: example_zone
+        fqdn: auth-zone.com.
         primary_type: cloud
         view: "{{ view.id }}"
         state: present
