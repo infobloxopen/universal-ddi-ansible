@@ -73,7 +73,7 @@ EXAMPLES = r"""
           location: "site-1"
           
     - name: Get DHCP server information by filter query
-      infoblox.universal_ddi.dns_acl_info:
+      infoblox.universal_ddi.dhcp_server_info:
         filter_query: "name=='example-dhcp-server'"
         
 """  # noqa: E501

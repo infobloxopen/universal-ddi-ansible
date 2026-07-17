@@ -69,6 +69,7 @@ EXAMPLES = r"""
     infoblox.universal_ddi.infra_host_info:
       filters:
         display_name: "example_host"
+    register: infra_host_info
     timeout: 10
     retries: 5
     delay: 1

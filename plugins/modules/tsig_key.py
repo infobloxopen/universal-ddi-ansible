@@ -67,13 +67,6 @@ EXAMPLES = r"""
 - name: Create TSIG Key
   infoblox.universal_ddi.tsig_key:
     name: "example-tsig-key"
-    secret: "rA+n89+aOCjFVNzBPbYkl+j3oQcl4U19JAkCIK9Ad8k="
-    algorithm: "hmac_sha512"
-    state: present
-
-- name: Create TSIG Key with additional Fields
-  infoblox.universal_ddi.tsig_key:
-    name: "example-tsig-key"
     secret: "fA+n89+aOCjFVNzBPbYkl+j3oQcl4U19JAkCIK9Ad8k="
     algorithm: "hmac_sha512"
     state: present

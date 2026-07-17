@@ -52,14 +52,14 @@ EXAMPLES = r"""
       filters:
         id: "{{ forward_zone_id }}"
 
-  - name: Get Forward Zone information by filters (e.g. name)
+  - name: Get Forward Zone information by filters (e.g. fqdn)
     infoblox.universal_ddi.dns_forward_zone_info:
       filters:
-        name: "example_zone"
+        fqdn: "example-zone.com."
 
   - name: Get Forward Zone information by raw filter query
-    infoblox.universal_ddi.dns_auth_zone_info:
-      filter_query: "name=='example_zone'"
+    infoblox.universal_ddi.dns_forward_zone_info:
+      filter_query: "fqdn=='example-zone.com.'"
 
   - name: Get Forward Zone information by tag filters
     infoblox.universal_ddi.dns_forward_zone_info:
