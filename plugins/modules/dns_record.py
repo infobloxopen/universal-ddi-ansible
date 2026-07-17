@@ -188,7 +188,6 @@ options:
             order:
                 description: 
                     - "For B(NAPTR) record, a 16-bit unsigned integer specifying the order in which the NAPTR records must be processed. Low numbers are processed before high numbers, and once a NAPTR is found whose rule \"matches\" the target, the client must not consider any NAPTRs with a higher value for order (except as noted below for the \"flags\" field. The range of the value is 0 to 65535."
-                    - "Defaults to 0."
                 type: int
                 required: true
             regexp:
@@ -261,7 +260,6 @@ options:
             priority:
                 description:
                     - "For B(SRV) record, an unsigned 16-bit integer which specifies the priority of this target host. The range of the value is 0 to 65535. A client must attempt to contact the target host with the lowest-numbered priority it can reach. Target hosts with the same priority should be tried in an order defined by the I(weight) field."
-                    - "Defaults to 0."
                 type: int
                 required: true
             weight:
