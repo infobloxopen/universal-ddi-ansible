@@ -1,0 +1,19 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - name: Delete DTC Server 1
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server1_name }}"
+        address: "10.0.0.0"
+        state: absent
+      ignore_errors: true
+
+    - name: Delete DTC Server 2
+      infoblox.universal_ddi.dtc_server:
+        name: "{{ dtc_server2_name }}"
+        address: "20.0.0.0"
+        state: absent
+      ignore_errors: true
