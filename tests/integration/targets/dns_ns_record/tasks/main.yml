@@ -253,7 +253,190 @@
         - ns_record_info.objects[0].id == ns_record.id
         - ns_record_info.objects[0].inheritance_sources.ttl.action == "inherit"
 
+    - name: Create a NS Record with Record Protection - DDI Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns2.example.com."
+        type: "NS"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: ns_record_ddi_admin
+    - name: Get information about the NS Record with DDI Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "NS"
+      register: ns_record_info
+    - assert:
+        that:
+          - ns_record_ddi_admin is changed
+          - ns_record_info is not failed
+          - ns_record_info.objects | length == 1
+          - ns_record_info.objects[0].id == ns_record_ddi_admin.id
+          - ns_record_info.objects[0]['protection']['level'] == "DDI Admin"
+
+    - name: Create a NS Record with Record Protection - Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: ns_record_global_admin
+    - name: Get information about the NS Record with Global Admin protection
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "NS"
+      register: ns_record_info
+    - assert:
+        that:
+          - ns_record_global_admin is changed
+          - ns_record_info is not failed
+          - ns_record_info.objects | length == 1
+          - ns_record_info.objects[0].id == ns_record_global_admin.id
+          - ns_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Create a NS Record with Record Protection - DDI Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns2.example.com."
+        type: "NS"
+        configure_record_protection: "DDI Admin"
+        state: present
+      register: ns_record
+    - assert:
+        that:
+          - ns_record is not changed
+          - ns_record is not failed
+
+    - name: Create a NS Record with Record Protection - Global Admin (idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: ns_record
+    - assert:
+        that:
+          - ns_record is not changed
+          - ns_record is not failed
+
+    - name: Update NS Record Protection from DDI Admin to Global Admin
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns2.example.com."
+        type: "NS"
+        configure_record_protection: "Global Admin"
+        state: present
+      register: ns_record
+    - name: Get information about the NS Record after protection change
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-ddi-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "NS"
+      register: ns_record_info
+    - assert:
+        that:
+          - ns_record is changed
+          - ns_record is not failed
+          - ns_record_info.objects[0]['protection']['level'] == "Global Admin"
+
+    - name: Remove protection from NS Record (None)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        configure_record_protection: "None"
+        state: present
+      register: ns_record
+    - name: Get information about the NS Record after protection removed
+      infoblox.universal_ddi.dns_record_info:
+        filters:
+          name_in_zone: "protected-global-admin"
+          zone: "{{ _auth_zone.id }}"
+          type: "NS"
+      register: ns_record_info
+    - assert:
+        that:
+          - ns_record is changed
+          - ns_record is not failed
+          - ns_record_info.objects[0]['protection'] is not defined or ns_record_info.objects[0]['protection']['level'] is not defined
+
+    - name: Remove protection from NS Record (None, idempotent)
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        configure_record_protection: "None"
+        state: present
+      register: ns_record
+    - assert:
+        that:
+          - ns_record is not changed
+          - ns_record is not failed
+
   always:
+    - name: "Remove protection from NS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns2.example.com."
+        type: "NS"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the NS Record with DDI Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-ddi-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns2.example.com."
+        type: "NS"
+        state: absent
+      ignore_errors: true
+
+    - name: "Remove protection from NS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        configure_record_protection: "None"
+        state: present
+      ignore_errors: true
+
+    - name: "Delete the NS Record with Global Admin protection"
+      infoblox.universal_ddi.dns_record:
+        name_in_zone: "protected-global-admin"
+        zone: "{{ _auth_zone.id }}"
+        rdata:
+          dname: "ns3.example.com."
+        type: "NS"
+        state: absent
+      ignore_errors: true
+
     - name: Delete the NS Record
       infoblox.universal_ddi.dns_record:
         name_in_zone: "{{ record_name }}"
