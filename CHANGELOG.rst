@@ -25,7 +25,7 @@ Minor Changes
 Bugfixes
 --------
 
-- anycast_config, anycast_config_info - Fixed an invalid ``service`` choice (``DHCP``) that should have been ``NTP`` (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+- anycast_config, anycast_config_info - Added ``NTP`` service mode and deprecated ``DHCP`` service mode (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
 - cloud_discovery_providers - Fixed provider deletion to transition the provider to a disabled state before deleting it, as required by the API (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
 - dns_record, ipam_address_block, ipam_ip_space, ipam_subnet - Fixed ``changed`` status reporting by re-reading the resource when the API's update response omits the result object (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
 
