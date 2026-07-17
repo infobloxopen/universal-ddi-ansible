@@ -155,6 +155,9 @@ options:
                                     action:
                                         description: "Filter action. E.g., I(include) or I(exclude)."
                                         type: str
+                                        choices:
+                                            - "include"
+                                            - "exclude"
                                     wildcards:
                                         description: "List of wildcard patterns to match zone names."
                                         type: list
@@ -329,7 +332,6 @@ EXAMPLES = r"""
         name: "aws_provider_minimal"
         provider_type: "Amazon Web Services"
         account_preference: "single"
-        desired_state: "disabled" #desired state should be disabled before deletion
         state: absent
         
     - name: Create a GCP cloud discovery provider 
@@ -899,8 +901,10 @@ class ProvidersModule(UniversalDDIAnsibleModule):
         additional_properties is the only way to ensure it survives serialization
         and reaches the PUT endpoint, which requires a non-empty source config ID.
 
-        source_configs can be added/removed/reordered between existing and payload,
-        so entries are matched by position only up to the shorter of the two lists.
+        The API currently allows at most one source_config per provider (multiple/
+        auto_discover_multiple both reject a second entry), so entries are matched
+        by position; the bounds check below only guards the 0-vs-1-length case
+        (e.g. source_configs becoming empty).
         """
         existing_source_configs = self.existing.source_configs or []
         for i, sc in enumerate(payload.source_configs or []):
@@ -921,8 +925,6 @@ class ProvidersModule(UniversalDDIAnsibleModule):
 
         # Retain cloud_credential_id from the existing source_configs at the dict level
         # (before from_dict) since the user typically does not provide it.
-        # Matched by position only up to the shorter of the two lists, since the
-        # number of source_configs may differ between existing and payload.
         existing_source_configs = self.existing.source_configs or []
         for sc, existing_sc in zip(payload_dict.get("source_configs", []), existing_source_configs):
             if existing_sc.cloud_credential_id is not None:
@@ -1067,7 +1069,7 @@ def main():
                                     type="list",
                                     elements="dict",
                                     options=dict(
-                                        action=dict(type="str"),
+                                        action=dict(type="str", choices=["include", "exclude"]),
                                         wildcards=dict(type="list", elements="str"),
                                     ),
                                 ),
