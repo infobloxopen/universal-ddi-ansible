@@ -1,0 +1,78 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        dtc_pool_name: "test-dtc-pool-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create a DTC Pool
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_name }}"
+        method: "round_robin"
+        tags:
+          location: "{{ tag_value }}"
+        state: "present"
+      register: dtc_pool
+
+    - name: Get information about the DTC Pool by ID
+      infoblox.universal_ddi.dtc_pool_info:
+        id: "{{ dtc_pool.id }}"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].name == dtc_pool_name
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+
+    - name: Get information about the DTC Pool by filters (name)
+      infoblox.universal_ddi.dtc_pool_info:
+        filters:
+          name: "{{ dtc_pool_name }}"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].name == dtc_pool_name
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+
+    - name: Get information about the DTC Pool by raw filter query
+      infoblox.universal_ddi.dtc_pool_info:
+        filter_query: "name=='{{ dtc_pool_name }}'"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+          - dtc_pool_info.objects[0].name == dtc_pool_name
+
+    - name: Get information about the DTC Pool by tag filters
+      infoblox.universal_ddi.dtc_pool_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+          - dtc_pool_info.objects[0].tags.location == tag_value
+
+    - name: Get information about the DTC Pool by raw tag filter query
+      infoblox.universal_ddi.dtc_pool_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: dtc_pool_info
+    - assert:
+        that:
+          - dtc_pool_info.objects | length == 1
+          - dtc_pool_info.objects[0].id == dtc_pool.id
+          - dtc_pool_info.objects[0].tags.location == tag_value
+
+  always:
+    - name: Delete DTC Pool
+      infoblox.universal_ddi.dtc_pool:
+        name: "{{ dtc_pool_name }}"
+        method: "round_robin"
+        state: "absent"
+      ignore_errors: true

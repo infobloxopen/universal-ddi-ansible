@@ -9,18 +9,44 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ansible: [ 'stable-2.15', 'stable-2.16', 'stable-2.17', 'devel' ]
-        python: [ '3.9', '3.10', '3.11', '3.12' ]
+        # TODO : Add devel to the ansible matrix
+        ansible: [ 'stable-2.16', 'stable-2.17', 'stable-2.18', 'stable-2.19', 'stable-2.20', 'stable-2.21' ]
+        python: [ '3.10', '3.11', '3.12', '3.13' ]
         exclude:
-          - ansible: 'stable-2.15'
-            python: '3.12'
+          - ansible: 'stable-2.16'
+            python: '3.13'
+          - ansible: 'stable-2.17'
+            python: '3.13'
+          - ansible: 'stable-2.18'
+            python: '3.10'
+          - ansible: 'stable-2.19'
+            python: '3.10'
+          - ansible: 'stable-2.20'
+            python: '3.11'
+          - ansible: 'stable-2.20'
+            python: '3.10'
+          - ansible: 'stable-2.21'
+            python: '3.11'
+          - ansible: 'stable-2.21'
+            python: '3.10'
+        include:
+            - ansible: 'stable-2.20'
+              python: '3.14'
+            - ansible: 'stable-2.21'
+              python: '3.14'
+
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
         with:
           path: infoblox.universal_ddi
 
-      - uses: ansible-community/ansible-test-gh-action@v1.15.0
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - uses: ansible-community/ansible-test-gh-action@v1.17.0
         with:
           collection-src-directory: infoblox.universal_ddi
           ansible-core-version: ${{ matrix.ansible }}
