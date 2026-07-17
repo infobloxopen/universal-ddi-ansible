@@ -45,6 +45,7 @@
         name: "{{ cloud_discovery_provider_aws_name }}"
         provider_type: "Amazon Web Services"
         account_preference: "single"
+        desired_state: "disabled"
         credential_preference:
           access_identifier_type: "role_arn"
           credential_type: "dynamic"
@@ -392,6 +393,43 @@
           - aws_provider_info is not failed
           - aws_provider_info.objects | length == 1
           - aws_provider_info.objects[0].tags.location == tag_value
+
+    - name: Create an AWS cloud discovery provider with zone_filters
+      infoblox.universal_ddi.cloud_discovery_providers:
+        name: "{{ cloud_discovery_provider_aws_name }}"
+        provider_type: "Amazon Web Services"
+        account_preference: "single"
+        credential_preference:
+          access_identifier_type: "role_arn"
+          credential_type: "dynamic"
+        source_configs:
+          - credential_config:
+                access_identifier: "{{ config_access_id }}"
+        destination_types_enabled:
+          - "DNS"
+        destinations:
+          - config:
+              dns:
+                sync_type: "read_only"
+                view_id: "{{ _view.id }}"
+                zone_filters:
+                  - action: "exclude"
+                    wildcards:
+                      - "*.internal.example.com"
+            destination_type: "DNS"
+        state: present
+      register: aws_provider
+    - name: Get AWS cloud discovery provider
+      infoblox.universal_ddi.cloud_discovery_providers_info:
+        filters:
+          name: "{{ cloud_discovery_provider_aws_name }}"
+      register: aws_provider_info
+    - assert:
+        that:
+          - aws_provider is changed
+          - aws_provider_info is not failed
+          # Zone Filters are not returned in the response, so we cannot assert on them. We can only assert that the provider was created successfully.
+          - aws_provider_info.objects | length == 1
 
     - name: Create an AWS cloud discovery provider with desired_state
       infoblox.universal_ddi.cloud_discovery_providers:
