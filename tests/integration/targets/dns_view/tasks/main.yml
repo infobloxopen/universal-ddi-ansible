@@ -744,35 +744,35 @@
           - view_info.objects[0].query_acl[1].access == "deny"
           - view_info.objects[0].query_acl[1].element == "any"
           - view_info.objects[0].query_acl | length == 2
-            
-          - name: Create a View with Recursion ACL
-            tags: runm
-            infoblox.universal_ddi.dns_view:
-              name: "{{ name }}"
-              recursion_acl:
-                - access: "allow"
-                  element: "ip"
-                  address: "192.168.11.11"
-                - access: "deny"
-                  element: "any"
-              state: present
-            register: view
-          - name: Get Information about the View
-            infoblox.universal_ddi.dns_view_info:
-              filters:
-                name: "{{ name }}"
-            register: view_info
-          - assert:
-              that:
-                - view_info is not failed
-                - view_info.objects | length == 1
-                - view_info.objects[0].id == view.id
-                - view_info.objects[0].recursion_acl[0].access == "allow"
-                - view_info.objects[0].recursion_acl[0].element == "ip"
-                - view_info.objects[0].recursion_acl[0].address == "192.168.11.11"
-                - view_info.objects[0].recursion_acl[1].access == "deny"
-                - view_info.objects[0].recursion_acl[1].element == "any"
-                - view_info.objects[0].recursion_acl | length == 2
+
+    - name: Create a View with Recursion ACL
+      tags: runm
+      infoblox.universal_ddi.dns_view:
+        name: "{{ name }}"
+        recursion_acl:
+          - access: "allow"
+            element: "ip"
+            address: "192.168.11.11"
+          - access: "deny"
+            element: "any"
+        state: present
+      register: view
+    - name: Get Information about the View
+      infoblox.universal_ddi.dns_view_info:
+        filters:
+          name: "{{ name }}"
+      register: view_info
+    - assert:
+        that:
+          - view_info is not failed
+          - view_info.objects | length == 1
+          - view_info.objects[0].id == view.id
+          - view_info.objects[0].recursion_acl[0].access == "allow"
+          - view_info.objects[0].recursion_acl[0].element == "ip"
+          - view_info.objects[0].recursion_acl[0].address == "192.168.11.11"
+          - view_info.objects[0].recursion_acl[1].access == "deny"
+          - view_info.objects[0].recursion_acl[1].element == "any"
+          - view_info.objects[0].recursion_acl | length == 2
 
     - name: Create a View with Recursion Enabled
       infoblox.universal_ddi.dns_view:
