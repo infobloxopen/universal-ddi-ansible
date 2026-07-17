@@ -113,6 +113,8 @@ jobs:
               dns_delegation_info
               dns_dname_record
               dns_dname_record_info
+              dns_sshfp_record
+              dns_sshfp_record_info
 
           - group: dns_records_2
             targets: >-
@@ -132,6 +134,8 @@ jobs:
               dns_svcb_record_info
               dns_txt_record
               dns_txt_record_info
+              dns_https_record
+              dns_https_record_info
 
           - group: dns_config
             targets: >-
