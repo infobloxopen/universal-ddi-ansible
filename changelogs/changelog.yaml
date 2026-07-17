@@ -229,3 +229,92 @@ releases:
       name: ipam_federation_federated_realm_info
       namespace: ''
     release_date: '2025-04-29'
+  1.2.0:
+    changes:
+      bugfixes:
+      - anycast_config, anycast_config_info - Fixed an invalid ``service`` choice
+        (``DHCP``) that should have been ``NTP`` (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+      - cloud_discovery_providers - Fixed provider deletion to transition the provider
+        to a disabled state before deleting it, as required by the API (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
+      - dns_record, ipam_address_block, ipam_ip_space, ipam_subnet - Fixed ``changed``
+        status reporting by re-reading the resource when the API's update response
+        omits the result object (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+      - ipam_next_available_address_block_info, ipam_next_available_subnet_info -
+        Fixed the tag-based next-available search to continue past address blocks
+        whose CIDR cannot satisfy the requested size instead of stopping (https://github.com/infobloxopen/universal-ddi-ansible/pull/47).
+      minor_changes:
+      - cloud_discovery_providers - Added a ``zone_filters`` option to include or
+        exclude specific zones from discovery for AWS, Azure, and GCP providers (https://github.com/infobloxopen/universal-ddi-ansible/pull/68).
+      - dns_record - Added a ``configure_record_protection`` option to set, update,
+        or remove protected-access levels on DNS resource records (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
+      - dns_record, dns_record_info - Added a ``target_name`` ``rdata`` sub-option
+        used by HTTPS/SVCB record types (https://github.com/infobloxopen/universal-ddi-ansible/pull/51).
+      - dns_record, dns_record_info - Added support for managing SSHFP (SSH public
+        key fingerprint) records (https://github.com/infobloxopen/universal-ddi-ansible/pull/61).
+      - ipam_address_block, ipam_ip_space - Added previously missing ``authoritative_dhcp``,
+        ``hold_reclaimed_time``, and ``hold_reclaimed_time_v6`` inheritance options
+        (https://github.com/infobloxopen/universal-ddi-ansible/pull/58).
+      release_summary: 'Adds full Ansible support for DTC (DNS Traffic Control): new
+        modules for DTC Servers, Pools, Policies, LBDNs, and HTTP/ICMP/SNMP/TCP Health
+        Checks (plus SNMP User Security Models). Also adds SSHFP DNS record support
+        and a new record-protection option to `dns_record`, adds zone filtering to
+        `cloud_discovery_providers`, and includes several bug fixes across the Anycast,
+        DHCP, DNS, IPAM, and Cloud Discovery modules.
+
+        '
+    modules:
+    - description: Manage DTC HTTP Health Check.
+      name: dtc_health_check_http
+      namespace: ''
+    - description: Get DTC HTTP Health Check information.
+      name: dtc_health_check_http_info
+      namespace: ''
+    - description: Manage DTC ICMP Health Check.
+      name: dtc_health_check_icmp
+      namespace: ''
+    - description: Get DTC ICMP Health Check information.
+      name: dtc_health_check_icmp_info
+      namespace: ''
+    - description: Manage DTC SNMP Health Check.
+      name: dtc_health_check_snmp
+      namespace: ''
+    - description: Get DTC SNMP Health Check information.
+      name: dtc_health_check_snmp_info
+      namespace: ''
+    - description: Manage DTC TCP Health Check.
+      name: dtc_health_check_tcp
+      namespace: ''
+    - description: Get DTC TCP Health Check information.
+      name: dtc_health_check_tcp_info
+      namespace: ''
+    - description: Manage DTC LBDN.
+      name: dtc_lbdn
+      namespace: ''
+    - description: Get DTC LBDN information.
+      name: dtc_lbdn_info
+      namespace: ''
+    - description: Manage DTC Policy.
+      name: dtc_policy
+      namespace: ''
+    - description: Get DTC Policy information.
+      name: dtc_policy_info
+      namespace: ''
+    - description: Manage DTC Pool.
+      name: dtc_pool
+      namespace: ''
+    - description: Get DTC Pool information.
+      name: dtc_pool_info
+      namespace: ''
+    - description: Manage DTC Server.
+      name: dtc_server
+      namespace: ''
+    - description: Get DTC Server information.
+      name: dtc_server_info
+      namespace: ''
+    - description: Manage DTC SNMP User Security Model.
+      name: dtc_snmp_user_security_model
+      namespace: ''
+    - description: Get DTC SNMP User Security Model information.
+      name: dtc_snmp_user_security_model_info
+      namespace: ''
+    release_date: '2026-07-17'
