@@ -155,20 +155,20 @@ EXAMPLES = r"""
         address: "10.0.0.0"
         state: present
       register: dtc_server
-      
+
     - name: "Create a TCP Health Check (required as parent)"
       infoblox.universal_ddi.dtc_health_check_tcp:
         name: "example_tcp_health_check"
         port: 80
         state: present
       register: health_check_tcp
-    
+
     - name: "Create an ICMP Health Check (required as parent)"
       infoblox.universal_ddi.dtc_health_check_icmp:
         name: "example_icmp_health_check"
         state: present
       register: health_check_icmp
-    
+
     - name: "Create a DTC Pool"
       infoblox.universal_ddi.dtc_pool:
         name: "example_dtc_pool"
@@ -179,7 +179,7 @@ EXAMPLES = r"""
     - name: "Create a DTC Pool with Additional Fields"
       infoblox.universal_ddi.dtc_pool:
         name: "example_dtc_pool2"
-        method: "ratio" 
+        method: "ratio"
         comment: "Example DTC Pool"
         health_checks:
           - health_check_id: "{{ health_check_tcp.id }}"
