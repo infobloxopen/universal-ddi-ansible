@@ -1,0 +1,35 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+
+    - name: "Delete HTTP Health Check"
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete TCP Health Check"
+      infoblox.universal_ddi.dtc_health_check_tcp:
+        name: "{{ health_check_tcp_name }}"
+        port: 80
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete ICMP Health Check"
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete SNMP Health Check"
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_snmp_name }}"
+        version: v2c
+        community: "public"
+        state: absent
+      ignore_errors: true
