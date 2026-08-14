@@ -192,25 +192,26 @@
           - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
           - dtc_lbdn_info.objects[0].ttl == 300
 
-    - name: Create a DTC LBDN with precedence
-      infoblox.universal_ddi.dtc_lbdn:
-        name: "{{ dtc_lbdn_name }}"
-        view: "{{ _view.id }}"
-        precedence: 4700
-        state: present
-      register: dtc_lbdn
-    - name: Get DTC LBDN Information
-      infoblox.universal_ddi.dtc_lbdn_info:
-        filters:
-          name: "{{ dtc_lbdn_name }}"
-          view: "{{ _view.id }}"
-      register: dtc_lbdn_info
-    - assert:
-        that:
-          - dtc_lbdn_info is not failed
-          - dtc_lbdn_info.objects | length == 1
-          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
-          - dtc_lbdn_info.objects[0].precedence == 4700
+# Skipping this test due to DDIDNS-2509
+#    - name: Create a DTC LBDN with precedence
+#      infoblox.universal_ddi.dtc_lbdn:
+#        name: "{{ dtc_lbdn_name }}"
+#        view: "{{ _view.id }}"
+#        precedence: 4700
+#        state: present
+#      register: dtc_lbdn
+#    - name: Get DTC LBDN Information
+#      infoblox.universal_ddi.dtc_lbdn_info:
+#        filters:
+#          name: "{{ dtc_lbdn_name }}"
+#          view: "{{ _view.id }}"
+#      register: dtc_lbdn_info
+#    - assert:
+#        that:
+#          - dtc_lbdn_info is not failed
+#          - dtc_lbdn_info.objects | length == 1
+#          - dtc_lbdn_info.objects[0].id == dtc_lbdn.id
+#          - dtc_lbdn_info.objects[0].precedence == 4700
 
     - name: Create a DTC LBDN with DTC Policy association
       infoblox.universal_ddi.dtc_lbdn:
