@@ -11,6 +11,7 @@ Usage:
     python cleanup.py --delete --prefixes my-test  # override prefixes for ALL resource types
     python cleanup.py --delete --only "DNS Views"  # single resource type
 """
+
 # TODO : Add Support for Deletion of child federated block, reserved block, or delegation for Realm
 
 from __future__ import annotations
@@ -379,9 +380,7 @@ class DetailServicesCleaner(ResourceCleaner):
             for host in hosts
             if host.services
             for svc in host.services
-            if svc.service_type == "anycast"
-            and svc.service_name
-            and svc.service_name.startswith("test-")
+            if svc.service_type == "anycast" and svc.service_name and svc.service_name.startswith("test-")
         ]
 
         if not candidates:
