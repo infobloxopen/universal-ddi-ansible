@@ -237,6 +237,16 @@
               - ac_config_ipv6_info.objects[0].anycast_ipv6_address == "2001:db8::1"
 
   always:
+    - name: Clean up Anycast Host
+      ansible.builtin.include_role:
+        name: "setup_anycast_host"
+        tasks_from: cleanup.yml
+
+    - name: Clean up Anycast Service
+      ansible.builtin.include_role:
+        name: "setup_anycast_service"
+        tasks_from: cleanup.yml
+
     - name: Delete Anycast Configuration enabled with DNS service
       infoblox.universal_ddi.anycast_config:
         name: "{{ ac_config_name }}"
@@ -260,13 +270,3 @@
         service: "DFP"
         state: "absent"
       ignore_errors: true
-
-    - name: Clean up Anycast Host
-      ansible.builtin.include_role:
-       name: "setup_anycast_host"
-       tasks_from: cleanup.yml
-
-    - name: Clean up Anycast Service
-      ansible.builtin.include_role:
-       name: "setup_anycast_service"
-       tasks_from: cleanup.yml

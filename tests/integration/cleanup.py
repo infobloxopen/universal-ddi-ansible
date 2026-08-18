@@ -12,6 +12,8 @@ Usage:
     python cleanup.py --delete --only "DNS Views"  # single resource type
 """
 
+# TODO : Add Support for Deletion of child federated block, reserved block, or delegation for Realm
+
 from __future__ import annotations
 
 import argparse
@@ -22,7 +24,8 @@ from pathlib import Path
 from typing import Iterator
 
 import universal_ddi_client
-from dns_config import AclApi, AuthNsgApi, AuthZoneApi, ForwardNsgApi, ForwardZoneApi, ServerApi, ViewApi
+from anycast import OnPremAnycastManagerApi
+from dns_config import AclApi, AuthNsgApi, AuthZoneApi, ForwardNsgApi, ForwardZoneApi, LbdnApi, ServerApi, ViewApi
 from infra_mgmt import DetailApi, HostsApi, ServicesApi
 from ipam import IpSpaceApi, OptionGroupApi, OptionSpaceApi
 from ipam_federation import FederatedRealmApi
@@ -181,6 +184,19 @@ class ResourceCleaner(ABC):
 _ZONE_REFERENCED_ERROR = "'Zone' object is referenced by a 'View'"
 
 
+class DtcLbdnCleaner(ResourceCleaner):
+    """Cleans up DTC LBDNs."""
+
+    resource_name = "DTC LBDNs"
+    default_prefixes = ("test-dtc-lbdn",)
+
+    def list_all(self):
+        return _paginate(LbdnApi(self.client).list)
+
+    def delete(self, resource_id: str) -> None:
+        LbdnApi(self.client).delete(resource_id)
+
+
 class DnsViewCleaner(ResourceCleaner):
     """Cleans up DNS Views, including dependent zones when necessary."""
 
@@ -332,21 +348,20 @@ class IpSpaceCleaner(ResourceCleaner):
         IpSpaceApi(self.client).delete(resource_id)
 
 
-_SERVICE_HOST_NAMES = {"TF_TEST_HOST_01", "TF_TEST_HOST_02", "TF_TEST_HOST_03", "TF_TEST_HOST_04"}
-
-
 class DetailServicesCleaner(ResourceCleaner):
     """
-    Cleans up anycast services where:
-      - hosts[0].composite_status is not 'online'
-      - hosts[0].display_name is one of the known test hosts
-    Filtering is by service criteria, not by name prefix.
+    Cleans up anycast services on hosts whose display_name contains 'TF_TEST'.
+    Only deletes services whose name starts with 'test-'.
     """
 
     resource_name = "Detail Services"
 
     def list_all(self):
-        return _paginate(DetailApi(self.client).services_list, filter="service_type=='anycast'")
+        return _paginate(
+            DetailApi(self.client).hosts_list,
+            filter="display_name~'TF_TEST'",
+            order_by="display_name desc",
+        )
 
     def delete(self, resource_id: str) -> None:
         ServicesApi(self.client).delete(resource_id)
@@ -355,16 +370,18 @@ class DetailServicesCleaner(ResourceCleaner):
         print(f"\n{'[DRY RUN] ' if dry_run else ''}=== {self.resource_name} ===")
 
         try:
-            candidates = [
-                svc
-                for svc in self.list_all()
-                if svc.hosts
-                and svc.hosts[0].composite_status != "online"
-                and svc.hosts[0].display_name in _SERVICE_HOST_NAMES
-            ]
+            hosts = list(self.list_all())
         except ApiException as exc:
             print(f"  ERROR listing resources: {exc}")
             return 0, 1
+
+        candidates = [
+            svc
+            for host in hosts
+            if host.services
+            for svc in host.services
+            if svc.service_type == "anycast" and svc.service_name and svc.service_name.startswith("test-")
+        ]
 
         if not candidates:
             print("Nothing to clean up")
@@ -372,17 +389,13 @@ class DetailServicesCleaner(ResourceCleaner):
 
         deleted = errors = 0
         for svc in candidates:
-            label = (
-                f"{svc.name!r}  (id={svc.id}, "
-                f"host={svc.hosts[0].display_name}, "
-                f"status={svc.hosts[0].composite_status})"
-            )
+            label = f"{svc.service_name!r}  (id={svc.service_id})"
             if dry_run:
                 print(f"  Would delete: {label}")
                 deleted += 1
             else:
                 try:
-                    self.delete(svc.id)
+                    self.delete(svc.service_id)
                     print(f"  Deleted: {label}")
                     deleted += 1
                 except ApiException as exc:
@@ -408,20 +421,36 @@ class HostsCleaner(ResourceCleaner):
         HostsApi(self.client).delete(resource_id)
 
 
+class AnyCastConfigCleaner(ResourceCleaner):
+    """Cleans up Anycast Configurations."""
+
+    resource_name = "Anycast Configs"
+    default_prefixes = ("test_ac",)
+
+    def list_all(self):
+        resp = OnPremAnycastManagerApi(self.client).get_anycast_config_list()
+        return resp.results or []
+
+    def delete(self, resource_id: str) -> None:
+        OnPremAnycastManagerApi(self.client).delete_anycast_config(int(resource_id))
+
+
 # ---------------------------------------------------------------------------
 # Registry — order here controls deletion order.
 # Add new ResourceCleaner subclasses and insert at the right position.
 # ---------------------------------------------------------------------------
 
 CLEANERS: list[type[ResourceCleaner]] = [
+    AnyCastConfigCleaner,
     DetailServicesCleaner,
     HostsCleaner,
     AclCleaner,
-    AuthNsgCleaner,
-    ForwardNsgCleaner,
     AuthZoneCleaner,
     DnsServerCleaner,
+    DtcLbdnCleaner,
     DnsViewCleaner,
+    AuthNsgCleaner,
+    ForwardNsgCleaner,
     OptionSpaceCleaner,
     OptionGroupCleaner,
     FederatedRealmCleaner,
