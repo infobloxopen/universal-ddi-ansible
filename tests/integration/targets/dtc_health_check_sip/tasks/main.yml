@@ -1,0 +1,329 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        health_check_sip_name: "test-health_check_sip_name-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create SIP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: present
+      check_mode: true
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip is changed
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 0
+
+    - name: Create a SIP Health Check
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].id == health_check_sip.id
+
+    - name: Create SIP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: present
+      register: health_check_sip
+    - assert:
+        that:
+          - health_check_sip is not changed
+          - health_check_sip is not failed
+
+    - name: Delete SIP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: absent
+      check_mode: true
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip is changed
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+
+    - name: Delete SIP Health Check
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: absent
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip is changed
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 0
+
+    - name: Delete SIP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: absent
+      register: health_check_sip
+    - assert:
+        that:
+          - health_check_sip is not changed
+          - health_check_sip is not failed
+
+    - name: Create SIP Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        comment: "Test SIP Health Check"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].comment == "Test SIP Health Check"
+
+    - name: Create SIP Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].tags.location == tag_value
+
+    - name: Create SIP Health Check with disabled true
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        disabled: true
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].disabled == true
+
+    - name: Create SIP Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        interval: 20
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].interval == 20
+
+    - name: Create SIP Health Check with port
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        port: 5061
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].port == 5061
+
+    - name: Create SIP Health Check with retry_down
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        retry_down: 2
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].retry_down == 2
+
+    - name: Create SIP Health Check with retry_up
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        retry_up: 3
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].retry_up == 3
+
+    - name: Create SIP Health Check with timeout
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        timeout: 15
+        interval: 25
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].timeout == 15
+
+    - name: Create SIP Health Check with result_code
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        result_code: 200
+        result_mode: "CODE_IS"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].result_code == 200
+
+    - name: Create SIP Health Check with result_mode CODE_IS_NOT
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        result_code: 403
+        result_mode: "CODE_IS_NOT"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].result_mode == "CODE_IS_NOT"
+          - health_check_sip_info.objects[0].result_code == 403
+
+    - name: Create SIP Health Check with result_mode ANY
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        result_mode: "ANY"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].result_mode == "ANY"
+
+    - name: Create SIP Health Check with transport TCP
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        transport: "TCP"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].transport == "TCP"
+
+    - name: Create SIP Health Check with transport UDP
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        transport: "UDP"
+        state: present
+      register: health_check_sip
+    - name: Get SIP Health Check information by name
+      infoblox.universal_ddi.dtc_health_check_sip_info:
+        filters:
+          name: "{{ health_check_sip_name }}"
+      register: health_check_sip_info
+    - assert:
+        that:
+          - health_check_sip_info is not failed
+          - health_check_sip_info.objects | length == 1
+          - health_check_sip_info.objects[0].transport == "UDP"
+
+  always:
+    - name: Delete SIP Health Check
+      infoblox.universal_ddi.dtc_health_check_sip:
+        name: "{{ health_check_sip_name }}"
+        state: absent
+      ignore_errors: true
