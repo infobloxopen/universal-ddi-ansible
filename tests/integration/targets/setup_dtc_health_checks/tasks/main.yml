@@ -1,0 +1,41 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        health_check_http_name: "test-http-health-check-{{ 999999 | random | string }}"
+        health_check_tcp_name:  "test-tcp-health-check-{{ 999999 | random | string }}"
+        health_check_icmp_name: "test-icmp-health-check-{{ 999999 | random | string }}"
+        health_check_snmp_name: "test-snmp-health-check-{{ 999999 | random | string }}"
+
+
+    - name: Create an HTTP Health Check
+      infoblox.universal_ddi.dtc_health_check_http:
+        name: "{{ health_check_http_name }}"
+        port: 80
+        request: "POST / HTTP/1.1\r\nHost: localhost\r\n\r\n"
+        state: present
+      register: _health_check_http
+
+    - name: Create a TCP Health Check
+      infoblox.universal_ddi.dtc_health_check_tcp:
+        name: "{{ health_check_tcp_name }}"
+        port: 80
+        state: present
+      register: _health_check_tcp
+
+    - name: Create an ICMP Health Check
+      infoblox.universal_ddi.dtc_health_check_icmp:
+        name: "{{ health_check_icmp_name }}"
+        state: present
+      register: _health_check_icmp
+
+    - name: Create an SNMP Health Check
+      infoblox.universal_ddi.dtc_health_check_snmp:
+        name: "{{ health_check_snmp_name }}"
+        version: v2c
+        community: "public"
+        state: present
+      register: _health_check_snmp

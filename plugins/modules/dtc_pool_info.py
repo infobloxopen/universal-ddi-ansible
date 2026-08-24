@@ -60,21 +60,21 @@ EXAMPLES = r"""
     - name: Get information about the DTC Pool by ID
       infoblox.universal_ddi.dtc_pool_info:
         id: "{{ dtc_pool.id }}"
-    
+
     - name: Get information about the DTC Pool by filters (Name)
       infoblox.universal_ddi.dtc_pool_info:
         filters:
           name: "example_dtc_pool"
-    
+
     - name: Get information about the DTC Pool by raw filter query
       infoblox.universal_ddi.dtc_pool_info:
         filter_query: "name=='example_dtc_pool'"
-    
+
     - name: Get information about the DTC Pool by tag filters
       infoblox.universal_ddi.dtc_pool_info:
         tag_filters:
           location: "site-1"
-    
+
     - name: Get information about the DTC Pool by raw tag filter query
       infoblox.universal_ddi.dtc_pool_info:
         tag_filter_query: "location=='site-1'"
