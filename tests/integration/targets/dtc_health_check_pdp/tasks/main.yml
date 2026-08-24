@@ -1,0 +1,265 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+
+  block:
+    - ansible.builtin.set_fact:
+        health_check_pdp_name: "test-health-check-pdp-{{ 999999 | random | string }}"
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create PDP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: present
+      check_mode: true
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp is changed
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 0
+
+    - name: Create a PDP Health Check
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].name == health_check_pdp_name
+          - health_check_pdp_info.objects[0].port == 2123
+
+    - name: Create PDP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: present
+      register: health_check_pdp
+    - assert:
+        that:
+          - health_check_pdp is not changed
+          - health_check_pdp is not failed
+
+    - name: Delete PDP Health Check (check mode)
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: absent
+      check_mode: true
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp is changed
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+
+    - name: Delete PDP Health Check
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: absent
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp is changed
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 0
+
+    - name: Delete PDP Health Check (idempotent)
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        state: absent
+      register: health_check_pdp
+    - assert:
+        that:
+          - health_check_pdp is not changed
+          - health_check_pdp is not failed
+
+    - name: Create PDP Health Check with comment
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        comment: "Test Comment"
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].comment == "Test Comment"
+
+    - name: Create PDP Health Check with tags
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        tags:
+          test_tag: "{{ tag_value }}"
+        state: present
+      register: health_check_pdp_tags
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].tags.test_tag == tag_value
+
+    - name: Create PDP Health Check with disabled true
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        disabled: true
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].disabled == true
+
+    - name: Create PDP Health Check with interval
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        interval: 20
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].interval == 20
+
+    - name: Create PDP Health Check with retry_down
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        retry_down: 2
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].retry_down == 2
+
+    - name: Create PDP Health Check with retry_up
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        retry_up: 3
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].retry_up == 3
+
+    - name: Create PDP Health Check with timeout
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2123
+        timeout: 10
+        interval: 20
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].timeout == 10
+
+    - name: Create PDP Health Check with updated port
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2124
+        state: present
+      register: health_check_pdp
+    - name: Get PDP Health Check information
+      infoblox.universal_ddi.dtc_health_check_pdp_info:
+        filters:
+          name: "{{ health_check_pdp_name }}"
+      register: health_check_pdp_info
+    - assert:
+        that:
+          - health_check_pdp_info is not failed
+          - health_check_pdp_info.objects | length == 1
+          - health_check_pdp_info.objects[0].id == health_check_pdp.id
+          - health_check_pdp_info.objects[0].port == 2124
+
+  always:
+    - name: "Delete PDP Health Check"
+      infoblox.universal_ddi.dtc_health_check_pdp:
+        name: "{{ health_check_pdp_name }}"
+        port: 2124
+        state: absent
+      ignore_errors: true
