@@ -97,6 +97,11 @@ item:
                         - "Percent of total space delegated."
                     type: int
                     returned: Always
+                forward_looking_delegation:
+                    description:
+                        - "Percent of total space in forward looking delegation blocks."
+                    type: int
+                    returned: Always
                 overlapping:
                     description:
                         - "Percent of total space in overlapping blocks."
@@ -122,9 +127,24 @@ item:
                 - "The resource identifier."
             type: str
             returned: Always
+        metadata:
+            description:
+                - "The metadata for the federated realm in JSON format."
+            type: dict
+            returned: Always
         name:
             description:
                 - "The name of the federated realm. May contain 1 to 256 characters; can include UTF-8."
+            type: str
+            returned: Always
+        provider:
+            description:
+                - "The provider type this realm is associated with. One of C(NIOS_X), C(NIOS), C(AWS), C(AZURE), C(GCP), C(MSAD)."
+            type: str
+            returned: Always
+        region:
+            description:
+                - "The region where the realm is located."
             type: str
             returned: Always
         tags:
@@ -137,6 +157,25 @@ item:
                 - "Time when the object has been updated. Equals to I(created_at) if not updated after creation."
             type: str
             returned: Always
+        utilization:
+            description:
+                - "The percentage of Federated Realm utilization."
+            type: int
+            returned: Always
+        utilization_v6:
+            description:
+                - "The IPv6 utilization metrics for the federated realm."
+            type: dict
+            returned: Always
+            contains:
+                total:
+                    description: ""
+                    type: str
+                    returned: Always
+                used:
+                    description: ""
+                    type: str
+                    returned: Always
 """  # noqa: E501
 
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
@@ -276,7 +315,6 @@ def main():
     module = FederatedRealmModule(
         argument_spec=module_args,
         supports_check_mode=True,
-        required_if=[("state", "present", ["name"])],
     )
 
     module.run_command()

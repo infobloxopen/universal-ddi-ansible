@@ -134,6 +134,27 @@
           - federated_realm_info.objects[0].id == federated_realm.id
           - federated_realm_info.objects[0].tags.location == "site-1"
 
+    - name: Create a Federated Realm and verify computed/read-only fields are returned
+      infoblox.universal_ddi.ipam_federation_federated_realm:
+        name: "{{ federated_realm_name }}"
+        state: present
+      register: federated_realm
+    - name: Get Information about the Federated Realm
+      infoblox.universal_ddi.ipam_federation_federated_realm_info:
+        filters:
+          name: "{{ federated_realm_name }}"
+      register: federated_realm_info
+    - assert:
+        that:
+          - federated_realm_info.objects[0].allocation_v4.allocated is defined
+          - federated_realm_info.objects[0].allocation_v4.delegated is defined
+          - federated_realm_info.objects[0].allocation_v4.forward_looking_delegation is defined
+          - federated_realm_info.objects[0].allocation_v4.overlapping is defined
+          - federated_realm_info.objects[0].allocation_v4.reserved is defined
+          - federated_realm_info.objects[0].utilization is defined
+          - federated_realm_info.objects[0].provider == "NIOS_X"
+          - federated_realm_info.objects[0].region is defined
+
   always:
     # Cleanup if the test fails
     - name: "Delete the Federated Realm"
