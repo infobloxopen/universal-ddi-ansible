@@ -187,6 +187,55 @@
             - federated_block_info.objects[0].id == federated_block.id
             - federated_block_info.objects[0].name == federated_block_name
 
+    - name: Create a Federated Block with Network Compliance
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "79.79.0.0/16"
+        federated_realm: "{{ _federated_realm1.id }}"
+        network_compliance:
+          default_netmask_length: 24
+          minimum_netmask_length: 20
+          maximum_netmask_length: 28
+        state: present
+      register: federated_block_nc
+    - name: Get Information about the Federated Block
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
+        filters:
+          address: "79.79.0.0/16"
+      register: federated_block_nc_info
+    - assert:
+        that:
+          - federated_block_nc is changed
+          - federated_block_nc_info is not failed
+          - federated_block_nc_info.objects | length == 1
+          - federated_block_nc_info.objects[0].id == federated_block_nc.id
+          - federated_block_nc_info.objects[0].network_compliance.default_netmask_length == 24
+          - federated_block_nc_info.objects[0].network_compliance.minimum_netmask_length == 20
+          - federated_block_nc_info.objects[0].network_compliance.maximum_netmask_length == 28
+
+    - name: Create a Federated Block and verify computed/read-only fields are returned
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "80.80.0.0/16"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: federated_block_ro
+    - name: Get Information about the Federated Block
+      infoblox.universal_ddi.ipam_federation_federated_block_info:
+        filters:
+          address: "80.80.0.0/16"
+      register: federated_block_ro_info
+    - assert:
+        that:
+          - federated_block_ro_info.objects[0].allocation_v4.allocated is defined
+          - federated_block_ro_info.objects[0].allocation_v4.delegated is defined
+          - federated_block_ro_info.objects[0].allocation_v4.forward_looking_delegation is defined
+          - federated_block_ro_info.objects[0].allocation_v4.overlapping is defined
+          - federated_block_ro_info.objects[0].allocation_v4.reserved is defined
+          - federated_block_ro_info.objects[0].utilization is defined
+          - federated_block_ro_info.objects[0].network_compliant == true
+          - federated_block_ro_info.objects[0].protocol == "ip4"
+          - federated_block_ro_info.objects[0].region is defined
+          - federated_block_ro_info.objects[0].state is defined
+
     - name: Reassigning the Federated Block to a different Federated Realm
       infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/16"
@@ -252,6 +301,20 @@
 
   always:
     # Cleanup if the test fails
+    - name: "Delete the Federated Block with Network Compliance"
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "79.79.0.0/16"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete the read-only-fields verification Federated Block"
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "80.80.0.0/16"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      ignore_errors: true
+
     - name: "Delete the child federated block"
       infoblox.universal_ddi.ipam_federation_federated_block:
         address: "45.85.0.0/24"

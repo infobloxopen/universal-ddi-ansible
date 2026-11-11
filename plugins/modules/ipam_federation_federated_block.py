@@ -44,6 +44,10 @@ options:
         description:
             - "The description for the federated block. May contain 0 to 1024 characters. Can include UTF-8."
         type: str
+    federated_pool_id:
+        description:
+            - "The resource identifier."
+        type: str
     federated_realm:
         description:
             - "The resource identifier."
@@ -53,10 +57,23 @@ options:
         description:
             - "The name of the federated block. May contain 1 to 256 characters. Can include UTF-8."
         type: str
-    parent:
+    network_compliance:
         description:
-            - "The resource identifier."
-        type: str
+            - "The network compliance policy for child objects. This defines the minimum, default, and maximum netmask lengths that can be used when creating child blocks."
+        type: dict
+        suboptions:
+            default_netmask_length:
+                description:
+                    - "The default netmask length used when allocating child blocks or pools."
+                type: int
+            maximum_netmask_length:
+                description:
+                    - "The maximum netmask length for allocating child blocks or pools."
+                type: int
+            minimum_netmask_length:
+                description:
+                    - "The minimum netmask length for allocating child blocks or pools."
+                type: int
     tags:
         description:
             - "The tags for the federated block in JSON format."
@@ -87,6 +104,16 @@ EXAMPLES = r"""
         comment: "This is an example federated block"
         tags:
             location: "site-1"
+        state: present
+
+    - name: Create a Federated Block with a Network Compliance Policy
+      infoblox.universal_ddi.ipam_federation_federated_block:
+        address: "45.86.0.0/16"
+        federated_realm: "{{ federated_realm.id }}"
+        network_compliance:
+            default_netmask_length: 24
+            minimum_netmask_length: 20
+            maximum_netmask_length: 28
         state: present
 
     - name: Delete the Federated Block
@@ -129,6 +156,11 @@ item:
                         - "Percent of total space delegated."
                     type: int
                     returned: Always
+                forward_looking_delegation:
+                    description:
+                        - "Percent of total space in forward looking delegation blocks."
+                    type: int
+                    returned: Always
                 overlapping:
                     description:
                         - "Percent of total space in overlapping blocks."
@@ -154,6 +186,11 @@ item:
                 - "Time when the object has been created."
             type: str
             returned: Always
+        federated_pool_id:
+            description:
+                - "The resource identifier."
+            type: str
+            returned: Always
         federated_realm:
             description:
                 - "The resource identifier."
@@ -164,10 +201,41 @@ item:
                 - "The resource identifier."
             type: str
             returned: Always
+        metadata:
+            description:
+                - "The metadata for the federated block in JSON format."
+            type: dict
+            returned: Always
         name:
             description:
                 - "The name of the federated block. May contain 1 to 256 characters. Can include UTF-8."
             type: str
+            returned: Always
+        network_compliance:
+            description:
+                - "The network compliance policy for child objects. This defines the minimum, default, and maximum netmask lengths that can be used when creating child blocks."
+            type: dict
+            returned: Always
+            contains:
+                default_netmask_length:
+                    description:
+                        - "The default netmask length used when allocating child blocks or pools."
+                    type: int
+                    returned: Always
+                maximum_netmask_length:
+                    description:
+                        - "The maximum netmask length for allocating child blocks or pools."
+                    type: int
+                    returned: Always
+                minimum_netmask_length:
+                    description:
+                        - "The minimum netmask length for allocating child blocks or pools."
+                    type: int
+                    returned: Always
+        network_compliant:
+            description:
+                - "Indicates if this block is compliant with its parent's network compliance policy. When false, a trouble dot should be displayed in the UI to indicate non-compliance."
+            type: bool
             returned: Always
         parent:
             description:
@@ -177,6 +245,16 @@ item:
         protocol:
             description:
                 - "The type of protocol of federated block (I(ip4) or I(ip6))."
+            type: str
+            returned: Always
+        region:
+            description:
+                - "The region where the federated block is located."
+            type: str
+            returned: Always
+        state:
+            description:
+                - "The current state of the federated block (e.g., 'active', 'pending', etc.)."
             type: str
             returned: Always
         tags:
@@ -189,6 +267,27 @@ item:
                 - "Time when the object has been updated. Equals to I(created_at) if not updated after creation."
             type: str
             returned: Always
+        utilization:
+            description:
+                - "The percentage of Federated Block utilization."
+            type: int
+            returned: Always
+        utilization_v6:
+            description:
+                - "The IPv6 utilization metrics for the federated block."
+            type: dict
+            returned: Always
+            contains:
+                total:
+                    description:
+                        - "Total IPv6 addresses."
+                    type: str
+                    returned: Always
+                used:
+                    description:
+                        - "Used IPv6 addresses."
+                    type: str
+                    returned: Always
 """  # noqa: E501
 
 from ansible_collections.infoblox.universal_ddi.plugins.module_utils.modules import UniversalDDIAnsibleModule
@@ -281,7 +380,19 @@ class FederatedBlockModule(UniversalDDIAnsibleModule):
             return None
 
         update_body = self.payload
-        update_body = self.validate_readonly_on_update(self.existing, update_body, ["address"])
+        if self.payload_params.get("address") != getattr(self.existing, "address"):
+            self.fail_json(msg="address cannot be updated")
+
+        # NOTE: unlike other modules, we cannot route this through validate_readonly_on_update()'s
+        # setattr(update_body, field, None) trick here: FederatedBlock.address is a required,
+        # non-Optional StrictStr field in the SDK (with validate_assignment=True), so a normal
+        # attribute assignment of None raises a pydantic ValidationError. The API itself rejects
+        # a PATCH that includes `address` at all, even unchanged ("The 'Address' field is
+        # read-only and cannot be updated."), so it must be excluded from the request body, not
+        # just left at its current value. Bypass pydantic's assignment validation to null it out;
+        # FederatedBlock.to_dict() (used to serialize the request) does `model_dump(exclude_none=True)`,
+        # so a None value here is correctly dropped from the outgoing payload.
+        object.__setattr__(update_body, "address", None)
 
         resp = FederatedBlockApi(self.client).update(id=self.existing.id, body=update_body)
         return resp.result.model_dump(by_alias=True, exclude_none=True)
@@ -339,9 +450,17 @@ def main():
         address=dict(type="str", required=True),
         cidr=dict(type="int"),
         comment=dict(type="str"),
+        federated_pool_id=dict(type="str"),
         federated_realm=dict(type="str", required=True),
         name=dict(type="str"),
-        parent=dict(type="str"),
+        network_compliance=dict(
+            type="dict",
+            options=dict(
+                default_netmask_length=dict(type="int"),
+                maximum_netmask_length=dict(type="int"),
+                minimum_netmask_length=dict(type="int"),
+            ),
+        ),
         tags=dict(type="dict"),
     )
 
