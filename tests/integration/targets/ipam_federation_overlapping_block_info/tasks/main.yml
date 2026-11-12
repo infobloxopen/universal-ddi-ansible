@@ -1,0 +1,105 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    - ansible.builtin.set_fact:
+        tag_value: "site-{{ 999999 | random | string }}"
+
+    - name: Create an Overlapping Block
+      infoblox.universal_ddi.ipam_federation_overlapping_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        tags:
+          location: "{{ tag_value }}"
+        state: present
+      register: overlapping_block
+
+    - name: Get Information about the Overlapping Block by ID
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        id: "{{ overlapping_block.id }}"
+      register: overlapping_block_info
+    - assert:
+        that:
+          - overlapping_block_info.objects | length == 1
+          - overlapping_block_info.objects[0].id == overlapping_block.id
+
+    - name: Get Information about a nonexistent (but well-formed) Overlapping Block ID
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        id: "federation/overlapping_block/00000000-0000-0000-0000-000000000000"
+      register: overlapping_block_info_404
+    - assert:
+        that:
+          - overlapping_block_info_404 is not failed
+          - overlapping_block_info_404.objects | length == 0
+
+    - name: Get Information about a malformed Overlapping Block ID
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        id: "{{ overlapping_block.id }}-malformed"
+      register: overlapping_block_info_malformed
+      ignore_errors: true
+    - assert:
+        that:
+          - overlapping_block_info_malformed is failed
+
+    - name: Get Information about the Overlapping Block by filters
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: overlapping_block_info
+    - assert:
+        that:
+          - overlapping_block_info.objects | length == 1
+          - overlapping_block_info.objects[0].id == overlapping_block.id
+
+    - name: Get Information about the Overlapping Block by filter query
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        #filter_query: "address=='72.72.1.0/24' and federated_realm=='{{ _federated_realm1.id }}'" #[NORTHSTAR-12774] Due to this bug federated realm cannot be currently added as a filter
+        filter_query: "address=='72.72.1.0/24'"
+      register: overlapping_block_info
+    - assert:
+        that:
+          - overlapping_block_info.objects | length == 1
+          - overlapping_block_info.objects[0].id == overlapping_block.id
+
+    - name: Get Information about the Overlapping Block by tag filters
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        tag_filters:
+          location: "{{ tag_value }}"
+      register: overlapping_block_info
+    - assert:
+        that:
+          - overlapping_block_info.objects | length == 1
+          - overlapping_block_info.objects[0].id == overlapping_block.id
+          - overlapping_block_info.objects[0].tags.location == overlapping_block.object.tags.location
+
+    - name: Get Information about the Overlapping Block using tag filter query
+      infoblox.universal_ddi.ipam_federation_overlapping_block_info:
+        tag_filter_query: "location=='{{ tag_value }}'"
+      register: overlapping_block_info
+    - assert:
+        that:
+          - overlapping_block_info.objects | length == 1
+          - overlapping_block_info.objects[0].id == overlapping_block.id
+          - overlapping_block_info.objects[0].tags.location == overlapping_block.object.tags.location
+          - overlapping_block_info.objects[0].tags.location == tag_value
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete Overlapping Block"
+      infoblox.universal_ddi.ipam_federation_overlapping_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete the Federated Block"
+      ansible.builtin.include_role:
+        name: setup_federation_federated_block
+        tasks_from: cleanup.yml
+
+    - name: "Delete the Federated Realms"
+      ansible.builtin.include_role:
+        name: setup_federation_federated_realms
+        tasks_from: cleanup.yml

@@ -60,6 +60,8 @@ action_groups:
     - ipam_federation_federated_realm_info
     - ipam_federation_federated_block
     - ipam_federation_federated_block_info
+    - ipam_federation_overlapping_block
+    - ipam_federation_overlapping_block_info
 
   keys:
     - tsig_key
