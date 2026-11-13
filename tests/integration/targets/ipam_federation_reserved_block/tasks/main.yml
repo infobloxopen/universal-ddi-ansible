@@ -1,0 +1,376 @@
+---
+- module_defaults:
+    group/infoblox.universal_ddi.all:
+      portal_url: "{{ portal_url }}"
+      portal_key: "{{ portal_key }}"
+  block:
+    # Create a random Reserved Block name to avoid conflicts
+    - ansible.builtin.set_fact:
+        reserved_block_name: "test-reserved-block-{{ 999999 | random | string }}"
+
+    - name: Create a Reserved Block (check mode)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      check_mode: true
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 0
+
+    - name: Create a Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].address == "72.72.1.0"
+          - reserved_block_info.objects[0].cidr == 24
+          - reserved_block_info.objects[0].federated_realm == reserved_block.object.federated_realm
+          - reserved_block_info.objects[0].parent == _federated_block.id
+          - reserved_block_info.objects[0].protocol == "ip4"
+          - reserved_block_info.objects[0].network_compliant is defined
+          - reserved_block_info.objects[0].region is defined
+          - reserved_block_info.objects[0].created_at is defined
+          - reserved_block_info.objects[0].updated_at is defined
+
+    - name: Create a Reserved Block (idempotent)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: reserved_block
+    - assert:
+        that:
+          - reserved_block is not changed
+          - reserved_block is not failed
+
+    - name: Delete the Reserved Block (check mode)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      check_mode: true
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+
+    - name: Delete the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 0
+
+    - name: Delete the Reserved Block (idempotent)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      register: reserved_block
+    - assert:
+        that:
+          - reserved_block is not changed
+          - reserved_block is not failed
+
+    - name: Create a Reserved Block with separate CIDR
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].address == "72.72.1.0"
+          - reserved_block_info.objects[0].cidr == 24
+
+    - name: Create a Reserved Block with Comment
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        comment: "Test Reserved Block"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].comment == "Test Reserved Block"
+          - reserved_block_info.objects[0].federated_realm == reserved_block.object.federated_realm
+
+    - name: Update the Reserved Block's comment
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        comment: "Updated Test Reserved Block"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.1.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].comment == "Updated Test Reserved Block"
+
+    - name: Create a Reserved Block with Tags
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.2.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        tags:
+          location: "site-1"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.2.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].tags.location == "site-1"
+
+    - name: Create a Reserved Block with a Name
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.2.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        name: "{{ reserved_block_name }}"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.2.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].name == reserved_block_name
+
+    - name: Reassigning the Reserved Block to a different Federated Realm
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.2.0/24"
+        federated_realm: "{{ _federated_realm2.id }}"
+        state: present
+      register: reserved_block
+    - name: Get Information about the Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        filters:
+          address: "72.72.2.0/24"
+      register: reserved_block_info
+    - assert:
+        that:
+          - reserved_block is changed
+          - reserved_block_info is not failed
+          - reserved_block_info.objects | length == 1
+          - reserved_block_info.objects[0].id == reserved_block.id
+          - reserved_block_info.objects[0].federated_realm == reserved_block.object.federated_realm
+
+    - name: Attempt to update the immutable address field
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        id: "{{ reserved_block.id }}"
+        address: "72.72.3.0/24"
+        federated_realm: "{{ _federated_realm2.id }}"
+        state: present
+      register: reserved_block_bad_update
+      ignore_errors: true
+    - assert:
+        that:
+          - reserved_block_bad_update is failed
+          - "'cannot be updated' in reserved_block_bad_update.msg"
+
+    - name: Omitting federated_realm should fail argument validation
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.3.0/24"
+        state: present
+      register: reserved_block_no_realm
+      ignore_errors: true
+    - assert:
+        that:
+          - reserved_block_no_realm is failed
+          - "'federated_realm' in reserved_block_no_realm.msg"
+
+    - name: Specifying both address and next_available_id should fail argument validation
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.3.0/24"
+        next_available_id: "{{ _federated_block.id }}"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: reserved_block_both_address_and_next_available
+      ignore_errors: true
+    - assert:
+        that:
+          - reserved_block_both_address_and_next_available is failed
+          - "'mutually exclusive' in reserved_block_both_address_and_next_available.msg"
+
+    - name: Omitting both address and next_available_id should fail argument validation
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: present
+      register: reserved_block_no_address_or_next_available
+      ignore_errors: true
+    - assert:
+        that:
+          - reserved_block_no_address_or_next_available is failed
+          - "'required' in reserved_block_no_address_or_next_available.msg"
+
+    - name: Create the next available Reserved Block under the Federated Block (check mode)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        next_available_id: "{{ _federated_block.id }}"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        comment: "Next available reserved block"
+        state: present
+      check_mode: true
+      register: next_available_reserved_block_check_mode
+    - assert:
+        that:
+          - next_available_reserved_block_check_mode is changed
+          - next_available_reserved_block_check_mode is not failed
+
+    - name: Create the next available Reserved Block under the Federated Block
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        next_available_id: "{{ _federated_block.id }}"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        comment: "Next available reserved block"
+        state: present
+      register: next_available_reserved_block
+    - name: Get Information about the next available Reserved Block
+      infoblox.universal_ddi.ipam_federation_reserved_block_info:
+        id: "{{ next_available_reserved_block.id }}"
+      register: next_available_reserved_block_info
+    - assert:
+        that:
+          - next_available_reserved_block is changed
+          - next_available_reserved_block_info is not failed
+          - next_available_reserved_block_info.objects | length == 1
+          - next_available_reserved_block_info.objects[0].cidr == 24
+          - next_available_reserved_block_info.objects[0].parent == _federated_block.id
+          - next_available_reserved_block_info.objects[0].comment == "Next available reserved block"
+
+    - name: Manage the next available Reserved Block by ID (idempotent)
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        id: "{{ next_available_reserved_block.id }}"
+        # next_available_id/cidr are ignored once id locates the existing object (find() looks
+        # up by id first), but required_one_of/required_by in module_args still mandate them.
+        next_available_id: "{{ _federated_block.id }}"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        comment: "Next available reserved block"
+        state: present
+      register: next_available_reserved_block_recheck
+    - assert:
+        that:
+          - next_available_reserved_block_recheck is not changed
+          - next_available_reserved_block_recheck is not failed
+
+    - name: Delete the next available Reserved Block by ID
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        id: "{{ next_available_reserved_block.id }}"
+        next_available_id: "{{ _federated_block.id }}"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      register: next_available_reserved_block
+
+  always:
+    # Cleanup if the test fails
+    - name: "Delete the Reserved Block"
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.1.0/24"
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete the Reserved Block"
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        address: "72.72.2.0/24"
+        federated_realm: "{{ _federated_realm2.id }}"
+        state: absent
+      ignore_errors: true
+
+    - name: "Delete the next available Reserved Block"
+      infoblox.universal_ddi.ipam_federation_reserved_block:
+        id: "{{ next_available_reserved_block.id }}"
+        next_available_id: "{{ _federated_block.id }}"
+        cidr: 24
+        federated_realm: "{{ _federated_realm1.id }}"
+        state: absent
+      ignore_errors: true
+      when: next_available_reserved_block is defined
+
+    - name: "Delete the Federated Block"
+      ansible.builtin.include_role:
+        name: setup_federation_federated_block
+        tasks_from: cleanup.yml
+
+    - name: "Delete the Federated Realms"
+      ansible.builtin.include_role:
+        name: setup_federation_federated_realms
+        tasks_from: cleanup.yml
